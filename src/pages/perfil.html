@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/png" href="/ags-front/src/img/logo.png">
+
+        <link rel="stylesheet" href="../css/perfil.css">
+      <title>AGROSYSTEM - Mi Perfil</title>
+      <link rel="stylesheet" href="/ags-front/src/css/perfil.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <img src="/ags-front/src/img/logo.png" alt="Logo Agrosystem">
+      <span class="nombre">AGROSYSTEM</span>
+    </div>
+    <div class="header-buttons">
+      <button onclick="volverHome()" class="btn-volver">
+        <i class="fas fa-arrow-left"></i> Volver al Inicio
+      </button>
+      <button onclick="cerrarSesion()" class="btn-logout">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
+    </div>
+  </header>
+
+  <div class="perfil-container">
+    <div class="perfil-card">
+      <div class="perfil-header">
+        <div class="avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <h2 id="nombreUsuario">Cargando...</h2>
+        <p class="rol-badge" id="rolUsuario">Usuario</p>
+      </div>
+
+      <div class="perfil-info">
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="info-content">
+            <label>Nombre Completo</label>
+            <p id="nombreCompleto">-</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-id-badge"></i>
+          </div>
+          <div class="info-content">
+            <label>Usuario</label>
+            <p id="usuario">-</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-briefcase"></i>
+          </div>
+          <div class="info-content">
+            <label>Cargo</label>
+            <p id="cargo">-</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-phone"></i>
+          </div>
+          <div class="info-content">
+            <label>Teléfono</label>
+            <p id="telefono">-</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-calendar"></i>
+          </div>
+          <div class="info-content">
+            <label>Fecha de Registro</label>
+            <p id="fechaRegistro">-</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="info-content">
+            <label>Último Acceso</label>
+            <p id="ultimoAcceso">-</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="alerta-overlay" class="alerta-overlay">
+    <div class="alerta-container">
+      <div id="alerta-header" class="alerta-header">
+        <i id="alerta-icon" class="alerta-icon fas"></i>
+        <h3 id="alerta-title" class="alerta-title">Título de la Alerta</h3>
+      </div>
+      <div class="alerta-body">
+        <p id="alerta-message" class="alerta-message">Mensaje de la alerta.</p>
+      </div>
+      <div id="alerta-footer" class="alerta-footer">
+        <button id="btn-alerta-cancel" class="btn-alerta-cancel" style="display: none;">Cancelar</button>
+        <button id="btn-alerta-ok" class="btn-alerta-ok" style="display: none;">Aceptar</button>
+      </div>
+    </div>
+  </div>
+  <script src="/ags-front/src/js/perfil.js"></script>
+  <script src="../js/perfil.js" defer></script>
+
+</body>
+</html>
+

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/png" href="/ags-front/src/img/logo.png">
+    <title>AgroSystem - Registro</title>
+    <link rel="stylesheet" href="../css/registrarse.css">
+    <link rel="stylesheet" href="/ags-front/src/css/registrarse.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="registro-container">
+            <div class="registro-header">
+                <h1 class="logo-title">AGROSYSTEM</h1>
+                
+            </div>
+
+            <form id="formRegistro" class="registro-form">
+                <div class="input-group">
+                    <select id="cargo" name="cargo" class="input-field" required>
+                        <option value="">Selecciona tu cargo</option>
+                        <option value="veterinario">Veterinario</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-user icon" aria-hidden="true"></i>
+                    <input 
+                        type="text" 
+                        id="nombreCompleto" 
+                        name="nombreCompleto" 
+                        placeholder="ingrese su nombre " 
+                        class="input-field input-with-icon"
+                        required
+                    >
+                    </div>
+
+                <div class="input-group">
+                    <i class="fas fa-user icon" aria-hidden="true"></i>
+                    <input 
+                        type="text" 
+                        id="usuario" 
+                        name="usuario" 
+                        placeholder="Ingrese un usuario" 
+                        class="input-field input-with-icon"
+                        required
+                    >
+                    </div>
+
+                <div class="input-group">
+                    <i class="fas fa-envelope icon" aria-hidden="true"></i>
+                    <input 
+                        type="email" 
+                        id="correo" 
+                        name="correo" 
+                        placeholder="Correo electrónico" 
+                        class="input-field input-with-icon"
+                        required
+                    >
+                    </div>
+
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        id="contrasena" 
+                        name="contrasena" 
+                        placeholder="Contraseña" 
+                        class="input-field input-with-icon"
+                        required
+                    >
+                        <i class="fas fa-lock icon" aria-hidden="true"></i>
+                        <i class="fas fa-eye toggle-eye" id="togglePassword" aria-hidden="true"></i>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-phone icon" aria-hidden="true"></i>
+                    <input 
+                        type="tel" 
+                        id="telefono" 
+                        name="telefono" 
+                        placeholder="Ingrese su num de telefono" 
+                        class="input-field input-with-icon"
+                        required
+                    >
+                    </div>
+
+                
+                <button type="submit" class="registro-button">Registrarse</button>
+
+                <p class="login-text">
+                    ¿Ya tienes una cuenta? 
+                    <a href="/" class="login-link">Iniciar sesión</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script src="/ags-front/src/js/registrarse.js"></script>
+    <script src="../js/registrarse.js" defer></script>
+</body>
+</html>

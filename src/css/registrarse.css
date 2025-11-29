@@ -1,0 +1,221 @@
+:root {
+    --color-fondo-panel: rgba(103, 64, 24, 0.72);
+    --color-input: rgb(183, 130, 78, 0.45 );
+    --color-sombra: rgba(0, 0, 0, 0.4);
+    --color-texto-claro: #ffffff;
+    --color-boton: #6bb16e;
+    --color-boton-hover: #78c27c;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url('../img/Menu.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.main-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+.registro-container {
+    background-color: var(--color-fondo-panel);
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px var(--color-sombra);
+    width: 100%;
+    max-width: 500px;
+    color: var(--color-texto-claro);
+}
+
+.registro-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo-title {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    font-size: 1.2em;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.registro-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group {
+    position: relative;
+    width: 100%;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+.icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+    font-size: 1.2em;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.toggle-eye {
+    position: absolute;
+    right: 12px;
+    bottom: 14px;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.toggle-eye:hover {
+    opacity: 1;
+}
+
+.input-field {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    background-color: var(--color-input);
+    color: var(--color-texto-claro);
+    border-radius: 5px;
+    font-size: 1em;
+    box-shadow: 2px 2px 5px var(--color-sombra);
+    box-sizing: border-box;
+    transition: background-color 0.3s;
+}
+
+.input-with-icon {
+    padding-left: 40px;
+}
+
+.input-field::placeholder {
+    color: var(--color-texto-claro);
+    opacity: 0.7;
+}
+
+.input-field:focus {
+    outline: none;
+    background-color: rgba(156, 132, 112, 0.9);
+}
+
+select.input-field {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    padding-right: 40px;
+}
+
+select.input-field option {
+    background-color: var(--color-input);
+    color: var(--color-texto-claro);
+}
+
+/* Botón */
+.registro-button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 10px;
+    border: none;
+    background-color: var(--color-boton);
+    color: var(--color-texto-claro);
+    border-radius: 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 2px 2px 5px var(--color-sombra);
+}
+
+.registro-button:hover {
+    background-color: var(--color-boton-hover);
+}
+
+.registro-button:active {
+    transform: scale(0.98);
+}
+
+/* Texto de login */
+.login-text {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.login-link {
+    color: #9cdb8d;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
+
+/* Mensaje de éxito/error */
+.mensaje {
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 500;
+    display: none;
+}
+
+.mensaje.exito {
+    background-color: rgba(107, 177, 110, 0.3);
+    border: 1px solid var(--color-boton);
+    color: var(--color-texto-claro);
+}
+
+.mensaje.error {
+    background-color: rgba(220, 53, 69, 0.3);
+    border: 1px solid #dc3545;
+    color: var(--color-texto-claro);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .registro-container {
+        padding: 30px 20px;
+    }
+
+    .logo-title {
+        font-size: 2em;
+    }
+
+    .subtitle {
+        font-size: 1em;
+    }
+
+    .input-field {
+        font-size: 0.95em;
+    }
+}

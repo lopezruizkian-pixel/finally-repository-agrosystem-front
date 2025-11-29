@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/ags-front/src/img/logo.png">
+<title>Enfermedades - Agrosystem</title>
+<link rel="stylesheet" href="/ags-front/src/css/enfermedad.css">
+<link rel="stylesheet" href="../css/enfermedad.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="stylesheet" href="../css/modales.css">
+</head>
+<body>
+<header class="header">
+<div class="logo">
+	<img src="/ags-front/src/img/logo.png" alt="Logo Agrosystem">
+<span class="nombre">AGROSYSTEM</span>
+</div>
+<div class="header-buttons">
+<button onclick="irHome()" class="btn-volver">
+<i class="fas fa-arrow-left"></i> Volver al inicio 
+</button>
+</div>
+</header>
+
+<div class="contenedor-principal">
+<aside class="sidebar">
+<button class="menu-btn"><i class="fas fa-cow"></i> Animal</button>
+<button class="menu-btn"><i class="fas fa-pills"></i> Medicamento</button>
+<button class="menu-btn"><i class="fas fa-file-alt"></i> Tarjeta de salud</button>
+<button class="menu-btn"><i class="fas fa-notes-medical"></i> Reporte médico</button>
+<button class="menu-btn"><i class="fas fa-syringe"></i> Tratamiento</button>
+<button class="menu-btn activo"><i class="fas fa-shield-virus"></i> Enfermedad</button>
+</aside>
+
+<main class="contenido">
+<div class="buscador-agregar">
+<div class="buscador">
+<input type="text" placeholder="Buscar">
+<button>🔍</button>
+</div>
+<button class="btn-agregar">Agregar Enfermedad ➕</button>
+</div>
+<div class="tabla-animales"></div>
+</main>
+</div>
+
+<!-- Modal Agregar/Editar Enfermedad -->
+<div id="modalAgregarEnfermedad" class="modal">
+<div class="modal-contenido">
+<h2>Agregar Enfermedad</h2>
+<label>Nombre:</label>
+<input type="text" id="nombre">
+
+<label>Tipo:</label>
+<input type="text" id="tipo">
+
+<label>Síntomas:</label>
+<input type="text" id="sintomas">
+
+<label>Duración Estimada:</label>
+<input type="text" id="duracion">
+
+<label>Tratamientos Recomendados:</label>
+<input type="text" id="tratamientos">
+
+<label>Nivel de Riesgo:</label>
+<select id="riesgo">
+<option value="Leve">Leve</option>
+<option value="Moderado">Moderado</option>
+<option value="Grave">Grave</option>
+<option value="Crítico">Crítico</option>
+</select>
+
+<label>Modo de Transmisión:</label>
+<input type="text" id="transmision">
+
+<!-- Campos de análisis/observaciones eliminados porque no forman parte del payload de la API -->
+
+<div class="botones">
+<button id="btnGuardarEnfermedad">Guardar</button>
+<button id="btnCerrarModal">Cancelar</button>
+</div>
+</div>
+</div>
+
+<!-- Modal Visualizar Enfermedad -->
+<div id="modalVisualizarEnfermedad" class="modal">
+<div class="modal-contenido visualizar">
+<h2>Información del Reporte Médico</h2>
+<div id="contenidoEnfermedad"></div>
+<div class="botones">
+<button id="btnCerrarVisualizar">Cerrar</button>
+</div>
+</div>
+</div>
+
+<script src="/ags-front/src/js/enfermedad.js"></script>
+<script src="/ags-front/src/js/navegacion.js"></script>
+<script src="../js/enfermedad.js" defer></script>
+<script src="../js/navegacion.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+:root {
+    --color-primario: #6bb16e;
+    --color-secundario: #78c27c;
+    --color-fondo: #f5f5f5;
+    --color-texto: #333;
+    --color-texto-claro: #666;
+    --color-borde: #e0e0e0;
+    --color-sombra: rgba(0, 0, 0, 0.1);
+    --color-logout: #d9534f;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--color-fondo);
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: #6bb16e;
+    box-shadow: 0 2px 10px var(--color-sombra);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo img {
+    height: 50px;
+    width: auto;
+}
+
+.logo .nombre {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--color-texto);
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-volver,
+.btn-logout {
+    
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-volver {
+    background-color: var(--color-primario);
+    color: white;
+}
+
+.btn-volver:hover {
+    background-color: var(--color-secundario);
+}
+
+.btn-logout {
+    background-color: var(--color-logout);
+    color: white;
+}
+
+.btn-logout:hover {
+    background-color: #c9302c;
+}
+
+/* Container del perfil */
+.perfil-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    min-height: calc(100vh - 90px);
+}
+
+/* Card del perfil */
+.perfil-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px var(--color-sombra);
+    max-width: 700px;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Header del perfil */
+.perfil-header {
+    background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.avatar i {
+    font-size: 80px;
+    color: var(--color-primario);
+}
+
+.perfil-header h2 {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.rol-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* Información del perfil */
+.perfil-info {
+    padding: 30px 40px;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-icon {
+    width: 45px;
+    height: 45px;
+    background: var(--color-fondo);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.info-icon i {
+    font-size: 20px;
+    color: var(--color-primario);
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-content label {
+    display: block;
+    font-size: 0.85em;
+    color: var(--color-texto-claro);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.info-content p {
+    font-size: 1.1em;
+    color: var(--color-texto);
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .header-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .perfil-info {
+        padding: 20px;
+    }
+
+    .info-item {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .perfil-header {
+        padding: 30px 20px;
+    }
+
+    .perfil-header h2 {
+        font-size: 1.5em;
+    }
+}
+
+/* =======================================
+ * Sistema de alertas personalizadas (INICIO)
+ * ======================================= */
+ .alerta-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+    }
+    
+    .alerta-overlay.active {
+    display: flex;
+    }
+    
+    .alerta-container {
+     background: white;
+     border-radius: 12px;
+     max-width: 400px;
+     width: 90%;
+     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+     animation: alertaSlideIn 0.3s ease;
+    }
+    
+    @keyframes alertaSlideIn {
+     from {
+    transform: scale(0.8);
+    opacity: 0;
+     }
+    to {
+    transform: scale(1);
+    opacity: 1;
+    }
+    }
+    
+    .alerta-header {
+     padding: 20px;
+     border-radius: 12px 12px 0 0;
+     display: flex;
+     align-items: center;
+     gap: 15px;
+     color: white;
+    }
+    
+    .alerta-header.error {
+    background-color: #dc3545; /* Rojo */
+    }
+    
+    .alerta-header.success {
+     background-color: #28a745; /* Verde */
+    }
+    
+    .alerta-header.warning {
+     background-color: #ffc107; /* Amarillo */
+     color: #333;
+    }
+    
+    .alerta-header.info {
+     background-color: #17a2b8; /* Azul */
+    }
+    
+    .alerta-icon {
+     font-size: 2rem;
+    }
+    
+    .alerta-title {
+     margin: 0;
+     font-size: 1.2rem;
+     font-weight: bold;
+    }
+    
+    .alerta-body {
+     padding: 25px;
+     text-align: center;
+    }
+    
+    .alerta-message {
+     font-size: 1rem;
+     color: #333;
+     line-height: 1.6;
+    }
+    
+    .alerta-footer {
+     padding: 15px 20px;
+     display: flex;
+     justify-content: center; /* Alineación original para el botón 'Aceptar' simple */
+     border-top: 1px solid #e0e0e0;
+    }
+    
+    /* Estilo para el botón 'Aceptar' simple (VERDE) */
+    .btn-alerta-ok {
+     padding: 10px 30px;
+     border: none;
+     border-radius: 8px;
+     cursor: pointer;
+     font-weight: bold;
+     font-size: 0.95rem;
+     background-color: rgba(114, 158, 100, 1);
+     color: white;
+     transition: all 0.3s ease;
+    }
+    
+    .btn-alerta-ok:hover {
+     background-color: rgba(94, 138, 80, 1);
+     transform: translateY(-2px);
+    }
+    
+    /* =======================================
+     * ESTILOS AÑADIDOS PARA CONFIRMACIÓN DOBLE BOTÓN (COMO LA IMAGEN)
+     * ======================================= */
+    
+    .alerta-footer.confirmacion {
+        justify-content: flex-end; /* Alinea los botones a la derecha */
+        gap: 15px; /* Espacio entre los botones */
+    }
+    
+    /* Estilo para el botón de Cancelar (Gris) */
+    .btn-alerta-cancel {
+        padding: 10px 30px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.95rem;
+        background-color: white;
+        color: #333;
+        transition: all 0.3s ease;
+    }
+    .btn-alerta-cancel:hover {
+        background-color: #f0f0f0;
+    }
+    
+    /* Estilo para el botón de Confirmar (Rojo) */
+    .btn-alerta-confirmacion {
+        padding: 10px 30px; 
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.95rem;
+        
+        background-color: #dc3545; /* Rojo para la acción principal */
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-alerta-confirmacion:hover {
+        background-color: #c82333; 
+        transform: translateY(-2px);
+    }
+    /* =======================================
+     * Sistema de alertas personalizadas (FIN)
+     * ======================================= */

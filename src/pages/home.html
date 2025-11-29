@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="/ags-front/src/img/logo.png">
+  <title>AGROSYSTEM - Home</title>
+  <link rel="stylesheet" href="../css/estilos.css">
+  <link rel="stylesheet" href="/ags-front/src/css/estilos.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <img src="/ags-front/src/img/logo.png" alt="Logo Agrosystem">
+      <span class="nombre">AGROSYSTEM</span>
+    </div>
+    <span class="usuario-bienvenida" id="bienvenidaUsuario">Bienvenido, Juan!</span>
+    <button onclick="irPerfil()" class="btn-perfil">
+      <i class="fas fa-user"></i> Mi Perfil
+    </button>
+  </header>
+
+  <div class="dashboard">
+    <div class="contenedor-principal">
+      <aside class="sidebar">
+        <button class="menu-btn"><i class="fas fa-cow"></i> Animal</button>
+        <button class="menu-btn"><i class="fas fa-pills"></i> Medicamento</button>
+        <button class="menu-btn"><i class="fas fa-file-alt"></i> Tarjeta de salud</button>
+        <button class="menu-btn"><i class="fas fa-notes-medical"></i> Reporte médico</button>
+        <button class="menu-btn"><i class="fas fa-syringe"></i> Tratamiento</button>
+        <button class="menu-btn"><i class="fas fa-shield-virus"></i> Enfermedad</button>
+      </aside>
+
+      <main class="contenido">
+        <h2>TOTAL DE ANIMALES</h2>
+
+        <div class="form-agregar">
+          <!-- Filtros: Sexo y Rebaño -->
+          <label for="filtroSexo">Filtrar por sexo:</label>
+          <select id="filtroSexo">
+            <option value="Todos">Todos</option>
+            <option value="Macho">Macho</option>
+            <option value="Hembra">Hembra</option>
+          </select>
+
+          <label for="filtroRebano">Filtrar por rebaño:</label>
+          <select id="filtroRebano">
+            <option value="Todos">Todos</option>
+            <option value="Vaca">Vaca</option>
+            <option value="Toro">Toro</option>
+            <option value="Bcerra">Becerra</option>
+            <option value="Becerro">Becerro</option>
+          </select>
+
+          <button id="btnIrEstadisticas"><i class="fas fa-arrow-right"></i> Ver Estadísticas</button>
+        </div>
+
+        <div class="estadisticas-home">
+          <!-- Contenedor para tarjetas mejoradas -->
+          <div id="listaVacas" class="cards-container"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/ags-front/src/js/home.js" defer></script>
+  <script src="/ags-front/src/js/navegacion.js" defer></script>
+  <script src="../js/navegacion.js" defer></script>
+  <script src="../js/home.js" defer></script>
+</body>
+</html>

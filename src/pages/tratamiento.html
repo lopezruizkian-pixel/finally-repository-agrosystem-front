@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../css/tratamiento.css">
+  <link rel="icon" type="image/png" href="/ags-front/src/img/favicon.png">
+  <title>Tratamiento - Agrosystem</title>
+  <link rel="stylesheet" href="/ags-front/src/css/tratamiento.css">
+  <link rel="stylesheet" href="../css/tratamiento.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/modales.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <img src="/ags-front/src/img/logo.png" alt="Logo Agrosystem">
+      <span class="nombre">AGROSYSTEM</span>
+    </div>
+    <div class="header-buttons">
+      <button onclick="irHome()" class="btn-volver">
+        <i class="fas fa-arrow-left"></i> Volver al Inicio
+      </button>
+    </div>
+  </header>
+
+  <div class="contenedor-principal">
+    <aside class="sidebar">
+      <button class="menu-btn"><i class="fas fa-cow"></i> Animal</button>
+      <button class="menu-btn"><i class="fas fa-pills"></i> Medicamento</button>
+      <button class="menu-btn"><i class="fas fa-file-alt"></i> Tarjeta de salud</button>
+      <button class="menu-btn"><i class="fas fa-notes-medical"></i> Reporte médico</button>
+      <button class="menu-btn activo"><i class="fas fa-syringe"></i> Tratamiento</button>
+      <button class="menu-btn"><i class="fas fa-shield-virus"></i> Enfermedad</button>
+    </aside>
+
+    <main class="contenido">
+      <div class="buscador-agregar">
+        <div class="buscador">
+          <input type="text" placeholder="Buscar">
+          <button>🔍</button>
+        </div>
+        <button class="btn-agregar">Agregar Tratamiento ➕</button>
+      </div>
+
+      <div class="tabla-animales"></div>
+    </main>
+  </div>
+
+  <div id="modalVisualizarTratamiento" class="modal">
+    <div class="modal-contenido" style="width: 500px;">
+      <h2>Detalle del Tratamiento</h2>
+      <div id="contenidoTratamiento"></div>
+      <div class="botones">
+        <button id="btnCerrarVisualizar">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalAgregarTratamiento" class="modal">
+    <div class="modal-contenido">
+      <h2>Agregar Tratamiento</h2>
+
+      <label>Animal (Num. Arete):</label>
+      <!-- Permitir seleccionar un animal o escribir directamente su número de arete -->
+      <input type="text" id="numArete" placeholder="O escriba número de arete..." style="margin-bottom:8px;">
+      <select id="selectAnimalTratamiento">
+        <option value="">-- Seleccione un animal --</option>
+      </select>
+
+      <label>Reporte asociado (opcional):</label>
+      <select id="selectReporteTratamiento">
+        <option value="">-- Seleccione un reporte (opcional) --</option>
+      </select>
+
+      <label>Nombre del Tratamiento:</label>
+      <input type="text" id="nombreTratamiento" placeholder="Nombre descriptivo">
+
+      <label>Fecha de Inicio:</label>
+      <input type="date" id="fechaInicio">
+
+      <label>Fecha de Fin:</label>
+      <input type="date" id="fechaFin">
+
+      <label>Enfermedad/Condición:</label>
+      <input type="text" id="enfermedad" placeholder="Diagnóstico o condición">
+
+      <label>Medicamento (seleccione):</label>
+      <select id="selectMedicamentoTratamiento">
+        <option value="">-- Seleccione un medicamento --</option>
+      </select>
+
+      <label>Medicamentos (nota adicional):</label>
+      <textarea id="medicamentos" rows="2" placeholder="Opcional: notas sobre medicamentos/dosis"></textarea>
+
+      <label>Dosis:</label>
+      <input type="text" id="dosis" placeholder="Ej: 5ml cada 12 horas">
+
+      <label>Vía de Administración:</label>
+      <select id="via">
+        <option value="Oral">Oral</option>
+        <option value="Intramuscular">Intramuscular</option>
+        <option value="Intravenosa">Intravenosa</option>
+        <option value="Subcutánea">Subcutánea</option>
+        <option value="Tópica">Tópica</option>
+      </select>
+
+      <label>Frecuencia:</label>
+      <input type="text" id="frecuencia" placeholder="Ej: Cada 8 horas, 2 veces al día">
+
+      <label>Duración:</label>
+      <input type="text" id="duracion" placeholder="Ej: 7 días, 2 semanas">
+
+      <label>Veterinario Responsable:</label>
+      <input type="text" id="veterinario" placeholder="Nombre del veterinario">
+
+      <label>Estado:</label>
+      <select id="estado">
+        <option value="En curso">En curso</option>
+        <option value="Completado">Completado</option>
+        <option value="Suspendido">Suspendido</option>
+        <option value="En pausa">En pausa</option>
+      </select>
+
+      <label>Notas/Observaciones:</label>
+      <textarea id="observaciones" rows="3" placeholder="Indicaciones especiales, reacciones observadas, etc."></textarea>
+
+      <div class="botones">
+        <button id="btnGuardarTratamiento">Guardar</button>
+        <button id="btnCerrarModal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/navegacion.js" defer></script>
+  <script src="../js/tratamiento.js" defer></script>
+
+<script>
+
+</script>
+
+</body>
+</html>
