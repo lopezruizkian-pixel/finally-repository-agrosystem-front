@@ -98,6 +98,8 @@ const tabla = document.querySelector(".tabla-animales");
 
 // selects y elementos nuevos
 const selectAnimalReporte = document.getElementById('selectAnimalReporte');
+const selectTratamiento = document.getElementById('tratamiento');
+const selectMedicamentos = document.getElementById('medicamentos');
 
 // helper headers
 async function getAuthHeaders() {
@@ -154,6 +156,56 @@ async function fetchAnimalesForSelect(){
                 o.value = id;
                 o.textContent = `${name} (arete ${a.numArete || ''})`;
                 selectAnimalReporte.appendChild(o);
+            });
+        }
+    }catch(err){ console.error(err); }
+}
+
+// ===================================
+// FETCH TRATAMIENTOS PARA SELECT
+// ===================================
+async function fetchTratamientosForSelect(){
+    try{
+        console.debug('GET /tratamientos for select');
+        const res = await fetch('http://100.30.25.253:7000/tratamientos', { headers: await getAuthHeaders() });
+        const text = await res.text();
+        if(!res.ok){ console.error('Error cargando tratamientos', res.status, text); return; }
+        let data = [];
+        if(text){ try{ data = JSON.parse(text); }catch(e){ console.warn('fetchTratamientosForSelect: not JSON', text); return; } }
+        if(selectTratamiento){
+            selectTratamiento.innerHTML = '<option value="">-- Seleccione un tratamiento --</option>';
+            (data || []).forEach(t => {
+                const id = t.idTratamiento || t.id;
+                const nombre = t.nombreTratamiento || t.nombre || `Tratamiento ${id}`;
+                const o = document.createElement('option');
+                o.value = nombre;
+                o.textContent = nombre;
+                selectTratamiento.appendChild(o);
+            });
+        }
+    }catch(err){ console.error(err); }
+}
+
+// ===================================
+// FETCH MEDICAMENTOS PARA SELECT
+// ===================================
+async function fetchMedicamentosForSelect(){
+    try{
+        console.debug('GET /medicamento for select');
+        const res = await fetch('http://100.30.25.253:7000/medicamento', { headers: await getAuthHeaders() });
+        const text = await res.text();
+        if(!res.ok){ console.error('Error cargando medicamentos', res.status, text); return; }
+        let data = [];
+        if(text){ try{ data = JSON.parse(text); }catch(e){ console.warn('fetchMedicamentosForSelect: not JSON', text); return; } }
+        if(selectMedicamentos){
+            selectMedicamentos.innerHTML = '<option value="">-- Seleccione un medicamento --</option>';
+            (data || []).forEach(m => {
+                const id = m.idMedicamento || m.id;
+                const nombre = m.nombreMedicamento || m.nombre || `Medicamento ${id}`;
+                const o = document.createElement('option');
+                o.value = nombre;
+                o.textContent = nombre;
+                selectMedicamentos.appendChild(o);
             });
         }
     }catch(err){ console.error(err); }
@@ -282,8 +334,10 @@ let currentEditingId = null;
 // =====================
 if (btnAgregar) {
     btnAgregar.addEventListener("click", () => {
-        // refrescar lista de animales antes de abrir
+        // refrescar lista de animales, tratamientos y medicamentos antes de abrir
         fetchAnimalesForSelect();
+        fetchTratamientosForSelect();
+        fetchMedicamentosForSelect();
         modalAgregar.style.display = "flex";
         limpiarCampos();
         editIndex = -1; 
@@ -301,11 +355,9 @@ if (isAdmin() && btnAgregar) {
 btnCerrarAgregar.addEventListener("click", () => {
     modalAgregar.style.display = "none";
     currentEditingId = null;
-    // reset modal title and button text
     const hdr = modalAgregar && modalAgregar.querySelector('h2'); if(hdr) hdr.textContent = 'Agregar Reporte Médico';
     if(btnGuardar) btnGuardar.textContent = 'Guardar';
 });
-
 
 // =====================
 // CERRAR MODAL VISUALIZAR
@@ -314,22 +366,44 @@ btnCerrarVisualizar.addEventListener("click", () => {
     modalVisualizar.style.display = "none";
 });
 
+// =====================
+// FUNCIONES HELPER PARA CHECKBOXES
+// ===================================
 
-// =====================
-// GUARDAR (AGREGAR O EDITAR)
-// =====================
-    btnGuardar.addEventListener("click", async () => {
+// Obtener valores seleccionados de checkboxes
+function getCheckboxValues(name) {
+  const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
+  return Array.from(checkboxes).map(cb => cb.value);
+}
+
+// Establecer checkboxes según un array de valores
+function setCheckboxValues(name, values) {
+  const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+  checkboxes.forEach(cb => {
+    cb.checked = values && values.includes(cb.value);
+  });
+}
+
+// ===================================
+// GUARDAR (AGREGAR O EDITAR) - ACTUALIZADO
+// ===================================
+btnGuardar.addEventListener("click", async () => {
     // Construir payload para backend
     const selectedAnimal = selectAnimalReporte ? selectAnimalReporte.value : '';
     const fecha = document.getElementById("fecha").value;
-    const temperatura = document.getElementById("temperatura").value;
-    const condicionCorporal = document.getElementById("condicionCorporal").value;
-    const frecuenciaRespiratoria = document.getElementById("frecuenciaRespiratoria").value;
+    const temperatura = document.getElementById("temperatura").value; // Ahora es select
+    const condicionCorporal = document.getElementById("condicionCorporal").value; // Ahora es select
+    const frecuenciaRespiratoria = document.getElementById("frecuenciaRespiratoria").value; // Ahora es select
+    
+    // Obtener síntomas como array de checkboxes
+    const sintomasArray = getCheckboxValues('sintomas');
+    const sintomas = sintomasArray.join(', ');
+    
     const diagnosticoPresuntivo = document.getElementById("diagnosticoPresuntivo").value;
     const diagnosticoDefinitivo = document.getElementById("diagnosticoDefinitivo").value;
 
-    if(!selectedAnimal || !fecha){
-        mostrarAlerta('warning','Campos incompletos','Seleccione un animal y fecha.');
+    if(!selectedAnimal || !fecha || !temperatura || !condicionCorporal || !frecuenciaRespiratoria || sintomasArray.length === 0){
+        mostrarAlerta('warning','Campos incompletos','Seleccione un animal, fecha, temperatura, condición corporal, frecuencia respiratoria y al menos un síntoma.');
         return;
     }
 
@@ -340,56 +414,48 @@ btnCerrarVisualizar.addEventListener("click", () => {
         try{
             const parsed = JSON.parse(datosUsuarioRaw);
             if(parsed && (parsed.idUsuario || parsed.id)) idUsuario = parsed.idUsuario || parsed.id;
-            else if(parsed && parsed.usuario) idUsuario = parsed.usuario; // fallback to username string
+            else if(parsed && parsed.usuario) idUsuario = parsed.usuario;
         }catch(e){
-            // raw string
             idUsuario = datosUsuarioRaw;
         }
     }
-    // if numeric string, convert to number; else keep as-is
     const idUsuarioForPayload = (!isNaN(Number(idUsuario)) && idUsuario !== null) ? Number(idUsuario) : idUsuario || 0;
     console.debug('Using idUsuario for payload/header:', idUsuarioForPayload);
 
     const payload = {
         idAnimales: { idAnimal: Number(selectedAnimal) },
         idUsuario: { idUsuario: idUsuarioForPayload },
-        temperatura: Number(temperatura) || 0,
-        condicionCorporal: condicionCorporal || '',
-        frecuenciaRespiratoria: Number(frecuenciaRespiratoria) || 0,
+        temperatura: temperatura, // Mantener como string (categoría)
+        condicionCorporal: condicionCorporal, // Mantener como string
+        frecuenciaRespiratoria: frecuenciaRespiratoria, // Mantener como string (categoría)
+        sintomasObservados: sintomas, // Nuevo campo para síntomas concatenados
         fecha: fecha,
         diagnosticoPresuntivo: diagnosticoPresuntivo || '',
         diagnosticoDefinitivo: diagnosticoDefinitivo || ''
     };
 
-    // If idUsuarioForPayload is not a positive number, try to resolve it via /usuarios
     let resolvedIdForHeader = null;
     if(typeof idUsuarioForPayload === 'number' && idUsuarioForPayload > 0){
         resolvedIdForHeader = idUsuarioForPayload;
     } else if(typeof idUsuarioForPayload === 'string' && idUsuarioForPayload.trim()){ 
-        // try to resolve username -> numeric id
         const resolved = await resolveUsuarioId(idUsuarioForPayload);
         if(resolved){
             resolvedIdForHeader = resolved;
-            // update payload idUsuario to numeric
             payload.idUsuario.idUsuario = resolved;
         }
     }
 
     if(!resolvedIdForHeader){
-        mostrarAlerta('warning','Usuario no válido','No se pudo determinar un id de usuario numérico. Añade `idUsuario` al objeto `datosUsuarioAgroSystem` en sessionStorage con un id numérico o asegúrate que el nombre de usuario exista en el sistema.');
+        mostrarAlerta('warning','Usuario no válido','No se pudo determinar un id de usuario numérico.');
         return;
     }
 
-    // If we are editing an existing report, call PUT, otherwise POST
     if(currentEditingId){
-        // update payload idReporte inside update function
         await updateReporteBackend(payload, currentEditingId, resolvedIdForHeader);
     } else {
-        // enviar al backend con header override
         await sendReporteToBackend(payload, resolvedIdForHeader);
     }
 });
-
 
 // =====================
 // MOSTRAR TABLA
@@ -465,6 +531,10 @@ function verReporte(i) {
                     <p>${r.frecuenciaRespiratoria || ''}</p>
                 </div>
                 <div class="detalle-item">
+                    <strong>Síntomas Observados</strong>
+                    <p>${r.sintomas || r.sintomasObservados || ''}</p>
+                </div>
+                <div class="detalle-item">
                     <strong>Diagnóstico Presuntivo</strong>
                     <p>${r.diagnosticoPresuntivo || ''}</p>
                 </div>
@@ -481,29 +551,35 @@ function verReporte(i) {
 
 
 // =====================
-// EDITAR REPORTE
+// EDITAR REPORTE - ACTUALIZADO
 // =====================
 function editarReporte(i) {
     const r = reportes[i];
     editIndex = i;
     currentEditingId = r.idReporte || null;
-    // if idAnimales available, set select
     if(selectAnimalReporte && r.idAnimales && (r.idAnimales.idAnimal || r.idAnimales.id)){
         selectAnimalReporte.value = r.idAnimales.idAnimal || r.idAnimales.id;
     }
-    // set modal title and button text
-    const hdr = modalAgregar && modalAgregar.querySelector('h2'); if(hdr) hdr.textContent = 'Editar Reporte Médico';
+    const hdr = modalAgregar && modalAgregar.querySelector('h2'); 
+    if(hdr) hdr.textContent = 'Editar Reporte Médico';
     if(btnGuardar) btnGuardar.textContent = 'Actualizar';
     if(document.getElementById("fecha")) document.getElementById("fecha").value = r.fecha || '';
     if(document.getElementById("temperatura")) document.getElementById("temperatura").value = r.temperatura || '';
     if(document.getElementById("condicionCorporal")) document.getElementById("condicionCorporal").value = r.condicionCorporal || '';
     if(document.getElementById("frecuenciaRespiratoria")) document.getElementById("frecuenciaRespiratoria").value = r.frecuenciaRespiratoria || '';
+    
+    const sintomasArray = r.sintomas || r.sintomasObservados
+      ? (r.sintomas || r.sintomasObservados).split(',').map(s => s.trim())
+      : [];
+    setCheckboxValues('sintomas', sintomasArray);
+    
+    if(document.getElementById("veterinario")) document.getElementById("veterinario").value = r.veterinario || '';
     if(document.getElementById("diagnosticoPresuntivo")) document.getElementById("diagnosticoPresuntivo").value = r.diagnosticoPresuntivo || '';
     if(document.getElementById("diagnosticoDefinitivo")) document.getElementById("diagnosticoDefinitivo").value = r.diagnosticoDefinitivo || '';
-    if(document.getElementById("veterinario")) document.getElementById("veterinario").value = r.veterinario || '';
-    if(document.getElementById("sintomas")) document.getElementById("sintomas").value = r.sintomas || '';
-    if(document.getElementById("tratamiento")) document.getElementById("tratamiento").value = r.tratamiento || '';
-    if(document.getElementById("medicamentos")) document.getElementById("medicamentos").value = r.medicamentos || '';
+    // CAMBIO: setear select de tratamiento
+    if(selectTratamiento) selectTratamiento.value = r.tratamiento || '';
+    // CAMBIO: setear select de medicamentos
+    if(selectMedicamentos) selectMedicamentos.value = r.medicamentos || '';
     if(document.getElementById("observaciones")) document.getElementById("observaciones").value = r.observaciones || '';
     if(modalAgregar) modalAgregar.style.display = "flex";
 }
@@ -638,12 +714,11 @@ async function confirmarEliminarReporte() {
 
 
 // =====================
-// LIMPIAR CAMPOS
+// LIMPIAR CAMPOS - ACTUALIZADO
 // =====================
 function limpiarCampos() {
     const el = id => document.getElementById(id);
     if(el('selectAnimalReporte')) el('selectAnimalReporte').value = '';
-    if(el('numArete')) el('numArete').value = '';
     if(el('fecha')) el('fecha').value = '';
     if(el('veterinario')) el('veterinario').value = '';
     if(el('temperatura')) el('temperatura').value = '';
@@ -651,10 +726,11 @@ function limpiarCampos() {
     if(el('frecuenciaRespiratoria')) el('frecuenciaRespiratoria').value = '';
     if(el('diagnosticoPresuntivo')) el('diagnosticoPresuntivo').value = '';
     if(el('diagnosticoDefinitivo')) el('diagnosticoDefinitivo').value = '';
-    if(el('sintomas')) el('sintomas').value = '';
-    if(el('tratamiento')) el('tratamiento').value = '';
-    if(el('medicamentos')) el('medicamentos').value = '';
-    if(el('estado')) el('estado').value = 'Estable';
+    // Limpiar checkboxes de síntomas
+    document.querySelectorAll('input[name="sintomas"]').forEach(cb => cb.checked = false);
+    // CAMBIO: limpiar selects de tratamiento y medicamentos
+    if(selectTratamiento) selectTratamiento.value = '';
+    if(selectMedicamentos) selectMedicamentos.value = '';
     if(el('observaciones')) el('observaciones').value = '';
 }
 
@@ -666,6 +742,10 @@ window.verReporte = verReporte;
 window.editarReporte = editarReporte;
 window.eliminarReporte = eliminarReporte;
 
-// Inicializar datos desde el backend
+// =====================
+// INICIALIZAR DATOS
+// =====================
 fetchAnimalesForSelect();
+fetchTratamientosForSelect();
+fetchMedicamentosForSelect();
 fetchReportes();

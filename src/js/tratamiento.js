@@ -3,6 +3,7 @@ let tratamientos = [];
 let animalesList = [];
 let reportesList = [];
 let medicamentosList = [];
+let enfermedadesList = []; // NUEVA: lista de enfermedades
 
 // Selección de elementos
 const modal = document.getElementById('modalAgregarTratamiento');
@@ -20,6 +21,7 @@ const selectAnimalTratamiento = document.getElementById('selectAnimalTratamiento
 const selectReporteTratamiento = document.getElementById('selectReporteTratamiento');
 const selectMedicamentoTratamiento = document.getElementById('selectMedicamentoTratamiento');
 const inputDosis = document.getElementById('dosis');
+const inputUnidadDosis = document.getElementById('unidadDosis');
 const selectVia = document.getElementById('via');
 const inputFrecuencia = document.getElementById('frecuencia');
 const inputDuracion = document.getElementById('duracion');
@@ -169,6 +171,29 @@ function getCurrentUserRole() {
 }
 function isVeterinario(){ const r = getCurrentUserRole(); return r.includes('veterinario') || r.includes('vet'); }
 function isAdmin(){ const r = getCurrentUserRole(); return r.includes('admin') || r.includes('administrador'); }
+
+// Fetch enfermedades desde backend
+async function fetchEnfermedades(){
+  try{
+    console.debug('GET /enfermedades');
+    const res = await fetch('http://100.30.25.253:7000/enfermedades', { headers: await getAuthHeaders() });
+    const text = await res.text(); if(!res.ok){ console.error('Error cargando enfermedades', res.status, text); return; }
+    enfermedadesList = text ? JSON.parse(text) : [];
+    console.debug('enfermedades loaded', enfermedadesList);
+    // Poblar select de enfermedades
+    if(inputEnfermedad){
+      inputEnfermedad.innerHTML = '<option value="">Seleccionar enfermedad...</option>';
+      (enfermedadesList || []).forEach(e => {
+        const nombre = e.nombreEnfermedad || e.nombre || '';
+        const tipo = e.tipoEnfermedad || e.tipo || '';
+        const o = document.createElement('option');
+        o.value = nombre;
+        o.textContent = `${nombre} (${tipo})`;
+        inputEnfermedad.appendChild(o);
+      });
+    }
+  }catch(e){ console.error(e); }
+}
 
 // Fetch animals, reportes, medicamentos and tratamientos
 async function fetchAnimales(){
@@ -398,9 +423,10 @@ function limpiarModal() {
   inputNombreTratamiento.value = '';
   inputFechaInicio.value = '';
   inputFechaFin.value = '';
-  inputEnfermedad.value = '';
+  if(inputEnfermedad) inputEnfermedad.value = '';
   inputMedicamentos.value = '';
   inputDosis.value = '';
+  if(inputUnidadDosis) inputUnidadDosis.value = '';
   selectVia.value = 'Oral';
   inputFrecuencia.value = '';
   inputDuracion.value = '';
@@ -438,9 +464,12 @@ btnGuardar.addEventListener('click', () => {
   const nombreTratamiento = inputNombreTratamiento.value.trim();
   const fechaInicio = inputFechaInicio.value.trim();
   const fechaFin = inputFechaFin.value.trim();
-  const enfermedad = inputEnfermedad.value.trim();
+  const enfermedad = inputEnfermedad ? inputEnfermedad.value.trim() : '';
   const medicamentos = inputMedicamentos.value.trim();
-  const dosis = inputDosis.value.trim();
+  // CAMBIO: capturar dosis como valor + unidad
+  const dosisValor = inputDosis.value.trim();
+  const dosisUnidad = inputUnidadDosis ? inputUnidadDosis.value.trim() : '';
+  const dosis = dosisValor && dosisUnidad ? `${dosisValor} ${dosisUnidad}` : dosisValor;
   const via = selectVia.value;
   const frecuencia = inputFrecuencia.value.trim();
   const duracion = inputDuracion.value.trim();
@@ -454,6 +483,9 @@ btnGuardar.addEventListener('click', () => {
   if (!nombreTratamiento) camposFaltantes.push('Nombre del Tratamiento');
   if (!fechaInicio) camposFaltantes.push('Fecha de Inicio');
   if (!enfermedad) camposFaltantes.push('Enfermedad/Condición');
+  if (!dosisValor || !dosisUnidad) camposFaltantes.push('Dosis (Valor y Unidad)');
+  if (!frecuencia) camposFaltantes.push('Frecuencia');
+  if (!duracion) camposFaltantes.push('Duración');
 
   if (camposFaltantes.length > 0) {
     const mensaje = camposFaltantes.length === 1 
@@ -730,8 +762,9 @@ function renderizarTratamientos(lista = tratamientos) {
     if (btnEditar) btnEditar.addEventListener('click', async () => {
       console.debug('Editar clicked, tratamiento:', tratamiento);
       // Ensure reference lists are loaded before prefill
-      await Promise.all([fetchAnimales(), fetchReportes(), fetchMedicamentos()]);
+      await Promise.all([fetchAnimales(), fetchReportes(), fetchMedicamentos(), fetchEnfermedades()]);
       console.debug('select counts:', { animals: selectAnimalTratamiento ? selectAnimalTratamiento.options.length : 0, reportes: selectReporteTratamiento? selectReporteTratamiento.options.length:0, meds: selectMedicamentoTratamiento? selectMedicamentoTratamiento.options.length:0 });
+      
       // Prefill selects/inputs safely
       // Animal select
       try{
@@ -744,14 +777,6 @@ function renderizarTratamientos(lista = tratamientos) {
             // try match by arete text
             const opt = Array.from(selectAnimalTratamiento.options).find(o => o.textContent.includes(tratamiento.numArete));
             if(opt) selectAnimalTratamiento.value = opt.value;
-          }
-
-          // Mostrar/ocultar acciones: sólo veterinario puede editar/eliminar tratamientos
-          if (!isVeterinario()) {
-            const be = fila.querySelector('.btn-editar'); if (be) be.style.display = 'none';
-            const bd = fila.querySelector('.btn-eliminar'); if (bd) bd.style.display = 'none';
-          } else {
-            const btnEliminarFila = fila.querySelector('.btn-eliminar'); if (btnEliminarFila) btnEliminarFila.addEventListener('click', () => { abrirModalEliminar(tratamiento); });
           }
         }
         if(selectReporteTratamiento){
@@ -780,24 +805,45 @@ function renderizarTratamientos(lista = tratamientos) {
         }
       }catch(e){ console.warn('prefill medicamento select error', e); }
 
-      // Other inputs
+      // Other inputs - CAMBIO: parsear dosis en valor + unidad
       if(inputNombreTratamiento) inputNombreTratamiento.value = tratamiento.nombreTratamiento || '';
       if(inputFechaInicio) inputFechaInicio.value = formatDateForInput(tratamiento.fechaInicio || '');
       if(inputFechaFin) inputFechaFin.value = tratamiento.fechaFin || '';
+      
+      // CAMBIO: prefill enfermedad desde select
       if(inputEnfermedad) inputEnfermedad.value = tratamiento.enfermedad || '';
+      
       if(inputMedicamentos) inputMedicamentos.value = tratamiento.medicamentos || '';
-      if(inputDosis) inputDosis.value = tratamiento.dosis || '';
+      
+      // CAMBIO: parsear dosis en valor + unidad
+      if(inputDosis && tratamiento.dosis){
+        const parts = String(tratamiento.dosis).split(/\s+/);
+        inputDosis.value = parts[0] || '';
+        if(inputUnidadDosis && parts.length > 1){
+          const unidad = parts.slice(1).join(' ');
+          inputUnidadDosis.value = unidad;
+        }
+      } else {
+        if(inputDosis) inputDosis.value = '';
+        if(inputUnidadDosis) inputUnidadDosis.value = '';
+      }
+      
       if(selectVia) selectVia.value = tratamiento.via || 'Oral';
+      
+      // CAMBIO: prefill frecuencia desde select
       if(inputFrecuencia) inputFrecuencia.value = tratamiento.frecuencia || '';
+      
+      // CAMBIO: prefill duración desde select
       if(inputDuracion) inputDuracion.value = tratamiento.duracion || '';
+      
       if(inputVeterinario) inputVeterinario.value = tratamiento.veterinario || '';
       if(selectEstado) selectEstado.value = tratamiento.estado || 'En curso';
       if(inputObservaciones) inputObservaciones.value = tratamiento.observaciones || '';
 
       editIndex = tratamientos.indexOf(tratamiento);
-      // set modal to edit mode
       const hdr = modal && modal.querySelector('h2'); if(hdr) hdr.textContent = 'Editar Tratamiento';
       if(btnGuardar) btnGuardar.textContent = 'Actualizar';
+      
       // In edit mode: hide fields not allowed to edit (Estado, Frecuencia, Duración, Veterinario)
       try{
         if(selectAnimalTratamiento) selectAnimalTratamiento.disabled = true;
@@ -806,12 +852,10 @@ function renderizarTratamientos(lista = tratamientos) {
         if(inputFechaInicio) inputFechaInicio.disabled = true;
         if(inputFechaFin) inputFechaFin.disabled = true;
         if(inputDosis) inputDosis.disabled = true;
+        if(inputUnidadDosis) inputUnidadDosis.disabled = true;
         if(selectVia) selectVia.disabled = true;
         if(inputObservaciones) inputObservaciones.disabled = true;
-        // hide fields that should not be editable
         const hideField = (el) => { try{ if(!el) return; el.style.display = 'none'; const lab = el.previousElementSibling; if(lab && lab.tagName === 'LABEL') lab.style.display = 'none'; }catch(e){} };
-        hideField(inputFrecuencia);
-        hideField(inputDuracion);
         hideField(inputVeterinario);
         hideField(selectEstado);
         // allow editing these
@@ -864,5 +908,22 @@ window.addEventListener('click', (e) => {
 // Inicializar tabla
 // Load reference lists and backend tratamientos on init
 (async function init(){
-  await Promise.all([fetchAnimales(), fetchReportes(), fetchMedicamentos(), fetchTratamientosFromBackend()]);
+  await Promise.all([fetchAnimales(), fetchReportes(), fetchMedicamentos(), fetchEnfermedades(), fetchTratamientosFromBackend()]);
 })();
+
+// ===================================
+// EVENTOS PARA MOSTRAR CAMPOS "OTRO" EN MEDICAMENTO (si aplica)
+// ===================================
+
+// Badge de riesgo (si aplica en tratamiento)
+function getBadgeClass(riesgo) {
+  const clases = {
+    'Leve': 'badge-leve',
+    'Moderado': 'badge-moderado',
+    'Grave': 'badge-grave',
+    'Crítico': 'badge-critico'
+  };
+  return clases[riesgo] || 'badge-leve';
+}
+
+console.log('✅ Sistema de tratamientos cargado correctamente');

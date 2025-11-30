@@ -73,14 +73,73 @@
       <label>Veterinario:</label>
       <input type="text" id="veterinario" placeholder="Nombre del veterinario">
 
+      <h3>Temperatura</h3>
       <label>Temperatura:</label>
-      <input type="text" id="temperatura">
+      <select id="temperatura">
+        <option value="">Seleccionar temperatura...</option>
+        <option value="Hipotermia (< 37.5°C)">Hipotermia (< 37.5°C) - Riesgo</option>
+        <option value="Normal (37.5°C - 39.5°C)">Normal (37.5°C - 39.5°C) - Ideal</option>
+        <option value="Febrícula (39.6°C - 40.5°C)">Febrícula (39.6°C - 40.5°C) - Alerta</option>
+        <option value="Fiebre Alta (> 40.5°C)">Fiebre Alta (> 40.5°C) - Urgente</option>
+      </select>
 
-      <label>Condición corporal:</label>
-      <input type="text" id="condicionCorporal">
+      <h3>Condición Corporal</h3>
+      <label>Condición Corporal:</label>
+      <select id="condicionCorporal">
+        <option value="">Seleccionar condición...</option>
+        <option value="1">1 - Emaciada / Muy Flaca (Estructura ósea muy visible)</option>
+        <option value="2">2 - Delgada (Poca cobertura de grasa)</option>
+        <option value="3">3 - Óptima / Ideal (Buen estado general)</option>
+        <option value="4">4 - Sobrepeso (Exceso de grasa)</option>
+        <option value="5">5 - Obesa (Grasa excesiva, movilidad reducida)</option>
+      </select>
 
-      <label>Frecuencia respiratoria:</label>
-      <input type="text" id="frecuenciaRespiratoria">
+      <h3>Frecuencia Respiratoria</h3>
+      <label>Frecuencia Respiratoria:</label>
+      <select id="frecuenciaRespiratoria">
+        <option value="">Seleccionar frecuencia...</option>
+        <option value="Normal (10 - 30 rpm)">Normal (10 - 30 rpm)</option>
+        <option value="Bradipnea / Lenta (< 10 rpm)">Bradipnea / Lenta (< 10 rpm)</option>
+        <option value="Taquipnea Leve / Acelerada (30 - 50 rpm)">Taquipnea Leve / Acelerada (30 - 50 rpm)</option>
+        <option value="Disnea / Dificultosa (> 50 rpm)">Disnea / Dificultosa (> 50 rpm)</option>
+      </select>
+
+      <h3>Síntomas Observados</h3>
+      <label>Síntomas (Selecciona todos los que apliquen):</label>
+      <div class="checkbox-group">
+        <fieldset>
+          <legend>Generales:</legend>
+          <label><input type="checkbox" name="sintomas" value="Decaimiento (Tristeza)"> Decaimiento (Tristeza)</label>
+          <label><input type="checkbox" name="sintomas" value="Anorexia (No come)"> Anorexia (No come)</label>
+          <label><input type="checkbox" name="sintomas" value="Deshidratación"> Deshidratación</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Digestivos:</legend>
+          <label><input type="checkbox" name="sintomas" value="Diarrea"> Diarrea</label>
+          <label><input type="checkbox" name="sintomas" value="Timpanismo (Hinchazón)"> Timpanismo (Hinchazón)</label>
+          <label><input type="checkbox" name="sintomas" value="Salivación excesiva"> Salivación excesiva</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Respiratorios:</legend>
+          <label><input type="checkbox" name="sintomas" value="Tos"> Tos</label>
+          <label><input type="checkbox" name="sintomas" value="Secreción Nasal"> Secreción Nasal</label>
+          <label><input type="checkbox" name="sintomas" value="Lagrimeo"> Lagrimeo</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Locomoción:</legend>
+          <label><input type="checkbox" name="sintomas" value="Cojera"> Cojera</label>
+          <label><input type="checkbox" name="sintomas" value="Postración (No se levanta)"> Postración (No se levanta)</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Piel:</legend>
+          <label><input type="checkbox" name="sintomas" value="Pelo Hirsuto (Erizado)"> Pelo Hirsuto (Erizado)</label>
+          <label><input type="checkbox" name="sintomas" value="Heridas/Lesiones"> Heridas/Lesiones</label>
+        </fieldset>
+      </div>
 
       <label>Diagnóstico presuntivo:</label>
       <input type="text" id="diagnosticoPresuntivo">
@@ -88,14 +147,15 @@
       <label>Diagnóstico definitivo:</label>
       <input type="text" id="diagnosticoDefinitivo">
 
-      <label>Síntomas Observados:</label>
-      <textarea id="sintomas" rows="3"></textarea>
-
       <label>Tratamiento Aplicado:</label>
-      <textarea id="tratamiento" rows="3"></textarea>
+      <select id="tratamiento">
+        <option value="">-- Seleccione un tratamiento --</option>
+      </select>
 
       <label>Medicamentos:</label>
-      <input type="text" id="medicamentos">
+      <select id="medicamentos">
+        <option value="">-- Seleccione un medicamento --</option>
+      </select>
 
       <label>Estado del Animal:</label>
       <select id="estado">

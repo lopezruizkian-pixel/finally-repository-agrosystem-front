@@ -61,20 +61,13 @@
     <div class="modal-contenido">
       <h2>Agregar Tratamiento</h2>
 
-      <label>Animal (Num. Arete):</label>
-      <!-- Permitir seleccionar un animal o escribir directamente su número de arete -->
-      <input type="text" id="numArete" placeholder="O escriba número de arete..." style="margin-bottom:8px;">
+      <label>Animal:</label>
       <select id="selectAnimalTratamiento">
         <option value="">-- Seleccione un animal --</option>
       </select>
 
-      <label>Reporte asociado (opcional):</label>
-      <select id="selectReporteTratamiento">
-        <option value="">-- Seleccione un reporte (opcional) --</option>
-      </select>
-
       <label>Nombre del Tratamiento:</label>
-      <input type="text" id="nombreTratamiento" placeholder="Nombre descriptivo">
+      <input type="text" id="nombreTratamiento" placeholder="Ej: Desparasitación">
 
       <label>Fecha de Inicio:</label>
       <input type="date" id="fechaInicio">
@@ -82,36 +75,71 @@
       <label>Fecha de Fin:</label>
       <input type="date" id="fechaFin">
 
-      <label>Enfermedad/Condición:</label>
-      <input type="text" id="enfermedad" placeholder="Diagnóstico o condición">
+      <label>Reporte Médico (Opcional):</label>
+      <select id="selectReporteTratamiento">
+        <option value="">-- Seleccione un reporte --</option>
+      </select>
 
-      <label>Medicamento (seleccione):</label>
+      <label>Enfermedad/Condición:</label>
+      <select id="enfermedad">
+        <option value="">Seleccionar enfermedad...</option>
+      </select>
+
+      <label>Medicamento:</label>
       <select id="selectMedicamentoTratamiento">
         <option value="">-- Seleccione un medicamento --</option>
       </select>
 
-      <label>Descripción:</label>
-      <textarea id="medicamentos" rows="2" placeholder="Opcional: notas sobre medicamentos/dosis"></textarea>
+      <label>Medicamentos (Texto):</label>
+      <input type="text" id="medicamentos" placeholder="Nombre del medicamento">
 
-      <label>Dosis:</label>
-      <input type="text" id="dosis" placeholder="Ej: 5ml cada 12 horas">
+      <h3>Dosis</h3>
+      <label>Dosis (Valor + Unidad):</label>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <input type="number" id="dosis" placeholder="Valor" step="0.1" style="flex: 0 0 120px;">
+        <select id="unidadDosis" style="flex: 1;">
+          <option value="">Seleccionar unidad...</option>
+          <option value="ml / cc">ml / cc (Mililitros)</option>
+          <option value="mg">mg (Miligramos)</option>
+          <option value="g">g (Gramos)</option>
+          <option value="Bolos / Tabletas">Bolos / Tabletas</option>
+          <option value="Tubos / Jeringas">Tubos / Jeringas</option>
+          <option value="UI">UI (Unidades Internacionales)</option>
+        </select>
+      </div>
 
       <label>Vía de Administración:</label>
       <select id="via">
         <option value="Oral">Oral</option>
-        <option value="Intramuscular">Intramuscular</option>
-        <option value="Intravenosa">Intravenosa</option>
-        <option value="Subcutánea">Subcutánea</option>
+        <option value="Inyectable">Inyectable</option>
         <option value="Tópica">Tópica</option>
+        <option value="Intramamaria">Intramamaria</option>
       </select>
 
       <label>Frecuencia:</label>
-      <input type="text" id="frecuencia" placeholder="Ej: Cada 8 horas, 2 veces al día">
+      <select id="frecuencia">
+        <option value="">Seleccionar frecuencia...</option>
+        <option value="Dosis Única (Solo una vez)">Dosis Única (Solo una vez)</option>
+        <option value="Cada 24 horas (1 vez al día)">Cada 24 horas (1 vez al día)</option>
+        <option value="Cada 12 horas (2 veces al día)">Cada 12 horas (2 veces al día)</option>
+        <option value="Cada 8 horas (3 veces al día)">Cada 8 horas (3 veces al día)</option>
+        <option value="Cada 48 horas (Día por medio)">Cada 48 horas (Día por medio)</option>
+        <option value="Semanal (Cada 7 días)">Semanal (Cada 7 días)</option>
+      </select>
 
       <label>Duración:</label>
-      <input type="text" id="duracion" placeholder="Ej: 7 días, 2 semanas">
+      <select id="duracion">
+        <option value="">Seleccionar duración...</option>
+        <option value="1 día (Stat)">1 día (Stat)</option>
+        <option value="3 días">3 días</option>
+        <option value="5 días">5 días</option>
+        <option value="7 días">7 días</option>
+        <option value="10 días">10 días</option>
+        <option value="14 días">14 días</option>
+        <option value="Indefinido / Permanente">Indefinido / Permanente</option>
+      </select>
 
-      <label>Veterinario Responsable:</label>
+      <label>Veterinario:</label>
       <input type="text" id="veterinario" placeholder="Nombre del veterinario">
 
       <label>Estado:</label>
@@ -119,11 +147,10 @@
         <option value="En curso">En curso</option>
         <option value="Completado">Completado</option>
         <option value="Suspendido">Suspendido</option>
-        <option value="En pausa">En pausa</option>
       </select>
 
-      <label>Notas/Observaciones:</label>
-      <textarea id="observaciones" rows="3" placeholder="Indicaciones especiales, reacciones observadas, etc."></textarea>
+      <label>Observaciones:</label>
+      <textarea id="observaciones" placeholder="Observaciones adicionales..." rows="3"></textarea>
 
       <div class="botones">
         <button id="btnGuardarTratamiento">Guardar</button>
