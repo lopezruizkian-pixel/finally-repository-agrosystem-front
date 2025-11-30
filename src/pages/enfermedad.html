@@ -49,33 +49,83 @@
 <div id="modalAgregarEnfermedad" class="modal">
 <div class="modal-contenido">
 <h2>Agregar Enfermedad</h2>
+
 <label>Nombre:</label>
 <input type="text" id="nombre">
 
+<h3>Tipo de Enfermedad</h3>
 <label>Tipo:</label>
-<input type="text" id="tipo">
-
-<label>Síntomas:</label>
-<input type="text" id="sintomas">
-
-<label>Duración Estimada:</label>
-<input type="text" id="duracion">
-
-<label>Tratamientos Recomendados:</label>
-<input type="text" id="tratamientos">
-
-<label>Nivel de Riesgo:</label>
-<select id="riesgo">
-<option value="Leve">Leve</option>
-<option value="Moderado">Moderado</option>
-<option value="Grave">Grave</option>
-<option value="Crítico">Crítico</option>
+<select id="tipo">
+<option value="">Seleccionar...</option>
+<option value="Viral">Viral</option>
+<option value="Bacteriana">Bacteriana</option>
+<option value="Parasitaria (Interna)">Parasitaria (Interna)</option>
+<option value="Parasitaria (Externa)">Parasitaria (Externa)</option>
+<option value="Fúngica">Fúngica</option>
+<option value="Metabólica/Nutricional">Metabólica/Nutricional</option>
+<option value="Tóxica">Tóxica</option>
+<option value="Autoinmune">Autoinmune</option>
 </select>
 
-<label>Modo de Transmisión:</label>
-<input type="text" id="transmision">
+<h3>Síntomas (Selecciona todos los que apliquen)</h3>
+<div class="checkbox-group">
+<label><input type="checkbox" name="sintomas" value="Fiebre"> Fiebre</label>
+<label><input type="checkbox" name="sintomas" value="Tos/Estornudos"> Tos/Estornudos</label>
+<label><input type="checkbox" name="sintomas" value="Diarrea"> Diarrea</label>
+<label><input type="checkbox" name="sintomas" value="Vómito"> Vómito</label>
+<label><input type="checkbox" name="sintomas" value="Letargo/Debilidad"> Letargo/Debilidad</label>
+<label><input type="checkbox" name="sintomas" value="Anorexia (Falta de Apetito)"> Anorexia (Falta de Apetito)</label>
+<label><input type="checkbox" name="sintomas" value="Lesiones Cutáneas"> Lesiones Cutáneas</label>
+<label><input type="checkbox" name="sintomas" value="Cojera"> Cojera</label>
+<label><input type="checkbox" name="sintomas" value="Dificultad Respiratoria"> Dificultad Respiratoria</label>
+<label><input type="checkbox" name="sintomas" value="Ictericia (Piel/Ojos Amarillos)"> Ictericia (Piel/Ojos Amarillos)</label>
+<label><input type="checkbox" name="sintomas" value="Hemorragia"> Hemorragia</label>
+</div>
 
-<!-- Campos de análisis/observaciones eliminados porque no forman parte del payload de la API -->
+<h3>Duración Estimada</h3>
+<label>Duración:</label>
+<select id="duracion">
+<option value="">Seleccionar...</option>
+<option value="Aguda (Menos de 7 días)">Aguda (Menos de 7 días)</option>
+<option value="Subaguda (7 a 14 días)">Subaguda (7 a 14 días)</option>
+<option value="Crónica (Más de 14 días)">Crónica (Más de 14 días)</option>
+<option value="Peraguda (Horas/Muerte Rápida)">Peraguda (Horas/Muerte Rápida)</option>
+</select>
+
+<h3>Tratamientos Recomendados (Selecciona todos los que apliquen)</h3>
+<div class="checkbox-group">
+<label><input type="checkbox" name="tratamientos" value="Antibiótico"> Antibiótico</label>
+<label><input type="checkbox" name="tratamientos" value="Antiparasitario"> Antiparasitario</label>
+<label><input type="checkbox" name="tratamientos" value="Antiinflamatorio (AINE)"> Antiinflamatorio (AINE)</label>
+<label><input type="checkbox" name="tratamientos" value="Fluidoterapia"> Fluidoterapia</label>
+<label><input type="checkbox" name="tratamientos" value="Soporte Nutricional"> Soporte Nutricional</label>
+<label><input type="checkbox" name="tratamientos" value="Cirugía/Drenaje"> Cirugía/Drenaje</label>
+<label><input type="checkbox" name="tratamientos" value="Aislamiento"> Aislamiento</label>
+<label><input type="checkbox" name="tratamientos" value="Vacunación (Preventiva)"> Vacunación (Preventiva)</label>
+<label><input type="checkbox" name="tratamientos" value="Terapia de Reemplazo (ej. Hormonal)"> Terapia de Reemplazo (ej. Hormonal)</label>
+</div>
+
+<h3>Nivel de Riesgo</h3>
+<label>Riesgo:</label>
+<select id="riesgo">
+<option value="">Seleccionar...</option>
+<option value="Nulo/Mínimo">Nulo/Mínimo</option>
+<option value="Leve">Leve</option>
+<option value="Moderado">Moderado</option>
+<option value="Alto">Alto</option>
+<option value="Crítico/Mortal">Crítico/Mortal</option>
+</select>
+
+<h3>Modo de Transmisión (Selecciona todos los que apliquen)</h3>
+<div class="checkbox-group">
+<label><input type="checkbox" name="transmision" value="Contacto Directo"> Contacto Directo</label>
+<label><input type="checkbox" name="transmision" value="Fómites (Objetos contaminados)"> Fómites (Objetos contaminados)</label>
+<label><input type="checkbox" name="transmision" value="Aerosoles/Vía Aérea"> Aerosoles/Vía Aérea</label>
+<label><input type="checkbox" name="transmision" value="Vía Oral (Alimento/Agua contaminada)"> Vía Oral (Alimento/Agua contaminada)</label>
+<label><input type="checkbox" name="transmision" value="Vectorial (Insectos/Garrapatas)"> Vectorial (Insectos/Garrapatas)</label>
+<label><input type="checkbox" name="transmision" value="Vertical (Madre a cría)"> Vertical (Madre a cría)</label>
+<label><input type="checkbox" name="transmision" value="Zoonótica (Transmisible a humanos)"> Zoonótica (Transmisible a humanos)</label>
+</div>
 
 <div class="botones">
 <button id="btnGuardarEnfermedad">Guardar</button>

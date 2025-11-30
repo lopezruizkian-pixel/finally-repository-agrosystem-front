@@ -546,11 +546,18 @@ function limpiarModal() {
   selectRebano.value = 'Vaca';
   selectProcedencia.value = 'Interno';
   selectSexo.value = 'H';
+  // Limpiar campos adicionales
+  document.getElementById('fechaNacimiento').value = '';
+  document.getElementById('edad').value = '';
+  document.getElementById('peso').value = '';
+  document.getElementById('caracteristicas').value = '';
+  document.getElementById('padreArete').value = '';
+  document.getElementById('madreArete').value = '';
   editIndex = null;
 }
 
 // ===================================
-// GUARDAR ANIMAL (PRIMER MODAL)
+// GUARDAR ANIMAL (MODAL ÚNICO - SIN MODAL SECUNDARIO)
 // ===================================
 btnGuardar.addEventListener('click', () => {
   const nombre = inputNombre.value.trim();
@@ -558,48 +565,6 @@ btnGuardar.addEventListener('click', () => {
   const rebano = selectRebano.value;
   const procedencia = selectProcedencia.value;
   const sexo = selectSexo.value;
-
-  if (!nombre || !numArete || !sexo) {
-    mostrarAlerta('Por favor complete todos los campos obligatorios: Nombre, Número de Arete y Sexo.', 'error');
-    return;
-  }
-
-  animalTemp = { nombre, numArete, rebano, procedencia, sexo };
-
-  // Abrir modal secundario según el rebaño
-  abrirModalSecundario(rebano);
-  modal.style.display = 'none';
-});
-
-// ===================================
-// MODAL SECUNDARIO SEGÚN REBAÑO
-// ===================================
-function abrirModalSecundario(rebano) {
-  camposSecundarios.innerHTML = '';
-  camposSecundarios.innerHTML += `
-    <label>Nombre:</label><input type="text" id="nombreSecundario">
-    <label>Fecha de nacimiento:</label><input type="date" id="fechaNacimiento">
-    <label>Edad:</label><input type="number" id="edad">
-    <label>Peso inicial:</label><input type="text" id="peso">
-    <label>Característica:</label><input type="text" id="caracteristicas">
-    <h3>Padre</h3>
-    <label>Número de Arete:</label><input type="text" id="padreArete">
-    <h3>Madre</h3>
-    <label>Número de Arete:</label><input type="text" id="madreArete">
-  `;
-  // No agregar campos específicos de razas; enviar solamente los campos que espera el backend
-
-  modalSecundario.style.display = 'flex';
-}
-
-// ===================================
-// GUARDAR MODAL SECUNDARIO
-// ===================================
-btnGuardarSecundario.addEventListener('click', () => {
-  const nombreSec = document.getElementById('nombreSecundario') ? document.getElementById('nombreSecundario').value.trim() : null;
-  if (nombreSec !== null && nombreSec !== '') {
-    animalTemp.nombre = nombreSec;
-  }
   const fechaNacimiento = document.getElementById('fechaNacimiento').value;
   const edad = document.getElementById('edad').value;
   const peso = document.getElementById('peso').value;
@@ -607,27 +572,36 @@ btnGuardarSecundario.addEventListener('click', () => {
   const padreArete = document.getElementById('padreArete').value;
   const madreArete = document.getElementById('madreArete').value;
 
-  animalTemp.fechaNacimiento = fechaNacimiento;
-  animalTemp.edad = edad ? Number(edad) : null;
-  animalTemp.pesoInicial = peso ? Number(peso) : null;
-  animalTemp.caracteristica = caracteristicas || '';
-  animalTemp.padreArete = padreArete;
-  animalTemp.madreArete = madreArete;
+  if (!nombre || !numArete || !sexo) {
+    mostrarAlerta('Por favor complete todos los campos obligatorios: Nombre, Número de Arete y Sexo.', 'error');
+    return;
+  }
 
-  // No recoger campos específicos de razas; el backend no los espera
+  // Crear objeto con todos los datos en una sola tarjeta
+  animalTemp = {
+    nombre,
+    numArete,
+    rebano,
+    procedencia,
+    sexo,
+    fechaNacimiento,
+    edad,
+    pesoInicial: peso,
+    caracteristica: caracteristicas,
+    padreArete,
+    madreArete
+  };
 
-  if(editIndex !== null){
+  // Procesar directamente sin modal secundario
+  if (editIndex !== null) {
     // Actualizar en backend
-    // pasar el id que se usará en la ruta para que body.idAnimal coincida
     const routeId = animales[editIndex] && (animales[editIndex].idAnimal || animales[editIndex].id) ? (animales[editIndex].idAnimal || animales[editIndex].id) : animalTemp.idAnimal || animalTemp.id;
     updateAnimalBackend(animalTemp, routeId)
       .then(resp => {
         if (resp.success) {
-          // reemplazar en la lista local con la respuesta del backend si viene
           if (resp.data) {
             animales[editIndex] = resp.data;
           } else {
-            // si no devuelve, actualizar campos locales basados en animalTemp
             animales[editIndex] = {
               ...animales[editIndex],
               nombreAnimal: animalTemp.nombre,
@@ -644,7 +618,7 @@ btnGuardarSecundario.addEventListener('click', () => {
             };
           }
           mostrarAlerta(`El animal "${animalTemp.nombre}" ha sido actualizado exitosamente.`, 'success');
-          modalSecundario.style.display = 'none';
+          modal.style.display = 'none';
           renderizarAnimales();
         } else {
           mostrarAlerta(`Error al actualizar en servidor: ${resp.error}`, 'error');
@@ -654,31 +628,30 @@ btnGuardarSecundario.addEventListener('click', () => {
         mostrarAlerta(`Error en la petición: ${err.message || err}`, 'error');
       });
   } else {
-    // Enviar al backend primero. Si es exitoso, usar lo que devuelve el backend para pintar
+    // Guardar nuevo animal
     sendAnimalToBackend(animalTemp)
       .then(resp => {
         if (resp.success) {
-          // preferir los datos que regresa el backend
           if (resp.data) {
             animales.push(resp.data);
           } else {
-              animales.push({
-                idAnimal: resp.data && resp.data.idAnimal ? resp.data.idAnimal : null,
-                nombreAnimal: animalTemp.nombre,
-                numArete: animalTemp.numArete ? Number(animalTemp.numArete) : null,
-                'rebaño': animalTemp.rebano,
-                fechaNacimiento: animalTemp.fechaNacimiento,
-                pesoInicial: animalTemp.pesoInicial != null ? Number(animalTemp.pesoInicial) : null,
-                caracteristica: animalTemp.caracteristica || '',
-                idPadre: animalTemp.padreArete ? Number(animalTemp.padreArete) : null,
-                idMadre: animalTemp.madreArete ? Number(animalTemp.madreArete) : null,
-                edad: animalTemp.edad != null ? Number(animalTemp.edad) : null,
-                procedencia: animalTemp.procedencia,
-                sexo: (animalTemp.sexo === 'M')
-              });
+            animales.push({
+              idAnimal: resp.data && resp.data.idAnimal ? resp.data.idAnimal : null,
+              nombreAnimal: animalTemp.nombre,
+              numArete: animalTemp.numArete ? Number(animalTemp.numArete) : null,
+              'rebaño': animalTemp.rebano,
+              fechaNacimiento: animalTemp.fechaNacimiento,
+              pesoInicial: animalTemp.pesoInicial != null ? Number(animalTemp.pesoInicial) : null,
+              caracteristica: animalTemp.caracteristica || '',
+              idPadre: animalTemp.padreArete ? Number(animalTemp.padreArete) : null,
+              idMadre: animalTemp.madreArete ? Number(animalTemp.madreArete) : null,
+              edad: animalTemp.edad != null ? Number(animalTemp.edad) : null,
+              procedencia: animalTemp.procedencia,
+              sexo: (animalTemp.sexo === 'M')
+            });
           }
           mostrarAlerta(`El animal "${animalTemp.nombre}" ha sido registrado exitosamente.`, 'success');
-          modalSecundario.style.display = 'none';
+          modal.style.display = 'none';
           renderizarAnimales();
         } else {
           mostrarAlerta(`Error al registrar en servidor: ${resp.error}`, 'error');
@@ -688,7 +661,6 @@ btnGuardarSecundario.addEventListener('click', () => {
         mostrarAlerta(`Error en la petición: ${err.message || err}`, 'error');
       });
   }
-
 });
 
 // ===================================
@@ -847,7 +819,7 @@ function renderizarAnimales(lista = animales){
 
     // EDITAR
     fila.querySelector('.btn-editar').addEventListener('click', () => {
-      // llenar campos del primer modal
+      // llenar campos del modal único
       inputNombre.value = animal.nombreAnimal || '';
       inputNumArete.value = animal.numArete != null ? String(animal.numArete) : '';
       selectRebano.value = animal['rebaño'] || '';
@@ -855,45 +827,35 @@ function renderizarAnimales(lista = animales){
       selectSexo.value = animal.sexo ? 'M' : 'H';
       editIndex = animales.indexOf(animal);
 
-      // Mapear al formato que usa el formulario y las funciones de envío
       animalTemp = {
         idAnimal: animal.idAnimal != null ? animal.idAnimal : null,
         nombre: animal.nombreAnimal || '',
         numArete: animal.numArete != null ? String(animal.numArete) : '',
         rebano: animal['rebaño'] || '',
         procedencia: animal.procedencia || '',
-        sexo: animal.sexo ? 'M' : 'H'
-        ,
-        // prefijar los aretes de padres para mantener valores si no se modifican
+        sexo: animal.sexo ? 'M' : 'H',
         padreArete: animal.idPadre != null ? String(animal.idPadre) : '',
         madreArete: animal.idMadre != null ? String(animal.idMadre) : ''
       };
 
-      abrirModalSecundario(animal['rebaño']);
+      // Llenar todos los campos adicionales en el modal único
+      const f = animal.fechaNacimiento;
+      if (Array.isArray(f) && f.length >= 3) {
+        const y = String(f[0]).padStart(4,'0');
+        const m = String(f[1]).padStart(2,'0');
+        const d = String(f[2]).padStart(2,'0');
+        document.getElementById('fechaNacimiento').value = `${y}-${m}-${d}`;
+      } else {
+        document.getElementById('fechaNacimiento').value = f || '';
+      }
+      document.getElementById('edad').value = animal.edad != null ? animal.edad : '';
+      document.getElementById('peso').value = animal.pesoInicial != null ? animal.pesoInicial : '';
+      document.getElementById('caracteristicas').value = animal.caracteristica || '';
+      document.getElementById('padreArete').value = animal.idPadre != null ? String(animal.idPadre) : '';
+      document.getElementById('madreArete').value = animal.idMadre != null ? String(animal.idMadre) : '';
 
-      setTimeout(() => {
-        // fecha puede venir como array
-        const f = animal.fechaNacimiento;
-        if (Array.isArray(f) && f.length >= 3) {
-          const y = String(f[0]).padStart(4,'0');
-          const m = String(f[1]).padStart(2,'0');
-          const d = String(f[2]).padStart(2,'0');
-          document.getElementById('fechaNacimiento').value = `${y}-${m}-${d}`;
-        } else {
-          document.getElementById('fechaNacimiento').value = f || '';
-        }
-        document.getElementById('edad').value = animal.edad != null ? animal.edad : '';
-        document.getElementById('peso').value = animal.pesoInicial != null ? animal.pesoInicial : '';
-        document.getElementById('caracteristicas').value = animal.caracteristica || '';
-        // precargar nombre en modal secundario si existe
-        if (document.getElementById('nombreSecundario')) {
-          document.getElementById('nombreSecundario').value = animal.nombreAnimal || '';
-        }
-        document.getElementById('padreArete').value = animal.idPadre != null ? String(animal.idPadre) : '';
-        document.getElementById('madreArete').value = animal.idMadre != null ? String(animal.idMadre) : '';
-      }, 100);
-
-      modalSecundario.style.display = 'flex';
+      // Abrir modal único
+      modal.style.display = 'flex';
     });
 
     // Mostrar/ocultar botones según rol: solo admin puede editar/eliminar animales

@@ -53,26 +53,112 @@
       <label>Nombre:</label>
       <input type="text" id="nombre">
 
-      <label>Presentación:</label>
-      <input type="text" id="presentacion">
+      <label>Presentacion:</label>
+      <select id="formaFarmaceutica">
+        <option value="">Seleccionar...</option>
+        <option value="Solución Inyectable">Solución Inyectable</option>
+        <option value="Suspensión Inyectable">Suspensión Inyectable</option>
+        <option value="Polvo Soluble">Polvo Soluble</option>
+        <option value="Comprimido/Bolo Oral">Comprimido/Bolo Oral</option>
+        <option value="Tópico (Pour-on)">Tópico (Pour-on)</option>
+        <option value="Premix (para alimento)">Premix (para alimento)</option>
+        <option value="Ungüento">Ungüento</option>
+        <option value="otro">Otro</option>
+      </select>
+      <input type="text" id="formaFarmaceuticaOtro" placeholder="Especificar otra forma" style="display:none;">
 
-      <label>Dosis:</label>
-      <input type="text" id="dosis">
+      <label>Contenido:</label>
+      <select id="contenido">
+        <option value="">Seleccionar...</option>
+        <option value="10 ml">10 ml</option>
+        <option value="50 ml">50 ml</option>
+        <option value="100 ml">100 ml</option>
+        <option value="500 ml">500 ml</option>
+        <option value="1 kg">1 kg</option>
+        <option value="20 kg">20 kg</option>
+        <option value="otro">Otro</option>
+      </select>
+      <input type="text" id="contenidoOtro" placeholder="Especificar otro contenido" style="display:none;">
+
+      <h3>Dosis</h3>
+      <label>Unidad de Dosis:</label>
+      <select id="unidadDosis">
+        <option value="">Seleccionar...</option>
+        <option value="ml/kg de peso">ml/kg de peso</option>
+        <option value="mg/kg de peso">mg/kg de peso</option>
+        <option value="ml/animal">ml/animal</option>
+        <option value="Comprimido/animal">Comprimido/animal</option>
+        <option value="g/tonelada de alimento">g/tonelada de alimento</option>
+      </select>
+
+      <label>Valor de Dosis:</label>
+      <input type="number" id="valorDosis" step="0.1" placeholder="Ej: 0.5, 1.0, 10.0">
+
+      <label>Vía de Administración:</label>
+      
+      <select id="via">
+        <option value="">Seleccionar...</option>
+        <option value="Subcutánea (SC)">Subcutánea (SC)</option>
+        <option value="Intramuscular (IM)">Intramuscular (IM)</option>
+        <option value="Intravenosa (IV)">Intravenosa (IV)</option>
+        <option value="Oral (bolo)">Oral (bolo)</option>
+        <option value="Oral (alimento/agua)">Oral (alimento/agua)</option>
+        <option value="Tópica (Pour-on)">Tópica (Pour-on)</option>
+        <option value="Intramamaria">Intramamaria</option>
+        <option value="Intrauterina">Intrauterina</option>
+        <option value="otra">Otra</option>
+      </select>
+      <input type="text" id="viaOtra" placeholder="Especificar otra vía" style="display:none;">
+
+  
+      <label>Composición:</label>
+      <select id="composicion">
+        <option value="">Seleccionar...</option>
+        <optgroup label="Antiparasitarios">
+          <option value="Ivermectina">Ivermectina</option>
+          <option value="Doramectina">Doramectina</option>
+          <option value="Albendazol">Albendazol</option>
+          <option value="Levamisol">Levamisol</option>
+        </optgroup>
+        <optgroup label="Antibióticos">
+          <option value="Oxitetraciclina">Oxitetraciclina</option>
+          <option value="Amoxicilina">Amoxicilina</option>
+          <option value="Ceftiofur">Ceftiofur</option>
+          <option value="Tilosina">Tilosina</option>
+        </optgroup>
+        <optgroup label="Antiinflamatorios">
+          <option value="Flunixin Meglumine">Flunixin Meglumine</option>
+          <option value="Dexametasona">Dexametasona</option>
+        </optgroup>
+        <optgroup label="Suplementos">
+          <option value="Vitaminas A D E">Vitaminas A D E</option>
+          <option value="Calcio">Calcio</option>
+        </optgroup>
+      </select>
 
       <label>Caducidad:</label>
-      <input type="text" id="caducidad">
+      <input type="date" id="caducidad">
 
-      <label>Via:</label>
-      <input type="text" id="via">
+      <h3>Frecuencia de Aplicación</h3>
+      <label>Frecuencia:</label>
+      <select id="frecuencia">
+        <option value="">Seleccionar...</option>
+        <option value="Dosis Única">Dosis Única</option>
+        <option value="Cada 24 horas">Cada 24 horas</option>
+        <option value="Cada 12 horas">Cada 12 horas</option>
+        <option value="Repetir a los 7 días">Repetir a los 7 días</option>
+        <option value="Continuo">Continuo</option>
+      </select>
 
-      <label>Composición:</label>
-      <input type="text" id="composicion">
-
-       <label>Solucion:</label>
-      <input type="text" id="Solucion">
-
-       <label>Frecuencia de aplicacion:</label>
-      <input type="text" id="Frecuencia de aplicacion">
+      <label>Duración:</label>
+      <select id="duracion">
+        <option value="">Seleccionar...</option>
+        <option value="1 día">1 día</option>
+        <option value="3 días">3 días</option>
+        <option value="5 días">5 días</option>
+        <option value="7 días">7 días</option>
+        <option value="Hasta remisión clínica">Hasta remisión clínica</option>
+      </select>
 
       <label>Indicaciones:</label>
       <input type="text" id="indicaciones">

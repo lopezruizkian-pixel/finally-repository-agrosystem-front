@@ -88,12 +88,8 @@ const btnAgregar = document.querySelector('.btn-agregar');
 const tablaEnfermedades = document.querySelector('.tabla-animales');
 const inputNombre = document.getElementById('nombre');
 const inputTipo = document.getElementById('tipo');
-const inputSintomas = document.getElementById('sintomas');
 const inputDuracion = document.getElementById('duracion');
-const inputTratamientos = document.getElementById('tratamientos');
 const selectRiesgo = document.getElementById('riesgo');
-const inputTransmision = document.getElementById('transmision');
-const buscador = document.querySelector('.buscador input');
 
 // Modal de visualizar
 const modalVisualizar = document.getElementById('modalVisualizarEnfermedad');
@@ -257,28 +253,42 @@ window.addEventListener('click', (e) => {
 function limpiarModal() {
   inputNombre.value = '';
   inputTipo.value = '';
-  inputSintomas.value = '';
   inputDuracion.value = '';
-  inputTratamientos.value = '';
-  selectRiesgo.value = 'Leve';
-  inputTransmision.value = '';
+  selectRiesgo.value = '';
+  
+  // Limpiar todos los checkboxes de síntomas
+  document.querySelectorAll('input[name="sintomas"]').forEach(cb => cb.checked = false);
+  
+  // Limpiar todos los checkboxes de tratamientos
+  document.querySelectorAll('input[name="tratamientos"]').forEach(cb => cb.checked = false);
+  
+  // Limpiar todos los checkboxes de transmisión
+  document.querySelectorAll('input[name="transmision"]').forEach(cb => cb.checked = false);
+  
   editIndex = null;
 }
 
-// Badge de riesgo
-function getBadgeClass(riesgo) {
-  const clases = {
-    'Leve': 'badge-leve',
-    'Moderado': 'badge-moderado',
-    'Grave': 'badge-grave',
-    'Crítico': 'badge-critico'
-  };
-  return clases[riesgo] || 'badge-leve';
+// ===================================
+// FUNCIONES HELPER PARA CHECKBOXES
+// ===================================
+
+// Obtener valores seleccionados de checkboxes
+function getCheckboxValues(name) {
+  const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
+  return Array.from(checkboxes).map(cb => cb.value);
 }
 
-// -------------------------
-// GUARDAR ENFERMEDAD
-// -------------------------
+// Establecer checkboxes según un array de valores
+function setCheckboxValues(name, values) {
+  const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+  checkboxes.forEach(cb => {
+    cb.checked = values && values.includes(cb.value);
+  });
+}
+
+// ===================================
+// GUARDAR ENFERMEDAD (ACTUALIZADO)
+// ===================================
 btnGuardar.addEventListener('click', async () => {
   const nombre = inputNombre.value.trim();
   const tipo = inputTipo.value.trim();
@@ -289,15 +299,25 @@ btnGuardar.addEventListener('click', async () => {
     return;
   }
 
+  // Obtener valores de checkboxes
+  const sintomas = getCheckboxValues('sintomas');
+  const tratamientos = getCheckboxValues('tratamientos');
+  const transmision = getCheckboxValues('transmision');
+
+  // Convertir arrays a strings separados por comas para enviar al backend
+  const sintomasStr = sintomas.join(', ');
+  const tratamientosStr = tratamientos.join(', ');
+  const transmisionStr = transmision.join(', ');
+
   // Build payload according to API contract
   const payload = {
     nombreEnfermedad: nombre,
     tipoEnfermedad: tipo,
-    sintomas: inputSintomas.value.trim() || undefined,
-    duracionEstimada: inputDuracion.value ? Number(inputDuracion.value) : undefined,
-    tratamientosRecomendados: inputTratamientos.value.trim() || undefined,
+    sintomas: sintomasStr || undefined,
+    duracionEstimada: inputDuracion.value || undefined,
+    tratamientosRecomendados: tratamientosStr || undefined,
     nivelRiesgo: selectRiesgo.value || undefined,
-    modoTransmision: inputTransmision.value.trim() || undefined,
+    modoTransmision: transmisionStr || undefined,
     idMedicamento: null,
   };
 
@@ -421,11 +441,27 @@ function renderizarEnfermedades(lista = enfermedades) {
       be.addEventListener('click', () => {
         inputNombre.value = enfermedad.nombre;
         inputTipo.value = enfermedad.tipo;
-        inputSintomas.value = enfermedad.sintomas;
         inputDuracion.value = enfermedad.duracion;
-        inputTratamientos.value = enfermedad.tratamientos;
         selectRiesgo.value = enfermedad.riesgo;
-        inputTransmision.value = enfermedad.transmision;
+        
+        // Parsear síntomas (pueden venir como string "Fiebre, Tos/Estornudos")
+        const sintomasArray = enfermedad.sintomas 
+          ? enfermedad.sintomas.split(',').map(s => s.trim()) 
+          : [];
+        setCheckboxValues('sintomas', sintomasArray);
+        
+        // Parsear tratamientos
+        const tratamientosArray = enfermedad.tratamientos 
+          ? enfermedad.tratamientos.split(',').map(t => t.trim()) 
+          : [];
+        setCheckboxValues('tratamientos', tratamientosArray);
+        
+        // Parsear transmisión
+        const transmisionArray = enfermedad.transmision 
+          ? enfermedad.transmision.split(',').map(t => t.trim()) 
+          : [];
+        setCheckboxValues('transmision', transmisionArray);
+        
         editIndex = enfermedades.indexOf(enfermedad);
         modal.style.display = 'flex';
       });

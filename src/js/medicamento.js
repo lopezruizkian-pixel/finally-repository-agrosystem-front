@@ -8,14 +8,19 @@ const tablaMedicamentos = document.querySelector('.tabla-medicamentos');
 const buscador = document.querySelector('.buscador input');
 
 const inputNombre = document.getElementById('nombre');
-const inputPresentacion = document.getElementById('presentacion');
-const inputDosis = document.getElementById('dosis');
-const inputCaducidad = document.getElementById('caducidad');
+const inputFormaFarmaceutica = document.getElementById('formaFarmaceutica');
+const inputFormaFarmaceuticaOtro = document.getElementById('formaFarmaceuticaOtro');
+const inputContenido = document.getElementById('contenido');
+const inputContenidoOtro = document.getElementById('contenidoOtro');
+const inputUnidadDosis = document.getElementById('unidadDosis');
+const inputValorDosis = document.getElementById('valorDosis');
 const inputVia = document.getElementById('via');
+const inputViaOtra = document.getElementById('viaOtra');
 const inputComposicion = document.getElementById('composicion');
+const inputCaducidad = document.getElementById('caducidad');
+const inputFrecuencia = document.getElementById('frecuencia');
+const inputDuracion = document.getElementById('duracion');
 const inputIndicaciones = document.getElementById('indicaciones');
-// Frecuencia (puede llamarse 'frecuencia' o 'frecuenciaAplicacion' en el DOM)
-const inputFrecuencia = document.getElementById('frecuencia') || document.getElementById('frecuenciaAplicacion');
 
 // Modal de visualización
 const modalVisualizar = document.getElementById('modalVisualizarMedicamento');
@@ -197,57 +202,79 @@ window.addEventListener('click', e => {
 // Limpiar modal
 function limpiarModal() {
   inputNombre.value = '';
-  inputPresentacion.value = '';
-  inputDosis.value = '';
-  inputCaducidad.value = '';
+  inputFormaFarmaceutica.value = '';
+  inputFormaFarmaceuticaOtro.value = '';
+  inputFormaFarmaceuticaOtro.style.display = 'none';
+  inputContenido.value = '';
+  inputContenidoOtro.value = '';
+  inputContenidoOtro.style.display = 'none';
+  inputUnidadDosis.value = '';
+  inputValorDosis.value = '';
   inputVia.value = '';
+  inputViaOtra.value = '';
+  inputViaOtra.style.display = 'none';
   inputComposicion.value = '';
+  inputCaducidad.value = '';
+  inputFrecuencia.value = '';
+  inputDuracion.value = '';
   inputIndicaciones.value = '';
-  if (inputFrecuencia) inputFrecuencia.value = '';
-  // algunas plantillas usan id 'solucion' para el input de presentación
-  const altSol = document.getElementById('solucion');
-  if (altSol) altSol.value = '';
-  const altFreq = document.getElementById('frecuenciaAplicacion');
-  if (altFreq) altFreq.value = '';
   editIndex = null;
 }
 
 // Guardar medicamento (agregar o editar)
 btnGuardar.addEventListener('click', async () => {
-  const nombre = inputNombre ? inputNombre.value.trim() : '';
-  const presentacion = inputPresentacion ? inputPresentacion.value.trim() : (document.getElementById('solucion') ? document.getElementById('solucion').value.trim() : ''); // mapearemos a 'solucion'
-  const dosis = inputDosis ? inputDosis.value.trim() : '';
-  const caducidad = inputCaducidad ? inputCaducidad.value.trim() : ''; // expected YYYY-MM-DD from input[type=date]
-  const via = inputVia ? inputVia.value.trim() : '';
-  const composicion = inputComposicion ? inputComposicion.value.trim() : '';
-  const indicaciones = inputIndicaciones ? inputIndicaciones.value.trim() : '';
-  let frecuencia = '';
-  if (inputFrecuencia) frecuencia = inputFrecuencia.value.trim();
-  else if (document.getElementById('frecuenciaAplicacion')) frecuencia = document.getElementById('frecuenciaAplicacion').value.trim();
-  // fallback: buscar cualquier input/select cuyo id o name contenga 'frecuencia'
-  if(!frecuencia){
-    const fallback = document.querySelector('input[id*="frecuencia" i], select[id*="frecuencia" i], input[name*="frecuencia" i], select[name*="frecuencia" i]');
-    if(fallback) frecuencia = (fallback.value || '').trim();
-  }
+  const nombre = inputNombre.value.trim();
+  
+  // Presentación: forma + contenido
+  const formaFarmaceutica = inputFormaFarmaceutica.value === 'otro' 
+    ? inputFormaFarmaceuticaOtro.value.trim() 
+    : inputFormaFarmaceutica.value;
+  const contenido = inputContenido.value === 'otro' 
+    ? inputContenidoOtro.value.trim() 
+    : inputContenido.value;
+  const presentacion = `${formaFarmaceutica} - ${contenido}`;
 
-  console.debug('medicamento form values: { nombre, presentacion, dosis, caducidad, via, composicion, indicaciones, frecuencia }', { nombre, presentacion, dosis, caducidad, via, composicion, indicaciones, frecuencia });
+  // Dosis: unidad + valor
+  const unidadDosis = inputUnidadDosis.value;
+  const valorDosis = inputValorDosis.value.trim();
+  const dosis = `${valorDosis} ${unidadDosis}`;
 
-  if(!nombre || !presentacion) {
-    mostrarAlerta('Por favor complete al menos los campos: Nombre y Solución/Presentación.', 'error');
+  // Vía
+  const via = inputVia.value === 'otra' 
+    ? inputViaOtra.value.trim() 
+    : inputVia.value;
+
+  // Composición
+  const composicion = inputComposicion.value;
+
+  // Caducidad
+  const caducidad = inputCaducidad.value;
+
+  // Frecuencia + Duración
+  const frecuencia = inputFrecuencia.value;
+  const duracion = inputDuracion.value;
+  const frecuenciaCompleta = `${frecuencia} - ${duracion}`;
+
+  // Indicaciones
+  const indicaciones = inputIndicaciones.value.trim();
+
+  console.debug('medicamento form values:', { nombre, presentacion, dosis, via, composicion, caducidad, frecuenciaCompleta, indicaciones });
+
+  if(!nombre || !formaFarmaceutica || !contenido || !unidadDosis || !valorDosis || !via || !composicion || !caducidad || !frecuencia || !duracion) {
+    mostrarAlerta('Por favor complete todos los campos obligatorios.', 'error');
     return;
   }
 
-  // incluir ambos nombres de campo para mayor compatibilidad con el backend
+  // Crear objeto con todos los datos
   const medData = { 
     nombre,
     presentacion,
     dosis,
-    caducidad,
     via,
     composicion,
-    indicaciones,
-    frecuencia,
-    frecuenciaAplicacion: frecuencia
+    caducidad,
+    frecuenciaCompleta,
+    indicaciones
   };
 
   modal.style.display = 'none';
@@ -310,16 +337,12 @@ function renderizarMedicamentos(lista = medicamentos){
           <p>${med.nombre || med.nombreMedicamento || ''}</p>
         </div>
         <div class="detalle-item">
-          <strong>Solución / Presentación</strong>
+          <strong>Presentación</strong>
           <p>${med.presentacion || med.solucion || ''}</p>
         </div>
         <div class="detalle-item">
           <strong>Dosis</strong>
           <p>${med.dosis ?? 'No especificada'}</p>
-        </div>
-        <div class="detalle-item">
-          <strong>Caducidad</strong>
-          <p>${med.caducidad || (med.caducidadMs ? new Date(med.caducidadMs).toLocaleDateString() : 'No especificada')}</p>
         </div>
         <div class="detalle-item">
           <strong>Vía de Administración</strong>
@@ -330,8 +353,12 @@ function renderizarMedicamentos(lista = medicamentos){
           <p>${med.composicion || ''}</p>
         </div>
         <div class="detalle-item">
-          <strong>Frecuencia de aplicación</strong>
-          <p>${med.frecuencia || med.frecuenciaAplicacion || 'No especificada'}</p>
+          <strong>Caducidad</strong>
+          <p>${med.caducidad || (med.caducidadMs ? new Date(med.caducidadMs).toLocaleDateString() : 'No especificada')}</p>
+        </div>
+        <div class="detalle-item">
+          <strong>Frecuencia de Aplicación</strong>
+          <p>${med.frecuenciaCompleta || med.frecuencia || ''}</p>
         </div>
         <div class="detalle-item">
           <strong>Indicaciones</strong>
@@ -341,7 +368,7 @@ function renderizarMedicamentos(lista = medicamentos){
       modalVisualizar.style.display = 'flex';
     });
 
-    // Editar / Eliminar según rol: solo admin puede editar/eliminar medicamentos
+    // Editar / Eliminar según rol
     if (!isAdmin()) {
       const be = fila.querySelector('.btn-editar'); if (be) be.style.display = 'none';
       const bd = fila.querySelector('.btn-eliminar'); if (bd) bd.style.display = 'none';
@@ -349,26 +376,18 @@ function renderizarMedicamentos(lista = medicamentos){
       const beEl = fila.querySelector('.btn-editar');
       if (beEl) beEl.addEventListener('click', () => {
         inputNombre.value = med.nombre || med.nombreMedicamento || '';
-      // Rellenar presentación/solución en cualquiera de los posibles inputs
-      const valorPresent = med.presentacion || med.solucion || '';
-      if (inputPresentacion) inputPresentacion.value = valorPresent;
-      const altSolInput = document.getElementById('solucion');
-      if (altSolInput) altSolInput.value = valorPresent;
-
-      inputDosis.value = med.dosis ?? '';
-      // caducidad stored as YYYY-MM-DD for input
-      inputCaducidad.value = med.caducidad || (med.caducidadMs ? new Date(med.caducidadMs).toISOString().slice(0,10) : '');
-      inputVia.value = med.via || med.viaAdministracion || '';
-      inputComposicion.value = med.composicion || '';
-      // Rellenar frecuencia en ambos posibles inputs
-      const valorFreq = med.frecuencia || med.frecuenciaAplicacion || '';
-      if (inputFrecuencia) inputFrecuencia.value = valorFreq;
-      const altFreqInput = document.getElementById('frecuenciaAplicacion');
-      if (altFreqInput) altFreqInput.value = valorFreq;
-
-      inputIndicaciones.value = med.indicaciones || '';
-      editIndex = medicamentos.indexOf(med);
-      modal.style.display = 'flex';
+        inputFormaFarmaceutica.value = '';
+        inputContenido.value = '';
+        inputUnidadDosis.value = '';
+        inputValorDosis.value = med.dosis ? med.dosis.split(' ')[0] : '';
+        inputVia.value = med.via || med.viaAdministracion || '';
+        inputComposicion.value = med.composicion || '';
+        inputCaducidad.value = med.caducidad || (med.caducidadMs ? new Date(med.caducidadMs).toISOString().slice(0,10) : '');
+        inputFrecuencia.value = '';
+        inputDuracion.value = '';
+        inputIndicaciones.value = med.indicaciones || '';
+        editIndex = medicamentos.indexOf(med);
+        modal.style.display = 'flex';
       });
       const bdEl = fila.querySelector('.btn-eliminar'); if (bdEl) bdEl.addEventListener('click', () => { abrirModalEliminar(med); });
     }
@@ -619,3 +638,37 @@ async function deleteMedicamentoBackend(id){
 fetchMedicamentosFromBackend();
 
 console.log('✅ Sistema de medicamentos cargado correctamente');
+
+// ===================================
+// EVENTOS PARA MOSTRAR CAMPOS "OTRO"
+// ===================================
+
+// Forma Farmacéutica - mostrar input de "otro"
+inputFormaFarmaceutica.addEventListener('change', () => {
+  if (inputFormaFarmaceutica.value === 'otro') {
+    inputFormaFarmaceuticaOtro.style.display = 'block';
+  } else {
+    inputFormaFarmaceuticaOtro.style.display = 'none';
+    inputFormaFarmaceuticaOtro.value = '';
+  }
+});
+
+// Contenido - mostrar input de "otro"
+inputContenido.addEventListener('change', () => {
+  if (inputContenido.value === 'otro') {
+    inputContenidoOtro.style.display = 'block';
+  } else {
+    inputContenidoOtro.style.display = 'none';
+    inputContenidoOtro.value = '';
+  }
+});
+
+// Vía - mostrar input de "otra"
+inputVia.addEventListener('change', () => {
+  if (inputVia.value === 'otra') {
+    inputViaOtra.style.display = 'block';
+  } else {
+    inputViaOtra.style.display = 'none';
+    inputViaOtra.value = '';
+  }
+});
