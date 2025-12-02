@@ -553,3 +553,60 @@ body {
   background-color: rgba(94, 138, 80, 1);
   transform: translateY(-2px);
 }
+
+/* Estilos para secciones de estadísticas */
+.seccion-estadistica {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid rgba(114, 158, 100, 1);
+}
+
+.seccion-estadistica h3 {
+  margin-top: 0;
+  color: rgba(114, 158, 100, 1);
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.seccion-estadistica h3::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: rgba(114, 158, 100, 1);
+  border-radius: 50%;
+}
+
+#graficoVacas,
+#graficoEnfermedades {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.contenidoEstadisticas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.contenidoEstadisticas p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid rgba(114, 158, 100, 1);
+}
+
+.contenidoEstadisticas i {
+  margin-right: 8px;
+  color: rgba(114, 158, 100, 1);
+}

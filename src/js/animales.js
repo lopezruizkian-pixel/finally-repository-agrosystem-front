@@ -440,7 +440,7 @@ async function deleteAnimalBackend(id) {
   }
 }
 
-// Cerrar alerta con ESC
+// Cerrar alerta with ESC
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && modalAlerta.classList.contains('active')) {
     cerrarAlerta();
@@ -733,6 +733,7 @@ function renderizarAnimales(lista = animales){
         <th>Nombre</th>
         <th>Número de Arete</th>
         <th>Sexo</th>
+        <th>Estado</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -741,14 +742,22 @@ function renderizarAnimales(lista = animales){
   const tbody = tabla.querySelector('tbody');
   lista.forEach(animal => {
     const fila = document.createElement('tr');
+    const estadoActual = animal.estado || 'Vivo';
+    
     fila.innerHTML = `
       <td>${animal.nombreAnimal || ''}</td>
       <td>${animal.numArete || ''}</td>
       <td>${animal.sexo ? 'M' : 'H'}</td>
       <td>
+        <select class="select-estado" data-id="${animal.idAnimal || animal.id}">
+          <option value="Vivo" ${estadoActual === 'Vivo' ? 'selected' : ''}>Vivo</option>
+          <option value="Vendido" ${estadoActual === 'Vendido' ? 'selected' : ''}>Vendido</option>
+          <option value="Muerto" ${estadoActual === 'Muerto' ? 'selected' : ''}>Muerto</option>
+        </select>
+      </td>
+      <td>
         <button class="btn-ver" title="Ver detalles"><i class="fas fa-eye" aria-hidden="true"></i></button>
         <button class="btn-editar" title="Editar"><i class="fas fa-pen" aria-hidden="true"></i></button>
-        <button class="btn-eliminar" title="Eliminar"><i class="fas fa-trash" aria-hidden="true"></i></button>
       </td>
     `;
 
@@ -778,6 +787,10 @@ function renderizarAnimales(lista = animales){
         <div class="detalle-item">
           <strong>Sexo</strong>
           <p>${animal.sexo ? 'M' : 'H'}</p>
+        </div>
+        <div class="detalle-item">
+          <strong>Estado</strong>
+          <p>${animal.estado || 'Vivo'}</p>
         </div>
         <div class="detalle-item">
           <strong>Rebaño</strong>
@@ -819,7 +832,6 @@ function renderizarAnimales(lista = animales){
 
     // EDITAR
     fila.querySelector('.btn-editar').addEventListener('click', () => {
-      // llenar campos del modal único
       inputNombre.value = animal.nombreAnimal || '';
       inputNumArete.value = animal.numArete != null ? String(animal.numArete) : '';
       selectRebano.value = animal['rebaño'] || '';
@@ -838,7 +850,6 @@ function renderizarAnimales(lista = animales){
         madreArete: animal.idMadre != null ? String(animal.idMadre) : ''
       };
 
-      // Llenar todos los campos adicionales en el modal único
       const f = animal.fechaNacimiento;
       if (Array.isArray(f) && f.length >= 3) {
         const y = String(f[0]).padStart(4,'0');
@@ -854,16 +865,65 @@ function renderizarAnimales(lista = animales){
       document.getElementById('padreArete').value = animal.idPadre != null ? String(animal.idPadre) : '';
       document.getElementById('madreArete').value = animal.idMadre != null ? String(animal.idMadre) : '';
 
-      // Abrir modal único
       modal.style.display = 'flex';
     });
 
-    // Mostrar/ocultar botones según rol: solo admin puede editar/eliminar animales
+    // Mostrar/ocultar botones según rol
     if (!isAdmin()) {
       const btnEdit = fila.querySelector('.btn-editar'); if (btnEdit) btnEdit.style.display = 'none';
-      const btnDel = fila.querySelector('.btn-eliminar'); if (btnDel) btnDel.style.display = 'none';
-    } else {
-      const btnDel = fila.querySelector('.btn-eliminar'); if (btnDel) btnDel.addEventListener('click', () => { abrirModalEliminar(animal); });
+      const selectEst = fila.querySelector('.select-estado'); if (selectEst) selectEst.style.display = 'none';
+    }
+
+    // Event listener para el select de estado
+    const selectEstado = fila.querySelector('.select-estado');
+    if (selectEstado) {
+      selectEstado.addEventListener('change', async (e) => {
+        const nuevoEstado = e.target.value;
+        const idAnimal = animal.idAnimal || animal.id;
+        
+        if (!idAnimal) {
+          mostrarAlerta('No se puede actualizar el estado sin ID del animal', 'error');
+          return;
+        }
+
+        // Actualizar estado en backend
+        const routeId = idAnimal;
+        const payload = {
+          idAnimal: Number(idAnimal),
+          nombreAnimal: animal.nombreAnimal || '',
+          numArete: animal.numArete ? Number(animal.numArete) : null,
+          "rebaño": animal['rebaño'] || '',
+          fechaNacimiento: animal.fechaNacimiento || null,
+          pesoInicial: animal.pesoInicial != null ? Number(animal.pesoInicial) : null,
+          caracteristica: animal.caracteristica || '',
+          edad: animal.edad ? Number(animal.edad) : null,
+          procedencia: animal.procedencia || '',
+          sexo: animal.sexo,
+          estado: nuevoEstado
+        };
+
+        try {
+          const headers = await getAuthHeaders();
+          const res = await fetch(`http://100.30.25.253:7000/animales/${routeId}`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || 'Error al actualizar estado');
+          }
+
+          // Actualizar estado local
+          animal.estado = nuevoEstado;
+          mostrarAlerta(`Estado actualizado a "${nuevoEstado}"`, 'success');
+        } catch (err) {
+          mostrarAlerta(`Error actualizando estado: ${err.message}`, 'error');
+          // Revertir select al estado anterior
+          selectEstado.value = estadoActual;
+        }
+      });
     }
 
     tbody.appendChild(fila);

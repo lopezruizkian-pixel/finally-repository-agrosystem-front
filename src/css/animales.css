@@ -89,6 +89,8 @@ body {
 .contenido {
   flex: 1;
   padding: 20px 40px;
+  overflow-y: auto;
+  height: calc(100vh - 60px);
 }
 
 .buscador-agregar {
@@ -446,4 +448,245 @@ body {
   color: #333;
   font-size: 1rem;
   line-height: 1.5;
+}
+
+/* Estilos para secciones de estadísticas */
+.seccion-estadistica {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid rgba(114, 158, 100, 1);
+  width: 100%;
+  max-width: 900px;
+}
+
+.seccion-estadistica h3 {
+  margin-top: 0;
+  color: rgba(114, 158, 100, 1);
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.seccion-estadistica h3::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: rgba(114, 158, 100, 1);
+  border-radius: 50%;
+}
+
+#graficoVacas,
+#graficoEnfermedades {
+  max-width: 100%;
+  height: auto;
+  margin: 20px 0;
+  display: block;
+}
+
+.contenidoEstadisticas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.contenidoEstadisticas p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid rgba(114, 158, 100, 1);
+}
+
+.contenidoEstadisticas i {
+  margin-right: 8px;
+  color: rgba(114, 158, 100, 1);
+}
+
+/* ===================================
+   ESTILOS PARA VISTA DE ESTADÍSTICAS
+   =================================== */
+
+.contenido {
+  flex: 1;
+  padding: 20px 40px;
+  overflow-y: auto;
+  height: calc(100vh - 60px);
+}
+
+/* Secciones de estadísticas */
+.seccion-estadistica {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid rgba(114, 158, 100, 1);
+}
+
+.seccion-estadistica h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: rgba(114, 158, 100, 1);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seccion-estadistica h3 i {
+  font-size: 1.2rem;
+}
+
+/* Contenedor del gráfico y info */
+.estadistica-contenedor {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  align-items: start;
+}
+
+.grafico-contenedor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 250px;
+}
+
+.grafico-contenedor canvas {
+  max-width: 100%;
+  max-height: 250px;
+}
+
+.estadistica-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.estadistica-info p {
+  margin: 0;
+  padding: 8px 12px;
+  background-color: #f0f7f1;
+  border-radius: 6px;
+  border-left: 3px solid rgba(114, 158, 100, 1);
+  color: #333;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.estadistica-info strong {
+  color: rgba(114, 158, 100, 1);
+  font-weight: 600;
+}
+
+.estadistica-info i {
+  margin-right: 6px;
+  color: rgba(114, 158, 100, 1);
+  font-size: 0.95rem;
+}
+
+/* Responsive: en pantallas pequeñas */
+@media (max-width: 1200px) {
+  .estadistica-contenedor {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .grafico-contenedor {
+    min-height: 220px;
+  }
+
+  .grafico-contenedor canvas {
+    max-height: 220px;
+  }
+
+  .contenido {
+    padding: 15px 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contenido {
+    padding: 12px 15px;
+  }
+
+  .seccion-estadistica {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+
+  .estadistica-info p {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+
+  .grafico-contenedor {
+    min-height: 200px;
+    padding: 10px;
+  }
+
+  .grafico-contenedor canvas {
+    max-height: 200px;
+  }
+
+  .estadistica-contenedor {
+    gap: 10px;
+  }
+
+  .seccion-estadistica h3 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    gap: 6px;
+  }
+
+  .seccion-estadistica h3 i {
+    font-size: 1.1rem;
+  }
+}
+
+/* Estilos para select de estado en tabla */
+.select-estado {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.select-estado:hover {
+  border-color: rgba(114, 158, 100, 1);
+}
+
+.select-estado:focus {
+  outline: none;
+  border-color: rgba(114, 158, 100, 1);
+  box-shadow: 0 0 5px rgba(114, 158, 100, 0.3);
+}
+
+.select-estado option[value="Vivo"] {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.select-estado option[value="Vendido"] {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.select-estado option[value="Muerto"] {
+  background-color: #f8d7da;
+  color: #721c24;
 }
