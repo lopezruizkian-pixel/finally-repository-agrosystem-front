@@ -243,6 +243,7 @@ let editIndex = null;
 // -------------------------
 if (btnAgregar) {
   btnAgregar.addEventListener('click', () => {
+    if(!isVeterinario()){ mostrarAlerta('Por favor inicie sesión con un rol veterinario para crear enfermedades.','warning'); return; }
     limpiarModal();
     modal.style.display = 'flex';
   });
@@ -254,11 +255,32 @@ function getCurrentUserRole(){
   if(!datosStr) return '';
   try{ const d = JSON.parse(datosStr); return (d.rolNombre || (d.rol && (d.rol.nombre || (d.rol.idRol===1?'Administrador':''))) || d.rol || '').toString().toLowerCase(); }catch(e){ return String(datosStr).toLowerCase(); }
 }
-function isVeterinario(){ const r = getCurrentUserRole(); return r.includes('veterinario') || r.includes('vet'); }
-function isAdmin(){ const r = getCurrentUserRole(); return r.includes('admin') || r.includes('administrador'); }
+// Try to extract a numeric role id from stored user data (returns number or null)
+function getCurrentUserRoleId(){
+  const datosStr = sessionStorage.getItem('datosUsuarioAgroSystem') || localStorage.getItem('datosUsuarioAgroSystem') || '';
+  if(!datosStr) return null;
+  try{
+    const d = JSON.parse(datosStr);
+    if(!d) return null;
+    if(typeof d.rol === 'number') return d.rol;
+    if(typeof d.rol === 'string' && /^\d+$/.test(d.rol)) return Number(d.rol);
+    if(typeof d.rol === 'object'){
+      if(typeof d.rol.idRol === 'number') return d.rol.idRol;
+      if(typeof d.rol.id === 'number') return d.rol.id;
+      if(typeof d.rol.idRol === 'string' && /^\d+$/.test(d.rol.idRol)) return Number(d.rol.idRol);
+      if(typeof d.rol.id === 'string' && /^\d+$/.test(d.rol.id)) return Number(d.rol.id);
+    }
+    return null;
+  }catch(e){ return null; }
+}
 
-// Quitar el botón agregar a admin (solo veterinario puede CRUD aquí)
-if(isAdmin() && btnAgregar){ btnAgregar.style.display = 'none'; }
+function isVeterinario(){ const r = getCurrentUserRole(); const id = getCurrentUserRoleId(); return id === 2 || r.includes('veterinario') || r.includes('vet'); }
+function isAdmin(){ const r = getCurrentUserRole(); const id = getCurrentUserRoleId(); return id === 1 || r.includes('admin') || r.includes('administrador'); }
+
+// Control de visibilidad del botón Agregar según rol numérico/textual
+const _role_now = getCurrentUserRoleId();
+if((_role_now === 1 || isAdmin()) && btnAgregar){ btnAgregar.style.display = 'none'; }
+if((_role_now === 2) && btnAgregar){ btnAgregar.style.display = ''; }
 
 // Cerrar modal agregar/editar
 btnCerrarModal.addEventListener('click', () => modal.style.display = 'none');
@@ -427,6 +449,8 @@ function cerrarModalEliminar() {
 
 function confirmarEliminarEnfermedad() {
   (async ()=>{
+    // Only veterinario (role 2) can delete
+    if(!isVeterinario()){ mostrarAlerta('No tiene permisos para eliminar enfermedades.','warning'); cerrarModalEliminar(); return; }
     if(enfermedadAEliminar){
       const id = enfermedadAEliminar.idEnfermedad || (enfermedadAEliminar.raw && (enfermedadAEliminar.raw.idEnfermedad||enfermedadAEliminar.raw.id));
       if(id){

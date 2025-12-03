@@ -151,8 +151,27 @@ function getCurrentUserRole() {
   if (!datosStr) return '';
   try { const datos = JSON.parse(datosStr); return (datos.rolNombre || (datos.rol && (datos.rol.nombre || (datos.rol.idRol === 1 ? 'Administrador' : ''))) || datos.rol || '').toString().toLowerCase(); } catch(e){ return String(datosStr).toLowerCase(); }
 }
-function isVeterinario(){ const r = getCurrentUserRole(); return r.includes('veterinario') || r.includes('vet'); }
-function isAdmin(){ const r = getCurrentUserRole(); return r.includes('admin') || r.includes('administrador'); }
+// Try to extract numeric role id (1,2...) from stored user data
+function getCurrentUserRoleId(){
+  const datosStr = sessionStorage.getItem('datosUsuarioAgroSystem') || localStorage.getItem('datosUsuarioAgroSystem') || null;
+  if(!datosStr) return null;
+  try{
+    const datos = JSON.parse(datosStr);
+    if(!datos) return null;
+    if(typeof datos.rol === 'number') return datos.rol;
+    if(typeof datos.rol === 'string' && /^\d+$/.test(datos.rol)) return Number(datos.rol);
+    if(typeof datos.rol === 'object'){
+      if(typeof datos.rol.idRol === 'number') return datos.rol.idRol;
+      if(typeof datos.rol.id === 'number') return datos.rol.id;
+      if(typeof datos.rol.idRol === 'string' && /^\d+$/.test(datos.rol.idRol)) return Number(datos.rol.idRol);
+      if(typeof datos.rol.id === 'string' && /^\d+$/.test(datos.rol.id)) return Number(datos.rol.id);
+    }
+    return null;
+  }catch(e){ return null; }
+}
+
+function isVeterinario(){ const r = getCurrentUserRole(); const id = getCurrentUserRoleId(); return id === 2 || r.includes('veterinario') || r.includes('vet'); }
+function isAdmin(){ const r = getCurrentUserRole(); const id = getCurrentUserRoleId(); return id === 1 || r.includes('admin') || r.includes('administrador'); }
 
 // Fetch data functions (Animals, Reportes, Medicamentos, Enfermedades)
 async function fetchEnfermedades(){
@@ -366,16 +385,18 @@ function cerrarModalEliminar() {
   document.getElementById('modalEliminarTratamiento').classList.remove('active');
 }
 async function confirmarEliminarTratamiento() {
+   // Permission check: only veterinario (role 2) can delete
+   if(!isVeterinario()){ mostrarAlerta('No tiene permisos para eliminar tratamientos', 'warning'); cerrarModalEliminar(); return; }
    if(tratamientoAEliminar && tratamientoAEliminar.idTratamiento) {
-       try {
-           const res = await fetch(`http://192.168.1.17:7002/tratamientos/${tratamientoAEliminar.idTratamiento}`, {
-               method: 'DELETE', headers: await getAuthHeaders()
-           });
-           if(res.ok) {
-               mostrarAlerta('Eliminado correctamente', 'success');
-               fetchTratamientosFromBackend();
-           } else { mostrarAlerta('Error al eliminar', 'error'); }
-       } catch(e) { mostrarAlerta('Error de conexión', 'error'); }
+     try {
+       const res = await fetch(`http://192.168.1.17:7002/tratamientos/${tratamientoAEliminar.idTratamiento}`, {
+         method: 'DELETE', headers: await getAuthHeaders()
+       });
+       if(res.ok) {
+         mostrarAlerta('Eliminado correctamente', 'success');
+         fetchTratamientosFromBackend();
+       } else { mostrarAlerta('Error al eliminar', 'error'); }
+     } catch(e) { mostrarAlerta('Error de conexión', 'error'); }
    }
    cerrarModalEliminar();
 }
@@ -393,8 +414,16 @@ function renderizarTratamientos(lista) {
   
   lista.forEach((t, index) => {
      const tr = document.createElement('tr');
+     // Try to include animal name when available
+     let animalLabel = t.numArete || 'N/A';
+     try{
+       const aid = (t.idAnimal && (t.idAnimal.idAnimal || t.idAnimal)) || null;
+       const found = animalesList.find(a => (a.idAnimal || a.id) == aid);
+       if(found){ const aName = found.nombreAnimal || found.nombre || ''; animalLabel = `${aName} (arete ${t.numArete || 'N/A'})`; }
+     }catch(e){ /* ignore */ }
+
      tr.innerHTML = `
-       <td>${t.numArete || 'N/A'}</td>
+       <td>${animalLabel}</td>
        <td>${t.nombreTratamiento}</td>
        <td>${t.fechaInicio}</td>
        <td>${t.fechaFin || '-'}</td>
@@ -435,14 +464,39 @@ function renderizarTratamientos(lista) {
 }
 
 // Inicializar
+// Control de visibilidad del botón Agregar según rol numérico
+const _roleId_now = getCurrentUserRoleId();
+if(_roleId_now === 1 && btnAgregar) { btnAgregar.style.display = 'none'; }
+if(_roleId_now === 2 && btnAgregar) { btnAgregar.style.display = ''; }
 if(btnAgregar) btnAgregar.onclick = () => { 
-    editIndex = null; 
-    // Limpiar form
-    inputNombreTratamiento.value = ''; inputObservaciones.value = '';
-    modal.style.display = 'flex'; 
+  if(!isVeterinario()){ mostrarAlerta('No tiene permisos para crear tratamientos', 'warning'); return; }
+  editIndex = null; 
+  // Limpiar form
+  inputNombreTratamiento.value = ''; inputObservaciones.value = '';
+  modal.style.display = 'flex'; 
 };
 if(btnCerrarModal) btnCerrarModal.onclick = () => modal.style.display = 'none';
 if(btnCerrarVisualizar) btnCerrarVisualizar.onclick = () => modalVisualizar.style.display = 'none';
+
+// Buscador: filtrar tratamientos por nombre de animal o número de arete
+if(buscador){
+  buscador.addEventListener('input', (e) => {
+    const q = (e.target.value || '').trim().toLowerCase();
+    if(!q) { renderizarTratamientos(tratamientos); return; }
+    const filtered = (tratamientos || []).filter(t => {
+      const numArete = (t.numArete || '').toString().toLowerCase();
+      let animalName = '';
+      try{
+        const aid = (t.idAnimal && (t.idAnimal.idAnimal || t.idAnimal)) || null;
+        const found = (animalesList || []).find(a => (a.idAnimal || a.id) == aid);
+        animalName = found ? (found.nombreAnimal || found.nombre || '') : '';
+      }catch(e){ animalName = ''; }
+      animalName = String(animalName).toLowerCase();
+      return numArete.includes(q) || animalName.includes(q);
+    });
+    renderizarTratamientos(filtered);
+  });
+}
 
 // Carga inicial
 (async function init(){

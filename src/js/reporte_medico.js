@@ -89,6 +89,9 @@ const btnGuardar = document.getElementById("btnGuardarReporte");
 
 const tabla = document.querySelector(".tabla-animales");
 
+// Search input (buscador) inside .buscador div
+const buscador = document.querySelector('.buscador input');
+
 // selects y elementos nuevos
 const selectAnimalReporte = document.getElementById('selectAnimalReporte');
 const selectTratamiento = document.getElementById('tratamiento');
@@ -128,8 +131,35 @@ function getCurrentUserRole() {
     if (!datosStr) return '';
     try { const d = JSON.parse(datosStr); return (d.rolNombre || (d.rol && (d.rol.nombre || (d.rol.idRol===1?'Administrador':''))) || d.rol || '').toString().toLowerCase(); } catch(e){ return String(datosStr).toLowerCase(); }
 }
-function isAdmin(){ const r = getCurrentUserRole(); return r.includes('admin') || r.includes('administrador'); }
-function isVeterinario(){ const r = getCurrentUserRole(); return r.includes('veterinario') || r.includes('vet'); }
+// Try to extract a numeric role id from stored user data (returns number or null)
+function getCurrentUserRoleId(){
+    const datosStr = sessionStorage.getItem('datosUsuarioAgroSystem') || localStorage.getItem('datosUsuarioAgroSystem') || '';
+    if(!datosStr) return null;
+    try{
+        const d = JSON.parse(datosStr);
+        if(!d) return null;
+        // several shapes: d.rol may be number, string, or object with idRol/id
+        if(typeof d.rol === 'number') return d.rol;
+        if(typeof d.rol === 'string' && /^\d+$/.test(d.rol)) return Number(d.rol);
+        if(typeof d.rol === 'object'){
+            if(typeof d.rol.idRol === 'number') return d.rol.idRol;
+            if(typeof d.rol.id === 'number') return d.rol.id;
+            if(typeof d.rol.idRol === 'string' && /^\d+$/.test(d.rol.idRol)) return Number(d.rol.idRol);
+            if(typeof d.rol.id === 'string' && /^\d+$/.test(d.rol.id)) return Number(d.rol.id);
+        }
+        // fallback: some payloads use top-level 'rol' as object name or rolNombre string
+        return null;
+    }catch(e){ return null; }
+}
+
+function getCurrentUserRole() {
+    const datosStr = sessionStorage.getItem('datosUsuarioAgroSystem') || localStorage.getItem('datosUsuarioAgroSystem') || '';
+    if (!datosStr) return '';
+    try { const d = JSON.parse(datosStr); return (d.rolNombre || (d.rol && (d.rol.nombre || (d.rol.idRol===1?'Administrador':''))) || d.rol || '').toString().toLowerCase(); } catch(e){ return String(datosStr).toLowerCase(); }
+}
+
+function isAdmin(){ const r = getCurrentUserRole(); const id = getCurrentUserRoleId(); return id === 1 || r.includes('admin') || r.includes('administrador'); }
+function isVeterinario(){ const r = getCurrentUserRole(); const id = getCurrentUserRoleId(); return id === 2 || r.includes('veterinario') || r.includes('vet'); }
 
 // Fetch animales to populate select
 async function fetchAnimalesForSelect(){
@@ -341,6 +371,11 @@ if (isAdmin() && btnAgregar) {
     btnAgregar.style.display = 'none';
 }
 
+// Extra: if role explicitly numeric 1, ensure no-crear; if role numeric 2 allow create
+const roleIdNow = getCurrentUserRoleId();
+if (roleIdNow === 1 && btnAgregar) btnAgregar.style.display = 'none';
+if (roleIdNow === 2 && btnAgregar) btnAgregar.style.display = '';
+
 
 // =====================
 // CERRAR MODAL AGREGAR
@@ -524,8 +559,8 @@ btnGuardar.addEventListener("click", async () => {
 // =====================
 // MOSTRAR TABLA
 // =====================
-function mostrarTabla() {
-        if (reportes.length === 0) {
+function mostrarTabla(lista = reportes) {
+        if (!Array.isArray(lista) || lista.length === 0) {
                 tabla.innerHTML = "<p>No hay reportes registrados.</p>";
                 return;
         }
@@ -541,7 +576,7 @@ function mostrarTabla() {
                 </tr>
         `;
 
-        reportes.forEach((r, index) => {
+        lista.forEach((r, index) => {
                 const arete = (r.idAnimales && (r.idAnimales.numArete || r.idAnimales.numArete === 0)) ? r.idAnimales.numArete : '';
                 const nombre = (r.idAnimales && (r.idAnimales.nombreAnimal || r.idAnimales.nombre)) ? (r.idAnimales.nombreAnimal || r.idAnimales.nombre) : '';
                 html += `
@@ -560,6 +595,20 @@ function mostrarTabla() {
 
         html += "</table>";
         tabla.innerHTML = html;
+}
+
+// Buscador: filtrar reportes por nombre de animal o número de arete
+if(buscador){
+    buscador.addEventListener('input', () => {
+        const texto = buscador.value.trim().toLowerCase();
+        if(!texto){ mostrarTabla(reportes); return; }
+        const resultados = (reportes || []).filter(r => {
+            const arete = r.idAnimales && (r.idAnimales.numArete || r.idAnimales.numArete === 0) ? String(r.idAnimales.numArete).toLowerCase() : '';
+            const nombre = r.idAnimales && (r.idAnimales.nombreAnimal || r.idAnimales.nombre) ? String(r.idAnimales.nombreAnimal || r.idAnimales.nombre).toLowerCase() : '';
+            return (arete && arete.includes(texto)) || (nombre && nombre.includes(texto));
+        });
+        mostrarTabla(resultados);
+    });
 }
 
 
@@ -618,6 +667,7 @@ function verReporte(i) {
 // EDITAR REPORTE - ACTUALIZADO
 // =====================
 function editarReporte(i) {
+    if(!isVeterinario()){ mostrarAlerta('warning','Permiso denegado','No tiene permisos para editar reportes.'); return; }
     const r = reportes[i];
     editIndex = i;
     currentEditingId = r.idReporte || null;
@@ -655,6 +705,7 @@ function editarReporte(i) {
 async function eliminarReporte(i) {
     // Abrir modal de confirmación persistente (se maneja en confirmarEliminarReporte)
     const r = reportes[i];
+    if(!isVeterinario()){ mostrarAlerta('warning','Permiso denegado','No tiene permisos para eliminar reportes.'); return; }
     if(!r){ mostrarAlerta('warning','Error','Reporte no encontrado'); return; }
     reporteAEliminarIndex = i;
     abrirModalEliminarReporte(r);
