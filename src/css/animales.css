@@ -231,6 +231,7 @@ body {
   border-left: 5px solid rgba(114, 158, 100, 1);
   width: 100%;
   max-width: 1000px;
+}
 .btn-toggle-sidebar:hover {
   background-color: rgba(94, 138, 80, 1);
   transform: scale(1.1);
