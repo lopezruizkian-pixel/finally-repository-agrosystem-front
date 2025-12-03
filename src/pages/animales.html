@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="../img/logo.png">
   
-  <!-- Usar rutas relativas consistentes -->
   <link rel="stylesheet" href="../css/animales.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/modales.css">
@@ -47,6 +46,7 @@
     </main>
   </div>
 
+  <!-- Modal Visualizar Animal -->
   <div id="modalVisualizarAnimal" class="modal">
     <div class="modal-contenido visualizar">
       <h2>Detalles del Animal</h2>
@@ -57,68 +57,107 @@
     </div>
   </div>
 
+  <!-- Modal Agregar Animal -->
   <div id="modalAgregarAnimal" class="modal">
     <div class="modal-contenido">
-      <h2>Agregar Animal</h2>
+      <h2 id="tituloModal">Agregar Animal</h2>
 
-      <label>Nombre:</label>
-      <input type="text" id="nombre">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre: <span class="required">*</span></label>
+          <input type="text" id="nombre" placeholder="Nombre del animal">
+        </div>
 
-      <label>Sexo:</label>
-      <select id="sexo">
-        <option value="H">Hembra</option>
-        <option value="M">Macho</option>
-      </select>
+        <div class="form-group">
+          <label>Número de Arete: <span class="required">*</span></label>
+          <input type="number" id="numArete" placeholder="Número de arete">
+        </div>
 
-      <label>Número de Arete:</label>
-      <input type="text" id="numArete">
+        <div class="form-group">
+          <label>Sexo: <span class="required">*</span></label>
+          <select id="sexo">
+            <option value="H">Hembra</option>
+            <option value="M">Macho</option>
+          </select>
+        </div>
 
-      <label>Rebaño:</label>
-      <select id="rebano">
-        <option value="Vaca">Vaca</option>
-        <option value="Becerro">Becerro</option>
-        <option value="Becerra">Becerra</option>
-        <option value="Toro">Toro</option>
-      </select>
+        <div class="form-group">
+          <label>Estado:</label>
+          <select id="estado">
+            <option value="Vivo">Vivo</option>
+            <option value="Vendido">Vendido</option>
+            <option value="Muerto">Muerto</option>
+          </select>
+        </div>
 
-      <label>Procedencia:</label>
-      <select id="procedencia">
-        <option value="Interno">Interno</option>
-        <option value="Externo">Externo</option>
-      </select>
+        <div class="form-group">
+          <label>Rebaño:</label>
+          <select id="rebano">
+            <option value="Vaca">Vaca</option>
+            <option value="Becerro">Becerro</option>
+            <option value="Becerra">Becerra</option>
+            <option value="Toro">Toro</option>
+          </select>
+        </div>
 
-      <label>Fecha de Nacimiento:</label>
-      <input type="date" id="fechaNacimiento">
+        <div class="form-group">
+          <label>Procedencia:</label>
+          <select id="procedencia">
+            <option value="Interno">Interno</option>
+            <option value="Externo">Externo</option>
+          </select>
+        </div>
 
-      <label>Edad:</label>
-      <input type="number" id="edad">
+        <div class="form-group">
+          <label>Fecha de Nacimiento:</label>
+          <input type="date" id="fechaNacimiento">
+        </div>
 
-      <label>Peso Inicial:</label>
-      <input type="number" id="peso" step="0.1">
+        <div class="form-group">
+          <label>Edad (años):</label>
+          <input type="number" id="edad" placeholder="Edad" min="0">
+        </div>
 
-      <label>Características:</label>
-      <input type="text" id="caracteristicas">
+        <div class="form-group">
+          <label>Peso Inicial (kg):</label>
+          <input type="number" id="peso" step="0.01" placeholder="Peso en kg" min="0">
+        </div>
 
-      <label>Número de Arete del Padre:</label>
-      <input type="text" id="padreArete">
+        <div class="form-group">
+          <label>ID Padre:</label>
+          <input type="number" id="padreArete" placeholder="ID del padre" min="0">
+        </div>
 
-      <label>Número de Arete de la Madre:</label>
-      <input type="text" id="madreArete">
+        <div class="form-group">
+          <label>ID Madre:</label>
+          <input type="number" id="madreArete" placeholder="ID de la madre" min="0">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Características:</label>
+          <textarea id="caracteristicas" rows="3" placeholder="Descripción de características del animal"></textarea>
+        </div>
+      </div>
 
       <div class="botones">
-        <button id="btnGuardarAnimal">Guardar</button>
-        <button id="btnCerrarModal">Cancelar</button>
+        <button id="btnGuardarAnimal" class="btn-guardar">
+          <i class="fas fa-save"></i> Guardar
+        </button>
+        <button id="btnCerrarModal" class="btn-cancelar">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- Modal Actualizar Peso -->
   <div id="modalActualizarPeso" class="modal">
     <div class="modal-contenido">
       <h2>Actualizar Peso del Animal</h2>
       <p id="nombreAnimalPeso" style="margin-bottom: 15px; font-weight: bold; color: #2c5f2d;"></p>
 
       <label>Nuevo Peso (kg):</label>
-      <input type="number" id="nuevoPeso" step="0.1" placeholder="Ej: 450.5">
+      <input type="number" id="nuevoPeso" step="0.01" placeholder="Ej: 450.5" min="0">
 
       <label>Fecha:</label>
       <input type="date" id="fechaPeso">
@@ -145,7 +184,121 @@
     </div>
   </div>
 
-  <!-- Scripts con rutas relativas -->
+  <style>
+    /* Estilos para el modal mejorado */
+    .modal-contenido {
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #2c5f2d;
+      font-size: 0.95rem;
+    }
+
+    .required {
+      color: #dc3545;
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #729e65;
+      box-shadow: 0 0 0 3px rgba(114, 158, 101, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .botones {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .btn-guardar,
+    .btn-cancelar {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+
+    .btn-guardar {
+      background-color: #729e65;
+      color: white;
+    }
+
+    .btn-guardar:hover {
+      background-color: #5e8a51;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .btn-cancelar {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .btn-cancelar:hover {
+      background-color: #5a6268;
+      transform: translateY(-2px);
+    }
+
+    #tituloModal {
+      color: #2c5f2d;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #729e65;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
   <script src="../js/navegacion.js"></script>
   <script src="../js/animales.js"></script>
 </body>
