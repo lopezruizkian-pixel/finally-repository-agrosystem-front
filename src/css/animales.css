@@ -96,6 +96,130 @@ body {
   align-items: center;
 }
 
+/* Buscador + Agregar */
+.buscador-agregar {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f6fbf6;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(114,158,100,0.08);
+}
+
+.buscador input {
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 6px 8px;
+  font-size: 0.95rem;
+  min-width: 220px;
+}
+
+.buscador button {
+  border: none;
+  background: rgba(114,158,100,1);
+  color: white;
+  padding: 7px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-agregar {
+  background: linear-gradient(180deg, rgba(114,158,100,1), rgba(92,128,82,1));
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(40, 74, 32, 0.12);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.btn-agregar:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(40,74,32,0.16); }
+
+/* Table improvements */
+.tabla-animales {
+  width: 100%;
+  max-width: 1000px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.tabla-animales table { width: 100%; border-collapse: collapse; }
+.tabla-animales thead th {
+  background: linear-gradient(90deg, rgba(243,246,242,1), rgba(235,239,233,1));
+  color: #2c5f2d;
+  font-weight: 700;
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #e9efe8;
+}
+
+.tabla-animales tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f6f1;
+  vertical-align: middle;
+}
+
+.tabla-animales tbody tr:hover { background: #fbfcfb; }
+
+/* Action buttons (view/edit/delete) */
+.tabla-animales button {
+  margin: 0 6px 0 0;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 0.95rem;
+  padding: 6px;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.btn-ver .fa-eye { color: #2c7a2f; }
+.btn-editar .fa-pen { color: #0b5cff; }
+.btn-eliminar .fa-trash-alt { color: #c9302c; }
+
+/* When buttons are hidden (permiso) keep layout stable */
+.btn-editar[style*="display: none"], .btn-ver[style*="display: none"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Sidebar collapse on very small screens */
+@media (max-width: 700px) {
+  .contenedor-principal { flex-direction: column; }
+  .sidebar { width: 100%; display: flex; flex-direction: row; gap: 6px; padding: 8px; overflow-x: auto; }
+  .menu-btn { width: auto; padding: 8px 10px; }
+  .contenido { padding: 12px; height: auto; }
+  .buscador input { min-width: 120px; }
+  .btn-agregar { padding: 8px 12px; }
+  .modal-contenido { width: 95%; max-width: 720px; }
+}
+
 /* Secciones de estadísticas */
 .seccion-estadistica {
   background-color: #fff;

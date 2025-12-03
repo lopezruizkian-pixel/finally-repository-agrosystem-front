@@ -142,7 +142,25 @@ function getCurrentUserRole(){
   if(!datosStr) return '';
   try{ const d = JSON.parse(datosStr); return (d.rolNombre || (d.rol && (d.rol.nombre || (d.rol.idRol===1?'Administrador':''))) || d.rol || '').toString().toLowerCase(); }catch(e){ return String(datosStr).toLowerCase(); }
 }
-function isVeterinario(){ const r = getCurrentUserRole(); return r.includes('veterinario') || r.includes('vet'); }
+function isVeterinario(){ 
+  // Try to detect veterinarian role by numeric id (2), object idRol, or role name contains 'veterinario'/'vet'
+  const datosStr = sessionStorage.getItem('datosUsuarioAgroSystem') || localStorage.getItem('datosUsuarioAgroSystem') || '';
+  if(datosStr){
+    try{
+      const d = JSON.parse(datosStr);
+      if(d && d.rol !== undefined && d.rol !== null){
+        if(typeof d.rol === 'number' && Number(d.rol) === 2) return true;
+        if(typeof d.rol === 'string' && String(d.rol) === '2') return true;
+        if(typeof d.rol === 'object' && (d.rol.idRol === 2 || d.rol.id === 2)) return true;
+      }
+      if(d && (d.rolNombre || d.role)){
+        const name = String(d.rolNombre || d.role).toLowerCase();
+        if(name.includes('veterinario') || name.includes('vet')) return true;
+      }
+    }catch(e){ /* ignore parse errors */ }
+  }
+  const r = getCurrentUserRole(); return r.includes('veterinario') || r.includes('vet');
+}
 function isAdmin(){ const r = getCurrentUserRole(); return r.includes('admin') || r.includes('administrador'); }
 
 // Crear modal de confirmación de eliminación

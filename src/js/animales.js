@@ -15,6 +15,52 @@ const selectSexo = document.getElementById('sexo');
 const selectEstado = document.getElementById('estado');
 const buscador = document.querySelector('.buscador input');
 
+// Hide rebano group initially; we'll show it after sexo selection
+const rebanoGroup = selectRebano ? selectRebano.closest('.form-group') : null;
+if (rebanoGroup) {
+  rebanoGroup.style.display = 'none';
+}
+
+/**
+ * Populate `selectRebano` options based on sexo value ('H' or 'M').
+ * Shows the rebanoGroup if hidden.
+ */
+function populateRebanoOptions(sexo) {
+  if (!selectRebano) return;
+  const s = String(sexo || '').toUpperCase();
+  const opts = [];
+  if (s === 'H') {
+    opts.push({ v: 'Vaca', t: 'Vaca' });
+    opts.push({ v: 'Becerra', t: 'Becerra' });
+  } else if (s === 'M') {
+    opts.push({ v: 'Toro', t: 'Toro' });
+    opts.push({ v: 'Becerro', t: 'Becerro' });
+  } else {
+    // default: keep existing options but show a generic list
+    opts.push({ v: 'Vaca', t: 'Vaca' });
+    opts.push({ v: 'Toro', t: 'Toro' });
+  }
+
+  // replace options
+  selectRebano.innerHTML = '';
+  opts.forEach(o => {
+    const option = document.createElement('option');
+    option.value = o.v;
+    option.textContent = o.t;
+    selectRebano.appendChild(option);
+  });
+
+  // show group
+  if (rebanoGroup) rebanoGroup.style.display = '';
+}
+
+// When sexo changes, populate and show rebaño
+if (selectSexo) {
+  selectSexo.addEventListener('change', (e) => {
+    populateRebanoOptions(e.target.value);
+  });
+}
+
 // Modal y contenido de visualización
 let modalVisualizar = document.getElementById('modalVisualizarAnimal');
 if (!modalVisualizar) {
@@ -43,8 +89,18 @@ function getCurrentUserRole() {
   const datosStr = sessionStorage.getItem('datosUsuarioAgroSystem') || localStorage.getItem('datosUsuarioAgroSystem') || null;
   if (!datosStr) return '';
   try {
-    const datos = JSON.parse(datosStr);
-    return (datos.rolNombre || (datos.rol && (datos.rol.nombre || (datos.rol.idRol === 1 ? 'Administrador' : ''))) || datos.rol || '').toString().toLowerCase();
+    const datos = typeof datosStr === 'string' ? JSON.parse(datosStr) : datosStr;
+    if (datos.rol !== undefined && datos.rol !== null) {
+      if (typeof datos.rol === 'number') return (datos.rol === 1 ? 'administrador' : String(datos.rol)).toLowerCase();
+      if (typeof datos.rol === 'string') return datos.rol.toLowerCase();
+      if (typeof datos.rol === 'object') {
+        if (datos.rol.nombre) return String(datos.rol.nombre).toLowerCase();
+        if (datos.rol.idRol !== undefined) return (datos.rol.idRol === 1 ? 'administrador' : String(datos.rol.idRol)).toLowerCase();
+      }
+    }
+    if (datos.rolNombre) return String(datos.rolNombre).toLowerCase();
+    if (datos.role) return String(datos.role).toLowerCase();
+    return '';
   } catch (e) {
     return String(datosStr).toLowerCase();
   }
@@ -522,9 +578,10 @@ window.addEventListener('click', (e) => {
 function limpiarModal() {
   inputNombre.value = '';
   inputNumArete.value = '';
-  selectRebano.value = 'Vaca';
+  // clear rebaño until sexo is selected
+  try { selectRebano.innerHTML = ''; } catch(e){}
   selectProcedencia.value = 'Interno';
-  selectSexo.value = 'H';
+  selectSexo.value = '';
   selectEstado.value = 'Vivo';
   document.getElementById('fechaNacimiento').value = '';
   document.getElementById('edad').value = '';
@@ -533,6 +590,8 @@ function limpiarModal() {
   document.getElementById('padreArete').value = '';
   document.getElementById('madreArete').value = '';
   editIndex = null;
+  // hide rebaño until sexo is chosen
+  if (rebanoGroup) rebanoGroup.style.display = 'none';
 }
 
 // ===================================
@@ -775,9 +834,12 @@ function renderizarAnimales(lista = animales){
       
       inputNombre.value = animal.nombreAnimal || '';
       inputNumArete.value = animal.numArete != null ? String(animal.numArete) : '';
-      selectRebano.value = animal['rebaño'] || 'Vaca';
-      selectProcedencia.value = animal.procedencia || 'Interno';
+      // set sexo first so we can populate and show rebaño correctly
       selectSexo.value = (animal.sexo === 'M' || animal.sexo === true) ? 'M' : 'H';
+      populateRebanoOptions(selectSexo.value);
+      // try to restore the stored rebaño value if present
+      try { selectRebano.value = animal['rebaño'] || selectRebano.options[0].value || 'Vaca'; } catch(e) { selectRebano.value = 'Vaca'; }
+      selectProcedencia.value = animal.procedencia || 'Interno';
       selectEstado.value = animal.estado || 'Vivo';
       
       editIndex = animales.indexOf(animal);

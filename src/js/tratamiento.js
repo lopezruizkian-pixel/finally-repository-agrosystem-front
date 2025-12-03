@@ -169,7 +169,28 @@ function getCurrentUserRole() {
   if (!datosStr) return '';
   try { const datos = JSON.parse(datosStr); return (datos.rolNombre || (datos.rol && (datos.rol.nombre || (datos.rol.idRol === 1 ? 'Administrador' : ''))) || datos.rol || '').toString().toLowerCase(); } catch(e){ return String(datosStr).toLowerCase(); }
 }
-function isVeterinario(){ const r = getCurrentUserRole(); return r.includes('veterinario') || r.includes('vet'); }
+function isVeterinario(){
+  // Primero intentar interpretar directamente el objeto de usuario almacenado
+  const datosStr = sessionStorage.getItem('datosUsuarioAgroSystem') || localStorage.getItem('datosUsuarioAgroSystem') || null;
+  if(datosStr){
+    try{
+      const datos = JSON.parse(datosStr);
+      if(datos){
+        // rol como número o string numérico
+        if(typeof datos.rol === 'number' && datos.rol === 2) return true;
+        if(typeof datos.rol === 'string' && Number(datos.rol) === 2) return true;
+        // rol como objeto con idRol/id
+        if(typeof datos.rol === 'object' && (datos.rol.idRol === 2 || datos.rol.id === 2)) return true;
+        // rolNombre textual
+        const rolNombre = (datos.rolNombre || datos.rol || '').toString().toLowerCase();
+        if(rolNombre.includes('veterinario') || rolNombre.includes('vet')) return true;
+      }
+    }catch(e){ /* ignore parse errors */ }
+  }
+  // Fallback: usar el helper existente que normaliza a string
+  const r = getCurrentUserRole();
+  return r === '2' || r.includes('veterinario') || r.includes('vet');
+}
 function isAdmin(){ const r = getCurrentUserRole(); return r.includes('admin') || r.includes('administrador'); }
 
 // Fetch enfermedades desde backend

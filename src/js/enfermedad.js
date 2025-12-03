@@ -90,6 +90,7 @@ const inputNombre = document.getElementById('nombre');
 const inputTipo = document.getElementById('tipo');
 const inputDuracion = document.getElementById('duracion');
 const selectRiesgo = document.getElementById('riesgo');
+const tratamientosGroup = document.getElementById('tratamientosGroup');
 
 // Modal de visualizar
 const modalVisualizar = document.getElementById('modalVisualizarEnfermedad');
@@ -182,6 +183,30 @@ async function createEnfermedadBackend(payload){
     await fetchEnfermedadesFromBackend();
     return true;
   }catch(e){ console.error(e); mostrarAlerta('Error creando enfermedad','error'); return false; }
+}
+
+// Load tratamientos from backend and populate the tratamientos checkbox group
+let tratamientosList = [];
+async function fetchTratamientosFromBackend(){
+  try{
+    console.debug('GET /tratamientos');
+    const res = await fetch('http://192.168.1.17:7002/tratamientos', { headers: await getAuthHeaders() });
+    const text = await res.text(); if(!res.ok){ console.error('Error cargando tratamientos', res.status, text); return; }
+    const data = text ? JSON.parse(text) : [];
+    tratamientosList = (data || []).map(t => ({ idTratamiento: t.idTratamiento || t.id || null, nombre: t.nombreTratamiento || t.nombre || `Tratamiento ${t.idTratamiento||t.id||''}` }));
+    // populate UI checkboxes
+    if(tratamientosGroup){
+      tratamientosGroup.innerHTML = '';
+      tratamientosList.forEach(t => {
+        const lab = document.createElement('label');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.name = 'tratamientos'; cb.value = String(t.idTratamiento);
+        lab.appendChild(cb);
+        lab.appendChild(document.createTextNode(' ' + (t.nombre || `Tratamiento ${t.idTratamiento}`)));
+        tratamientosGroup.appendChild(lab);
+      });
+    }
+  }catch(e){ console.error('fetchTratamientosFromBackend error', e); }
 }
 
 async function updateEnfermedadBackend(idEnfermedad, payload){
@@ -304,27 +329,67 @@ btnGuardar.addEventListener('click', async () => {
   const tratamientos = getCheckboxValues('tratamientos');
   const transmision = getCheckboxValues('transmision');
 
-  // Convertir arrays a strings separados por comas para enviar al backend
+  // Convertir arrays a strings separados por comas para enviar al backend (legacy)
   const sintomasStr = sintomas.join(', ');
   const tratamientosStr = tratamientos.join(', ');
   const transmisionStr = transmision.join(', ');
+  // preparar array de ids numéricos para 'tratamientos' (checkbox values contienen idTratamiento)
+  const tratamientosIds = (tratamientos || [])
+    .map(v => { const n = Number(v); return isNaN(n) ? null : n; })
+    .filter(x => x !== null);
 
-  // Build payload according to API contract
+  // Map textual duration options to integer expected by backend.
+  // If your API expects different codes, tell me and I will adjust the mapping.
+  const duracionRaw = (inputDuracion.value || '').toString();
+  // sensible defaults: map to approximate days or codes
+  const duracionMap = {
+    'aguda (menos de 7 días)': 7,
+    'subaguda (7 a 14 días)': 14,
+    'crónica (más de 14 días)': 30,
+    'cronica (más de 14 días)': 30,
+    'peraguda (horas/muerte rápida)': 1
+  };
+  let duracionEstimadaNumeric = undefined;
+  if(duracionRaw){
+    const key = duracionRaw.toLowerCase();
+    if(duracionMap.hasOwnProperty(key)) duracionEstimadaNumeric = duracionMap[key];
+    else {
+      // try to extract a number from the string
+      const m = duracionRaw.match(/(\d+)/);
+      if(m) duracionEstimadaNumeric = Number(m[1]);
+    }
+  }
+
+  // Build payload according to API contract (fields required by backend)
+  // Ensure payload fields are never `undefined` (use sensible defaults)
+  // Build payload according to API contract (fields required by backend)
+  // Ensure payload fields are never `undefined` (use sensible defaults)
   const payload = {
-    nombreEnfermedad: nombre,
-    tipoEnfermedad: tipo,
-    sintomas: sintomasStr || undefined,
-    duracionEstimada: inputDuracion.value || undefined,
-    tratamientosRecomendados: tratamientosStr || undefined,
-    nivelRiesgo: selectRiesgo.value || undefined,
-    modoTransmision: transmisionStr || undefined,
-    idMedicamento: null,
+    nombreEnfermedad: nombre || '',
+    tipoEnfermedad: tipo || '',
+    sintomas: sintomasStr || '',
+    // If we couldn't map a numeric duration, send 0 (backend should validate)
+    duracionEstimada: typeof duracionEstimadaNumeric === 'number' ? duracionEstimadaNumeric : 0,
+    // legacy field: comma-separated names or ids (string)
+    tratamientosRecomendados: tratamientosStr || '',
+    nivelRiesgo: selectRiesgo.value || 'Nulo/Mínimo',
+    modoTransmision: transmisionStr || ''
   };
 
-  // Attempt to set idMedicamento if the raw object exists in current edit
-  if(editIndex !== null){
+  // Include `idMedicamento` only when we have it. The backend model expects a
+  // `Medicamento` object, so send an object (e.g. { idMedicamento: 123 }) when
+  // possible. If unknown, omit the key entirely so JSON won't include null/0.
+  if (editIndex !== null) {
     const existing = enfermedades[editIndex];
-    if(existing && existing.idMedicamento) payload.idMedicamento = Number(existing.idMedicamento);
+    const med = existing && existing.idMedicamento;
+    if (med) {
+      if (typeof med === 'object') {
+        payload.idMedicamento = med;
+      } else {
+        const medId = Number(med);
+        if (!isNaN(medId)) payload.idMedicamento = { idMedicamento: medId };
+      }
+    }
   }
 
   if(editIndex !== null){
@@ -450,10 +515,22 @@ function renderizarEnfermedades(lista = enfermedades) {
           : [];
         setCheckboxValues('sintomas', sintomasArray);
         
-        // Parsear tratamientos
-        const tratamientosArray = enfermedad.tratamientos 
-          ? enfermedad.tratamientos.split(',').map(t => t.trim()) 
-          : [];
+        // Parsear tratamientos y soportar varias formas de respuesta:
+        // - enfermedad.raw.tratamientos puede ser un array de objetos con idTratamiento
+        // - enfermedad.tratamientos puede ser cadena de ids o nombres
+        let tratamientosArray = [];
+        try{
+          if(enfermedad.raw && Array.isArray(enfermedad.raw.tratamientos)){
+            tratamientosArray = enfermedad.raw.tratamientos.map(t => String(t.idTratamiento || t.id));
+          } else if(enfermedad.raw && Array.isArray(enfermedad.raw.tratamientosRecomendados)){
+            tratamientosArray = enfermedad.raw.tratamientosRecomendados.map(t => String(t.idTratamiento || t.id));
+          } else if(enfermedad.tratamientos){
+            const parts = enfermedad.tratamientos.split(',').map(s => s.trim());
+            const numeric = parts.map(p => { const n = Number(p); return isNaN(n)?null:n; }).filter(x=>x!==null);
+            if(numeric.length>0) tratamientosArray = numeric.map(x=>String(x));
+            else tratamientosArray = parts; // fallback a nombres
+          }
+        }catch(e){ tratamientosArray = []; }
         setCheckboxValues('tratamientos', tratamientosArray);
         
         // Parsear transmisión
@@ -486,5 +563,7 @@ buscador.addEventListener('input', () => {
   renderizarEnfermedades(resultados);
 });
 
-// Inicializar tabla (cargar desde backend)
-fetchEnfermedadesFromBackend();
+// Inicializar tabla (cargar desde backend) y cargar tratamientos disponibles
+(async function init(){
+  await Promise.all([fetchTratamientosFromBackend(), fetchEnfermedadesFromBackend()]);
+})();
