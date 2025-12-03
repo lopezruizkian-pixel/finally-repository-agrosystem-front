@@ -12,6 +12,7 @@ const inputNumArete = document.getElementById('numArete');
 const selectRebano = document.getElementById('rebano');
 const selectProcedencia = document.getElementById('procedencia');
 const selectSexo = document.getElementById('sexo');
+const selectEstado = document.getElementById('estado');
 const buscador = document.querySelector('.buscador input');
 
 // Modal y contenido de visualización
@@ -282,21 +283,9 @@ async function getAuthHeaders() {
 async function sendAnimalToBackend(animal) {
   try {
     const headers = await getAuthHeaders();
-    // obtener idPropietario si existe en datosUsuarioAgroSystem (para payload)
-    let idPropietario = null;
-    const datosStr = localStorage.getItem('datosUsuarioAgroSystem') || sessionStorage.getItem('datosUsuarioAgroSystem') || null;
-    if (datosStr) {
-      try {
-        const datos = JSON.parse(datosStr);
-        idPropietario = datos.idPropietario || datos.idPropiertario || datos.id || datos.usuarioId || null;
-      } catch (e) {
-        // si no es JSON, ignorar
-      }
-    }
 
     const sexoBool = (() => {
       const s = (animal.sexo || '').toString().toLowerCase();
-      // Interpretación: valores que indican macho => true; hembra => false
       if (s === 'm' || s === 'macho' || s === 'male' || s === 'masculino' || s === 'true' || s === '1') return "M";
       return "H";
     })();
@@ -313,11 +302,9 @@ async function sendAnimalToBackend(animal) {
       sexo: sexoBool,
       idPadre: (animal.padreArete !== undefined && animal.padreArete !== null && String(animal.padreArete).trim() !== '' && !isNaN(Number(animal.padreArete))) ? Number(animal.padreArete) : null,
       idMadre: (animal.madreArete !== undefined && animal.madreArete !== null && String(animal.madreArete).trim() !== '' && !isNaN(Number(animal.madreArete))) ? Number(animal.madreArete) : null,
-      // Field name expected by the server
-      estado: idPropietario
+      estado: animal.estado || 'Vivo'
     };
 
-    // debug: mostrar payload en consola para diagnóstico
     console.debug('POST /animales payload', payload);
 
     const res = await fetch('http://192.168.1.17:7002/animales', {
@@ -359,29 +346,23 @@ async function fetchAnimalsFromBackend() {
       throw new Error('Respuesta del servidor no es una lista');
     }
 
-    // Mantener exactamente lo que devuelve el backend
     animales = list;
-
     renderizarAnimales();
   } catch (err) {
     console.error('fetchAnimalsFromBackend error:', err);
     mostrarAlerta(`No se pudieron cargar los animales: ${err.message || err}`, 'error');
-    // Si falla, mantener la vista local vacía
     renderizarAnimales();
   }
 }
 
 // Actualizar animal en backend (PUT)
-// ahora acepta opcionalmente `routeId` para asegurarse que el id en el body
-// coincide con el id usado en la ruta (el backend lo requiere).
 async function updateAnimalBackend(animalTemp, routeId) {
   try {
     const headers = await getAuthHeaders();
     const id = routeId || animalTemp.idAnimal || animalTemp.id;
-    if (!id) throw new Error('Falta idAnimal para actualizar (asegúrate que el id esté en el objeto y/o en la ruta)');
+    if (!id) throw new Error('Falta idAnimal para actualizar');
 
     const payload = {
-      // Asegurar que idAnimal del body coincide con la ruta
       idAnimal: Number(id),
       nombreAnimal: animalTemp.nombre || '',
       numArete: animalTemp.numArete ? Number(animalTemp.numArete) : null,
@@ -391,14 +372,12 @@ async function updateAnimalBackend(animalTemp, routeId) {
       caracteristica: animalTemp.caracteristica || animalTemp.caracteristicas || '',
       edad: animalTemp.edad ? Number(animalTemp.edad) : null,
       procedencia: animalTemp.procedencia || '',
-      sexo: (animalTemp.sexo && (animalTemp.sexo === 'M' || animalTemp.sexo === 'm' || animalTemp.sexo === 'true')) ? true : false,
+      sexo: (animalTemp.sexo && (animalTemp.sexo === 'M' || animalTemp.sexo === 'm' || animalTemp.sexo === 'true')) ? "M" : "H",
       idPadre: (animalTemp.padreArete !== undefined && animalTemp.padreArete !== null && String(animalTemp.padreArete).trim() !== '' && !isNaN(Number(animalTemp.padreArete))) ? Number(animalTemp.padreArete) : null,
       idMadre: (animalTemp.madreArete !== undefined && animalTemp.madreArete !== null && String(animalTemp.madreArete).trim() !== '' && !isNaN(Number(animalTemp.madreArete))) ? Number(animalTemp.madreArete) : null,
-      // Field name expected by the server
-      idPropiertario: animalTemp.idPropietario ? Number(animalTemp.idPropietario) : null
+      estado: animalTemp.estado || 'Vivo'
     };
 
-    // debug: mostrar payload en consola para diagnóstico
     console.debug('PUT /animales/' + id + ' payload', payload);
 
     const res = await fetch(`http://192.168.1.17:7002/animales/${id}`, {
@@ -469,7 +448,7 @@ const camposSecundarios = document.getElementById('camposSecundarios');
 const btnGuardarSecundario = document.getElementById('btnGuardarSecundario');
 const btnCerrarSecundario = document.getElementById('btnCerrarSecundario');
 
-let animalTemp = {}; // Guardar temporalmente los datos del primer modal
+let animalTemp = {};
 
 // ===================================
 // MODAL DE ELIMINAR
@@ -546,7 +525,7 @@ function limpiarModal() {
   selectRebano.value = 'Vaca';
   selectProcedencia.value = 'Interno';
   selectSexo.value = 'H';
-  // Limpiar campos adicionales
+  selectEstado.value = 'Vivo';
   document.getElementById('fechaNacimiento').value = '';
   document.getElementById('edad').value = '';
   document.getElementById('peso').value = '';
@@ -565,6 +544,7 @@ btnGuardar.addEventListener('click', () => {
   const rebano = selectRebano.value;
   const procedencia = selectProcedencia.value;
   const sexo = selectSexo.value;
+  const estado = selectEstado.value;
   const fechaNacimiento = document.getElementById('fechaNacimiento').value;
   const edad = document.getElementById('edad').value;
   const peso = document.getElementById('peso').value;
@@ -577,13 +557,14 @@ btnGuardar.addEventListener('click', () => {
     return;
   }
 
-  // Crear objeto con todos los datos en una sola tarjeta
+  // Crear objeto con todos los datos
   animalTemp = {
     nombre,
     numArete,
     rebano,
     procedencia,
     sexo,
+    estado,
     fechaNacimiento,
     edad,
     pesoInicial: peso,
@@ -595,31 +576,18 @@ btnGuardar.addEventListener('click', () => {
   // Procesar directamente sin modal secundario
   if (editIndex !== null) {
     // Actualizar en backend
-    const routeId = animales[editIndex] && (animales[editIndex].idAnimal || animales[editIndex].id) ? (animales[editIndex].idAnimal || animales[editIndex].id) : animalTemp.idAnimal || animalTemp.id;
+    const animalOriginal = animales[editIndex];
+    animalTemp.idAnimal = animalOriginal.idAnimal || animalOriginal.id;
+    
+    const routeId = animalTemp.idAnimal;
+    
     updateAnimalBackend(animalTemp, routeId)
       .then(resp => {
         if (resp.success) {
-          if (resp.data) {
-            animales[editIndex] = resp.data;
-          } else {
-            animales[editIndex] = {
-              ...animales[editIndex],
-              nombreAnimal: animalTemp.nombre,
-              numArete: Number(animalTemp.numArete),
-              'rebaño': animalTemp.rebano,
-              fechaNacimiento: animalTemp.fechaNacimiento,
-              pesoInicial: animalTemp.pesoInicial != null ? Number(animalTemp.pesoInicial) : null,
-              caracteristica: animalTemp.caracteristica || '',
-              edad: animalTemp.edad != null ? Number(animalTemp.edad) : null,
-              idPadre: animalTemp.padreArete ? Number(animalTemp.padreArete) : null,
-              idMadre: animalTemp.madreArete ? Number(animalTemp.madreArete) : null,
-              procedencia: animalTemp.procedencia,
-              sexo: (animalTemp.sexo === 'M')
-            };
-          }
+          // Recargar la lista desde el backend para asegurar consistencia
+          fetchAnimalsFromBackend();
           mostrarAlerta(`El animal "${animalTemp.nombre}" ha sido actualizado exitosamente.`, 'success');
           modal.style.display = 'none';
-          renderizarAnimales();
         } else {
           mostrarAlerta(`Error al actualizar en servidor: ${resp.error}`, 'error');
         }
@@ -632,27 +600,10 @@ btnGuardar.addEventListener('click', () => {
     sendAnimalToBackend(animalTemp)
       .then(resp => {
         if (resp.success) {
-          if (resp.data) {
-            animales.push(resp.data);
-          } else {
-            animales.push({
-              idAnimal: resp.data && resp.data.idAnimal ? resp.data.idAnimal : null,
-              nombreAnimal: animalTemp.nombre,
-              numArete: animalTemp.numArete ? Number(animalTemp.numArete) : null,
-              'rebaño': animalTemp.rebano,
-              fechaNacimiento: animalTemp.fechaNacimiento,
-              pesoInicial: animalTemp.pesoInicial != null ? Number(animalTemp.pesoInicial) : null,
-              caracteristica: animalTemp.caracteristica || '',
-              idPadre: animalTemp.padreArete ? Number(animalTemp.padreArete) : null,
-              idMadre: animalTemp.madreArete ? Number(animalTemp.madreArete) : null,
-              edad: animalTemp.edad != null ? Number(animalTemp.edad) : null,
-              procedencia: animalTemp.procedencia,
-              sexo: (animalTemp.sexo === 'M')
-            });
-          }
+          // Recargar la lista desde el backend
+          fetchAnimalsFromBackend();
           mostrarAlerta(`El animal "${animalTemp.nombre}" ha sido registrado exitosamente.`, 'success');
           modal.style.display = 'none';
-          renderizarAnimales();
         } else {
           mostrarAlerta(`Error al registrar en servidor: ${resp.error}`, 'error');
         }
@@ -668,7 +619,6 @@ btnGuardar.addEventListener('click', () => {
 // ===================================
 function abrirModalEliminar(animal) {
   animalAEliminar = animal;
-  // Usar campos que proporciona el backend
   document.getElementById('mensajeEliminarAnimal').textContent = 
     `Se eliminará el animal "${animal.nombreAnimal || ''}" (Arete: ${animal.numArete || ''}).`;
   document.getElementById('modalEliminarAnimal').classList.add('active');
@@ -684,17 +634,13 @@ function cerrarModalEliminar() {
 function confirmarEliminarAnimal() {
   if (animalAEliminar) {
     const id = animalAEliminar.idAnimal || animalAEliminar.id || null;
-    // Llamar al backend para eliminar
     if (id) {
       deleteAnimalBackend(id)
         .then(resp => {
           if (resp.success) {
-            // Guardar información para la alerta antes de limpiar la referencia
-            const nombreAlert = animalAEliminar && (animalAEliminar.nombreAnimal || animalAEliminar.nombre) ? (animalAEliminar.nombreAnimal || animalAEliminar.nombre) : '';
-            const areteAlert = animalAEliminar && (animalAEliminar.numArete != null) ? animalAEliminar.numArete : '';
-            const idx = animales.indexOf(animalAEliminar);
-            if (idx > -1) animales.splice(idx, 1);
-            renderizarAnimales();
+            const nombreAlert = animalAEliminar.nombreAnimal || animalAEliminar.nombre || '';
+            const areteAlert = animalAEliminar.numArete || '';
+            fetchAnimalsFromBackend();
             cerrarModalEliminar();
             mostrarAlerta(`El animal "${nombreAlert}" (Arete: ${areteAlert}) ha sido eliminado exitosamente.`, 'success');
           } else {
@@ -703,9 +649,8 @@ function confirmarEliminarAnimal() {
         })
         .catch(err => mostrarAlerta(`Error en la petición: ${err.message || err}`, 'error'));
     } else {
-      // Si no tiene id, eliminar localmente
-      const nombreAlert = animalAEliminar && (animalAEliminar.nombreAnimal || animalAEliminar.nombre) ? (animalAEliminar.nombreAnimal || animalAEliminar.nombre) : '';
-      const areteAlert = animalAEliminar && (animalAEliminar.numArete != null) ? animalAEliminar.numArete : '';
+      const nombreAlert = animalAEliminar.nombreAnimal || animalAEliminar.nombre || '';
+      const areteAlert = animalAEliminar.numArete || '';
       const idx = animales.indexOf(animalAEliminar);
       if (idx > -1) animales.splice(idx, 1);
       renderizarAnimales();
@@ -747,14 +692,8 @@ function renderizarAnimales(lista = animales){
     fila.innerHTML = `
       <td>${animal.nombreAnimal || ''}</td>
       <td>${animal.numArete || ''}</td>
-      <td>${animal.sexo ? 'M' : 'H'}</td>
-      <td>
-        <select class="select-estado" data-id="${animal.idAnimal || animal.id}">
-          <option value="Vivo" ${estadoActual === 'Vivo' ? 'selected' : ''}>Vivo</option>
-          <option value="Vendido" ${estadoActual === 'Vendido' ? 'selected' : ''}>Vendido</option>
-          <option value="Muerto" ${estadoActual === 'Muerto' ? 'selected' : ''}>Muerto</option>
-        </select>
-      </td>
+      <td>${animal.sexo === 'M' || animal.sexo === true ? 'M' : 'H'}</td>
+      <td>${animal.estado}</td>
       <td>
         <button class="btn-ver" title="Ver detalles"><i class="fas fa-eye" aria-hidden="true"></i></button>
         <button class="btn-editar" title="Editar"><i class="fas fa-pen" aria-hidden="true"></i></button>
@@ -786,7 +725,7 @@ function renderizarAnimales(lista = animales){
         </div>
         <div class="detalle-item">
           <strong>Sexo</strong>
-          <p>${animal.sexo ? 'M' : 'H'}</p>
+          <p>${animal.sexo === 'M' || animal.sexo === true ? 'M' : 'H'}</p>
         </div>
         <div class="detalle-item">
           <strong>Estado</strong>
@@ -832,24 +771,18 @@ function renderizarAnimales(lista = animales){
 
     // EDITAR
     fila.querySelector('.btn-editar').addEventListener('click', () => {
+      console.debug('Editando animal:', animal);
+      
       inputNombre.value = animal.nombreAnimal || '';
       inputNumArete.value = animal.numArete != null ? String(animal.numArete) : '';
-      selectRebano.value = animal['rebaño'] || '';
-      selectProcedencia.value = animal.procedencia || '';
-      selectSexo.value = animal.sexo ? 'M' : 'H';
+      selectRebano.value = animal['rebaño'] || 'Vaca';
+      selectProcedencia.value = animal.procedencia || 'Interno';
+      selectSexo.value = (animal.sexo === 'M' || animal.sexo === true) ? 'M' : 'H';
+      selectEstado.value = animal.estado || 'Vivo';
+      
       editIndex = animales.indexOf(animal);
 
-      animalTemp = {
-        idAnimal: animal.idAnimal != null ? animal.idAnimal : null,
-        nombre: animal.nombreAnimal || '',
-        numArete: animal.numArete != null ? String(animal.numArete) : '',
-        rebano: animal['rebaño'] || '',
-        procedencia: animal.procedencia || '',
-        sexo: animal.sexo ? 'M' : 'H',
-        padreArete: animal.idPadre != null ? String(animal.idPadre) : '',
-        madreArete: animal.idMadre != null ? String(animal.idMadre) : ''
-      };
-
+      // Manejar fecha de nacimiento
       const f = animal.fechaNacimiento;
       if (Array.isArray(f) && f.length >= 3) {
         const y = String(f[0]).padStart(4,'0');
@@ -859,6 +792,7 @@ function renderizarAnimales(lista = animales){
       } else {
         document.getElementById('fechaNacimiento').value = f || '';
       }
+      
       document.getElementById('edad').value = animal.edad != null ? animal.edad : '';
       document.getElementById('peso').value = animal.pesoInicial != null ? animal.pesoInicial : '';
       document.getElementById('caracteristicas').value = animal.caracteristica || '';
@@ -870,8 +804,10 @@ function renderizarAnimales(lista = animales){
 
     // Mostrar/ocultar botones según rol
     if (!isAdmin()) {
-      const btnEdit = fila.querySelector('.btn-editar'); if (btnEdit) btnEdit.style.display = 'none';
-      const selectEst = fila.querySelector('.select-estado'); if (selectEst) selectEst.style.display = 'none';
+      const btnEdit = fila.querySelector('.btn-editar'); 
+      if (btnEdit) btnEdit.style.display = 'none';
+      const selectEst = fila.querySelector('.select-estado'); 
+      if (selectEst) selectEst.style.display = 'none';
     }
 
     // Event listener para el select de estado
@@ -886,8 +822,6 @@ function renderizarAnimales(lista = animales){
           return;
         }
 
-        // Actualizar estado en backend
-        const routeId = idAnimal;
         const payload = {
           idAnimal: Number(idAnimal),
           nombreAnimal: animal.nombreAnimal || '',
@@ -898,7 +832,9 @@ function renderizarAnimales(lista = animales){
           caracteristica: animal.caracteristica || '',
           edad: animal.edad ? Number(animal.edad) : null,
           procedencia: animal.procedencia || '',
-          sexo: animal.sexo,
+          sexo: animal.sexo === 'M' || animal.sexo === true ? "M" : "H",
+          idPadre: animal.idPadre || null,
+          idMadre: animal.idMadre || null,
           estado: nuevoEstado
         };
 
@@ -915,12 +851,10 @@ function renderizarAnimales(lista = animales){
             throw new Error(text || 'Error al actualizar estado');
           }
 
-          // Actualizar estado local
           animal.estado = nuevoEstado;
           mostrarAlerta(`Estado actualizado a "${nuevoEstado}"`, 'success');
         } catch (err) {
           mostrarAlerta(`Error actualizando estado: ${err.message}`, 'error');
-          // Revertir select al estado anterior
           selectEstado.value = estadoActual;
         }
       });
