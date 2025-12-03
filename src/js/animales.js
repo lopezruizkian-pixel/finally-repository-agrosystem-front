@@ -594,9 +594,6 @@ function limpiarModal() {
   if (rebanoGroup) rebanoGroup.style.display = 'none';
 }
 
-// ===================================
-// GUARDAR ANIMAL (MODAL ÚNICO - SIN MODAL SECUNDARIO)
-// ===================================
 btnGuardar.addEventListener('click', () => {
   const nombre = inputNombre.value.trim();
   const numArete = inputNumArete.value.trim();

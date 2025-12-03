@@ -16,21 +16,20 @@
       <img src="/ags-front/src/img/logo.png" alt="Logo Agrosystem">
       <span class="nombre">AGROSYSTEM</span>
     </div>
-    <div class="header-buttons">
-      <button onclick="irHome()" class="btn-volver">
-        <i class="fas fa-arrow-left"></i> Volver al Inicio
-      </button>
-    </div>
   </header>
 
   <div class="contenedor-principal">
-    <aside class="sidebar">
-      <button class="menu-btn"><i class="fas fa-cow"></i> Animal</button>
-      <button class="menu-btn"><i class="fas fa-pills"></i> Medicamento</button>
-      <button class="menu-btn"><i class="fas fa-file-alt"></i> Tarjeta de salud</button>
-      <button class="menu-btn activo"><i class="fas fa-notes-medical"></i> Reporte médico</button>
-      <button class="menu-btn"><i class="fas fa-syringe"></i> Tratamiento</button>
-      <button class="menu-btn"><i class="fas fa-shield-virus"></i> Enfermedad</button>
+    <aside class="sidebar" id="sidebar">
+      <button class="btn-dashboard" onclick="irHome()">
+        <i class="fas fa-home"></i>
+        <span>Inicio</span>
+      </button>
+      <button class="menu-btn"><i class="fas fa-cow"></i> <span>Animal</span></button>
+      <button class="menu-btn"><i class="fas fa-pills"></i> <span>Medicamento</span></button>
+      <button class="menu-btn"><i class="fas fa-file-alt"></i> <span>Tarjeta de salud</span></button>
+      <button class="menu-btn activo"><i class="fas fa-notes-medical"></i> <span>Reporte médico</span></button>
+      <button class="menu-btn"><i class="fas fa-syringe"></i> <span>Tratamiento</span></button>
+      <button class="menu-btn"><i class="fas fa-shield-virus"></i> <span>Enfermedad</span></button>
     </aside>
 
     <main class="contenido">
@@ -46,7 +45,7 @@
     </main>
   </div>
 
-  <!-- Modal visualizar -->
+  <!-- Modal Visualizar Reporte -->
   <div id="modalVisualizarReporte" class="modal">
     <div class="modal-contenido" style="width: 500px;">
       <h2>Detalle del Reporte Médico</h2>
@@ -57,116 +56,55 @@
     </div>
   </div>
 
-  <!-- Modal agregar -->
+  <!-- Modal Agregar/Editar Reporte -->
   <div id="modalAgregarReporte" class="modal">
     <div class="modal-contenido">
       <h2>Agregar Reporte Médico</h2>
 
-      <label>Animal:</label>
+      <label>Animal (seleccione):</label>
       <select id="selectAnimalReporte">
         <option value="">-- Seleccione un animal --</option>
       </select>
 
-      <label>Fecha:</label>
+      <label>Fecha del Reporte:</label>
       <input type="date" id="fecha">
+
+      <label>Temperatura (categoría):</label>
+      <select id="temperatura">
+        <option value="">Seleccionar...</option>
+        <option value="Normal (38-39°C)">Normal (38-39°C)</option>
+        <option value="Elevada (39-40°C)">Elevada (39-40°C)</option>
+        <option value="Muy elevada (>40°C)">Muy elevada (>40°C)</option>
+      </select>
+
+      <label>Condición Corporal:</label>
+      <select id="condicionCorporal">
+        <option value="">Seleccionar...</option>
+        <option value="1 - Muy delgado">1 - Muy delgado</option>
+        <option value="2 - Delgado">2 - Delgado</option>
+        <option value="3 - Ideal">3 - Ideal</option>
+        <option value="4 - Sobrepeso">4 - Sobrepeso</option>
+        <option value="5 - Obeso">5 - Obeso</option>
+      </select>
+
+      <label>Frecuencia Respiratoria (categoría):</label>
+      <select id="frecuenciaRespiratoria">
+        <option value="">Seleccionar...</option>
+        <option value="Normal (10-30 resp/min)">Normal (10-30 resp/min)</option>
+        <option value="Elevada (30-40 resp/min)">Elevada (30-40 resp/min)</option>
+        <option value="Muy elevada (>40 resp/min)">Muy elevada (>40 resp/min)</option>
+      </select>
+
+
 
       <label>Veterinario:</label>
       <input type="text" id="veterinario" placeholder="Nombre del veterinario">
 
-      <h3>Temperatura</h3>
-      <label>Temperatura:</label>
-      <select id="temperatura">
-        <option value="">Seleccionar temperatura...</option>
-        <option value="Hipotermia (< 37.5°C)">Hipotermia (< 37.5°C) - Riesgo</option>
-        <option value="Normal (37.5°C - 39.5°C)">Normal (37.5°C - 39.5°C) - Ideal</option>
-        <option value="Febrícula (39.6°C - 40.5°C)">Febrícula (39.6°C - 40.5°C) - Alerta</option>
-        <option value="Fiebre Alta (> 40.5°C)">Fiebre Alta (> 40.5°C) - Urgente</option>
-      </select>
+      <label>Diagnóstico Presuntivo:</label>
+      <input type="text" id="diagnosticoPresuntivo" placeholder="Diagnóstico inicial">
 
-      <h3>Condición Corporal</h3>
-      <label>Condición Corporal:</label>
-      <select id="condicionCorporal">
-        <option value="">Seleccionar condición...</option>
-        <option value="1">1 - Emaciada / Muy Flaca (Estructura ósea muy visible)</option>
-        <option value="2">2 - Delgada (Poca cobertura de grasa)</option>
-        <option value="3">3 - Óptima / Ideal (Buen estado general)</option>
-        <option value="4">4 - Sobrepeso (Exceso de grasa)</option>
-        <option value="5">5 - Obesa (Grasa excesiva, movilidad reducida)</option>
-      </select>
-
-      <h3>Frecuencia Respiratoria</h3>
-      <label>Frecuencia Respiratoria:</label>
-      <select id="frecuenciaRespiratoria">
-        <option value="">Seleccionar frecuencia...</option>
-        <option value="Normal (10 - 30 rpm)">Normal (10 - 30 rpm)</option>
-        <option value="Bradipnea / Lenta (< 10 rpm)">Bradipnea / Lenta (< 10 rpm)</option>
-        <option value="Taquipnea Leve / Acelerada (30 - 50 rpm)">Taquipnea Leve / Acelerada (30 - 50 rpm)</option>
-        <option value="Disnea / Dificultosa (> 50 rpm)">Disnea / Dificultosa (> 50 rpm)</option>
-      </select>
-
-      <h3>Síntomas Observados</h3>
-      <label>Síntomas (Selecciona todos los que apliquen):</label>
-      <div class="checkbox-group">
-        <fieldset>
-          <legend>Generales:</legend>
-          <label><input type="checkbox" name="sintomas" value="Decaimiento (Tristeza)"> Decaimiento (Tristeza)</label>
-          <label><input type="checkbox" name="sintomas" value="Anorexia (No come)"> Anorexia (No come)</label>
-          <label><input type="checkbox" name="sintomas" value="Deshidratación"> Deshidratación</label>
-        </fieldset>
-
-        <fieldset>
-          <legend>Digestivos:</legend>
-          <label><input type="checkbox" name="sintomas" value="Diarrea"> Diarrea</label>
-          <label><input type="checkbox" name="sintomas" value="Timpanismo (Hinchazón)"> Timpanismo (Hinchazón)</label>
-          <label><input type="checkbox" name="sintomas" value="Salivación excesiva"> Salivación excesiva</label>
-        </fieldset>
-
-        <fieldset>
-          <legend>Respiratorios:</legend>
-          <label><input type="checkbox" name="sintomas" value="Tos"> Tos</label>
-          <label><input type="checkbox" name="sintomas" value="Secreción Nasal"> Secreción Nasal</label>
-          <label><input type="checkbox" name="sintomas" value="Lagrimeo"> Lagrimeo</label>
-        </fieldset>
-
-        <fieldset>
-          <legend>Locomoción:</legend>
-          <label><input type="checkbox" name="sintomas" value="Cojera"> Cojera</label>
-          <label><input type="checkbox" name="sintomas" value="Postración (No se levanta)"> Postración (No se levanta)</label>
-        </fieldset>
-
-        <fieldset>
-          <legend>Piel:</legend>
-          <label><input type="checkbox" name="sintomas" value="Pelo Hirsuto (Erizado)"> Pelo Hirsuto (Erizado)</label>
-          <label><input type="checkbox" name="sintomas" value="Heridas/Lesiones"> Heridas/Lesiones</label>
-        </fieldset>
-      </div>
-
-      <label>Diagnóstico presuntivo:</label>
-      <input type="text" id="diagnosticoPresuntivo">
-
-      <label>Diagnóstico definitivo:</label>
-      <input type="text" id="diagnosticoDefinitivo">
-
-      <label>Tratamiento Aplicado:</label>
-      <select id="tratamiento">
-        <option value="">-- Seleccione un tratamiento --</option>
-      </select>
-
-      <label>Medicamentos:</label>
-      <select id="medicamentos">
-        <option value="">-- Seleccione un medicamento --</option>
-      </select>
-
-      <label>Estado del Animal:</label>
-      <select id="estado">
-        <option value="Estable">Estable</option>
-        <option value="En observación">En observación</option>
-        <option value="Crítico">Crítico</option>
-        <option value="Recuperado">Recuperado</option>
-      </select>
-
-      <label>Observaciones:</label>
-      <textarea id="observaciones" rows="3"></textarea>
+      <label>Diagnóstico Definitivo:</label>
+      <input type="text" id="diagnosticoDefinitivo" placeholder="Diagnóstico final">
 
       <div class="botones">
         <button id="btnGuardarReporte">Guardar</button>
@@ -175,6 +113,7 @@
     </div>
   </div>
 
+  <script src="../js/sidebar.js" defer></script>
   <script src="../js/navegacion.js" defer></script>
   <script src="../js/reporte_medico.js" defer></script>
 </body>

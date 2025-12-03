@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (datosUsuario) {
     const bienvenidaElement = document.getElementById('bienvenidaUsuario');
     if (bienvenidaElement) {
-      bienvenidaElement.textContent = `Bienvenido, ${datosUsuario.nombre}`;
+      bienvenidaElement.textContent = `BIENVENIDO ${datosUsuario.nombre}`;
     }
   }
 });
