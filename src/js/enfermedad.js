@@ -447,6 +447,17 @@ function confirmarEliminarEnfermedad() {
 // -------------------------
 // RENDERIZAR TABLA
 // -------------------------
+// Badge helper: devuelve la clase CSS según el nivel de riesgo
+function getBadgeClass(riesgo) {
+  if (!riesgo) return 'badge-leve';
+  const r = String(riesgo).toLowerCase();
+  if (r.includes('crít') || r.includes('crit') || r.includes('mortal')) return 'badge-critico';
+  if (r.includes('alto')) return 'badge-grave';
+  if (r.includes('moder')) return 'badge-moderado';
+  if (r.includes('leve') || r.includes('nulo') || r.includes('mínim') || r.includes('minim')) return 'badge-leve';
+  return 'badge-leve';
+}
+
 function renderizarEnfermedades(lista = enfermedades) {
   tablaEnfermedades.innerHTML = '';
   
@@ -491,7 +502,6 @@ function renderizarEnfermedades(lista = enfermedades) {
         <div class="detalle-item"><strong>Duración estimada</strong><p>${enfermedad.duracion}</p></div>
         <div class="detalle-item"><strong>Tratamientos</strong><p>${enfermedad.tratamientos}</p></div>
         <div class="detalle-item"><strong>Riesgo</strong><p><span class="badge-riesgo ${getBadgeClass(enfermedad.riesgo)}">${enfermedad.riesgo}</span></p></div>
-        <div class="detalle-item"><strong>Transmisión</strong><p>${enfermedad.transmision}</p></div>
       `;
       modalVisualizar.style.display = 'flex';
     });
@@ -551,6 +561,7 @@ function renderizarEnfermedades(lista = enfermedades) {
   tablaEnfermedades.appendChild(tabla);
 }
 
+const buscador = document.getElementById('buscadorEnfermedades');
 // -------------------------
 // BUSCADOR
 // -------------------------
