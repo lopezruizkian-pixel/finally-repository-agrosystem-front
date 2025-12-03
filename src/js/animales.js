@@ -214,7 +214,6 @@ async function updateAnimalBackend(animal, id) {
         
         // Construimos el payload asegurando tipos
         const payload = {
-            id: Number(id), // Algunos backends esperan 'id'
             idAnimal: Number(id),
             nombreAnimal: animal.nombre,
             numArete: Number(animal.numArete),

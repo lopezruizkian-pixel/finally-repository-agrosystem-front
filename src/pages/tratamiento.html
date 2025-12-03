@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="../img/logo.png">
-  <title>Tratamiento - Agrosystem</title>
+  <title>Tratamiento</title>
   <link rel="stylesheet" href="../css/tratamiento.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/modales.css">
@@ -77,10 +77,6 @@
         <option value="">-- Seleccione un reporte --</option>
       </select>
 
-      <label>Enfermedad/Condición:</label>
-      <select id="enfermedad">
-        <option value="">Seleccionar enfermedad...</option>
-      </select>
 
       <label>Medicamento:</label>
       <select id="selectMedicamentoTratamiento">
@@ -90,62 +86,9 @@
       <label>Medicamentos (Texto):</label>
       <input type="text" id="medicamentos" placeholder="Nombre del medicamento">
 
-      <h3>Dosis</h3>
-      <label>Dosis (Valor + Unidad):</label>
-      <div style="display: flex; gap: 10px; align-items: center;">
-        <input type="number" id="dosis" placeholder="Valor" step="0.1" style="flex: 0 0 120px;">
-        <select id="unidadDosis" style="flex: 1;">
-          <option value="">Seleccionar unidad...</option>
-          <option value="ml / cc">ml / cc (Mililitros)</option>
-          <option value="mg">mg (Miligramos)</option>
-          <option value="g">g (Gramos)</option>
-          <option value="Bolos / Tabletas">Bolos / Tabletas</option>
-          <option value="Tubos / Jeringas">Tubos / Jeringas</option>
-          <option value="UI">UI (Unidades Internacionales)</option>
-        </select>
-      </div>
-
-      <label>Vía de Administración:</label>
-      <select id="via">
-        <option value="Oral">Oral</option>
-        <option value="Inyectable">Inyectable</option>
-        <option value="Tópica">Tópica</option>
-        <option value="Intramamaria">Intramamaria</option>
-      </select>
-
-      <label>Frecuencia:</label>
-      <select id="frecuencia">
-        <option value="">Seleccionar frecuencia...</option>
-        <option value="Dosis Única (Solo una vez)">Dosis Única (Solo una vez)</option>
-        <option value="Cada 24 horas (1 vez al día)">Cada 24 horas (1 vez al día)</option>
-        <option value="Cada 12 horas (2 veces al día)">Cada 12 horas (2 veces al día)</option>
-        <option value="Cada 8 horas (3 veces al día)">Cada 8 horas (3 veces al día)</option>
-        <option value="Cada 48 horas (Día por medio)">Cada 48 horas (Día por medio)</option>
-        <option value="Semanal (Cada 7 días)">Semanal (Cada 7 días)</option>
-      </select>
-
-      <label>Duración:</label>
-      <select id="duracion">
-        <option value="">Seleccionar duración...</option>
-        <option value="1 día (Stat)">1 día (Stat)</option>
-        <option value="3 días">3 días</option>
-        <option value="5 días">5 días</option>
-        <option value="7 días">7 días</option>
-        <option value="10 días">10 días</option>
-        <option value="14 días">14 días</option>
-        <option value="Indefinido / Permanente">Indefinido / Permanente</option>
-      </select>
 
       <label>Veterinario:</label>
       <input type="text" id="veterinario" placeholder="Nombre del veterinario">
-
-      <label>Estado:</label>
-      <select id="estado">
-        <option value="En curso">En curso</option>
-        <option value="Completado">Completado</option>
-        <option value="Suspendido">Suspendido</option>
-      </select>
-
       <label>Observaciones:</label>
       <textarea id="observaciones" placeholder="Observaciones adicionales..." rows="3"></textarea>
 

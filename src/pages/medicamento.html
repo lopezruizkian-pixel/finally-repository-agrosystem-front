@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="../img/logo.png">
-        <link rel="stylesheet" href="../css/medicamento.css">
-      <title>Medicamento - Agrosystem</title>
-      <link rel="stylesheet" href="/ags-front/src/css/medicamento.css">
+  
+  <link rel="stylesheet" href="../css/medicamento.css">
+  
+  <title>Medicamento - Agrosystem</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-      <link rel="stylesheet" href="../css/modales.css">
+  <link rel="stylesheet" href="../css/modales.css">
 </head>
 <body>
   <header class="header">
@@ -16,7 +17,6 @@
       <img src="../img/logo.png" alt="Logo Agrosystem">
       <span class="nombre">AGROSYSTEM</span>
     </div>
-   
   </header>
 
   <div class="contenedor-principal">
@@ -53,7 +53,31 @@
       <label>Nombre:</label>
       <input type="text" id="nombre">
 
+      <label>Forma Farmacéutica:</label>
+      <select id="formaFarmaceutica">
+        <option value="">Seleccionar...</option>
+        <option value="Solución">Solución</option>
+        <option value="Suspensión">Suspensión</option>
+        <option value="Emulsión">Emulsión</option>
+        <option value="Polvo">Polvo</option>
+        <option value="Tableta">Tableta</option>
+        <option value="otro">Otro</option>
+      </select>
+      <input type="text" id="formaFarmaceuticaOtro" placeholder="Especificar..." style="display:none; margin-top:5px;">
+
+      <label>Contenido/Concentración:</label>
+      <select id="contenido">
+         <option value="">Seleccionar...</option>
+         <option value="10%">10%</option>
+         <option value="50mg/ml">50mg/ml</option>
+         <option value="otro">Otro</option>
+      </select>
+      <input type="text" id="contenidoOtro" placeholder="Especificar..." style="display:none; margin-top:5px;">
+
       <h3>Dosis</h3>
+      <label>Valor:</label>
+      <input type="number" id="valorDosis" step="0.01" placeholder="Ej: 1.5">
+
       <label>Unidad de Dosis:</label>
       <select id="unidadDosis">
         <option value="">Seleccionar...</option>
@@ -64,9 +88,7 @@
         <option value="g/tonelada de alimento">g/tonelada de alimento</option>
       </select>
 
-
       <label>Vía de Administración:</label>
-      
       <select id="via">
         <option value="">Seleccionar...</option>
         <option value="Subcutánea (SC)">Subcutánea (SC)</option>
@@ -79,8 +101,7 @@
         <option value="Intrauterina">Intrauterina</option>
         <option value="otra">Otra</option>
       </select>
-      <input type="text" id="viaOtra" placeholder="Especificar otra vía" style="display:none;">
-
+      <input type="text" id="viaOtra" placeholder="Especificar otra vía" style="display:none; margin-top:5px;">
   
       <label>Composición:</label>
       <select id="composicion">
@@ -121,6 +142,8 @@
         <option value="Continuo">Continuo</option>
       </select>
 
+      <label>Duración:</label>
+      <input type="text" id="duracion" placeholder="Ej: 3 días">
     
       <label>Indicaciones:</label>
       <input type="text" id="indicaciones">
@@ -132,24 +155,17 @@
     </div>
   </div>
 
-
-
-  <!-- Modal para visualizar medicamento -->
-<div id="modalVisualizarMedicamento" class="modal">
-  <div class="modal-contenido">
-    <h2>Información del Medicamento</h2>
-    <div id="contenidoMedicamento"></div>
-
-    <div class="botones">
-      <button id="btnCerrarVisualizar">Cerrar</button>
+  <div id="modalVisualizarMedicamento" class="modal">
+    <div class="modal-contenido">
+      <h2>Información del Medicamento</h2>
+      <div id="contenidoMedicamento"></div>
+      <div class="botones">
+        <button id="btnCerrarVisualizar">Cerrar</button>
+      </div>
     </div>
   </div>
-</div>
 
-
-  <script src="/ags-front/src/js/medicamento.js"></script>
   <script src="../js/sidebar.js" defer></script>
-  <script src="/ags-front/src/js/navegacion.js"></script>
   <script src="../js/navegacion.js" defer></script>
   <script src="../js/medicamento.js" defer></script>
 </body>

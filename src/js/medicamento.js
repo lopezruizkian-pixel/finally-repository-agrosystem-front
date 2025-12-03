@@ -1,5 +1,7 @@
+// Arreglo para almacenar medicamentos
 let medicamentos = [];
 
+// Selección de elementos
 const modal = document.getElementById('modalMedicamento');
 const btnGuardar = document.getElementById('btnGuardarMedicamento');
 const btnCerrarModal = document.getElementById('btnCerrarModal');
@@ -7,6 +9,7 @@ const btnAgregar = document.querySelector('.btn-agregar');
 const tablaMedicamentos = document.querySelector('.tabla-medicamentos');
 const buscador = document.querySelector('.buscador input');
 
+// Inputs del formulario
 const inputNombre = document.getElementById('nombre');
 const inputFormaFarmaceutica = document.getElementById('formaFarmaceutica');
 const inputFormaFarmaceuticaOtro = document.getElementById('formaFarmaceuticaOtro');
@@ -29,19 +32,44 @@ const btnCerrarVisualizar = document.getElementById('btnCerrarVisualizar');
 
 let editIndex = null;
 let medicamentoAEliminar = null;
-let isLoading = false;
 
-// Rol helpers
+// ===================================
+// ROLES Y PERMISOS
+// ===================================
 function getCurrentUserRole() {
   const datosStr = sessionStorage.getItem('datosUsuarioAgroSystem') || localStorage.getItem('datosUsuarioAgroSystem') || null;
   if (!datosStr) return '';
-  try { const datos = JSON.parse(datosStr); return (datos.rolNombre || (datos.rol && (datos.rol.nombre || (datos.rol.idRol === 1 ? 'Administrador' : ''))) || datos.rol || '').toString().toLowerCase(); } catch(e){ return String(datosStr).toLowerCase(); }
+  try {
+    const datos = JSON.parse(datosStr);
+    let role = datos.rolNombre || (datos.rol && datos.rol.nombre) || datos.rol || '';
+    
+    if (datos.rol && datos.rol.idRol) {
+        if (datos.rol.idRol === 1) return 'administrador';
+        if (datos.rol.idRol === 2) return 'veterinario';
+        return String(datos.rol.nombre || '').toLowerCase();
+    }
+    
+    if (role === 1 || role === '1') return 'administrador';
+    if (role === 2 || role === '2') return 'veterinario';
+
+    return String(role).toLowerCase();
+  } catch (e) {
+    return String(datosStr).toLowerCase();
+  }
 }
-function isVeterinario(){ const r = getCurrentUserRole(); return r.includes('veterinario') || r.includes('vet'); }
-function isAdmin(){ const r = getCurrentUserRole(); return r.includes('admin') || r.includes('administrador'); }
+
+function isVeterinario() { 
+    const r = getCurrentUserRole(); 
+    return r.includes('veterinario') || r.includes('vet'); 
+}
+
+function isAdmin() { 
+    const r = getCurrentUserRole(); 
+    return r.includes('admin') || r.includes('administrador'); 
+}
 
 // ===================================
-// SISTEMA DE ALERTAS PERSONALIZADAS
+// SISTEMA DE ALERTAS
 // ===================================
 const modalAlerta = document.createElement('div');
 modalAlerta.classList.add('alerta-overlay');
@@ -68,26 +96,13 @@ const alertaMessage = document.getElementById('alertaMessage');
 const btnAlertaOk = document.getElementById('btnAlertaOk');
 
 function mostrarAlerta(mensaje, tipo = 'info') {
-  // Configurar según el tipo de alerta
   alertaHeader.className = 'alerta-header ' + tipo;
   
   const config = {
-    error: {
-      icon: 'fa-exclamation-circle',
-      title: 'Error'
-    },
-    success: {
-      icon: 'fa-check-circle',
-      title: 'Éxito'
-    },
-    warning: {
-      icon: 'fa-exclamation-triangle',
-      title: 'Advertencia'
-    },
-    info: {
-      icon: 'fa-info-circle',
-      title: 'Información'
-    }
+    error: { icon: 'fa-exclamation-circle', title: 'Error' },
+    success: { icon: 'fa-check-circle', title: 'Éxito' },
+    warning: { icon: 'fa-exclamation-triangle', title: 'Advertencia' },
+    info: { icon: 'fa-info-circle', title: 'Información' }
   };
 
   const tipoConfig = config[tipo] || config.info;
@@ -107,7 +122,7 @@ function cerrarAlerta() {
 btnAlertaOk.addEventListener('click', cerrarAlerta);
 
 // ===================================
-// MODAL DE ELIMINAR (estructura estandarizada igual a animales)
+// MODAL DE ELIMINAR
 // ===================================
 const modalEliminar = document.createElement('div');
 modalEliminar.id = 'modalEliminarMedicamento';
@@ -141,9 +156,6 @@ modalEliminar.innerHTML = `
 `;
 document.body.appendChild(modalEliminar);
 
-// ===================================
-// FUNCIONES DEL MODAL DE ELIMINAR
-// ===================================
 function abrirModalEliminar(medicamento) {
   medicamentoAEliminar = medicamento;
   const nombreMostrar = medicamento.nombre || medicamento.nombreMedicamento || 'sin nombre';
@@ -167,9 +179,6 @@ function confirmarEliminarMedicamento() {
   }
 }
 
-// El modal de eliminar usa atributos onclick en sus botones (cerrarModalEliminar / confirmarEliminarMedicamento)
-// por lo que no es necesario añadir event listeners aquí.
-
 // ===================================
 // FUNCIONES PRINCIPALES
 // ===================================
@@ -182,18 +191,17 @@ if (btnAgregar) {
   });
 }
 
-// Mostrar acciones CRUD sólo para admin en medicamentos
+// ⭐ VALIDACIÓN DE PERMISOS: Ocultar botón Agregar si NO es Admin
 if (!isAdmin() && btnAgregar) {
   btnAgregar.style.display = 'none';
 }
 
-// Cerrar modal agregar/editar
+// Cerrar modales
 btnCerrarModal.addEventListener('click', () => modal.style.display = 'none');
 window.addEventListener('click', e => { 
   if(e.target === modal) modal.style.display = 'none'; 
 });
 
-// Cerrar modal visualizar
 btnCerrarVisualizar.addEventListener('click', () => modalVisualizar.style.display = 'none');
 window.addEventListener('click', e => { 
   if(e.target === modalVisualizar) modalVisualizar.style.display = 'none'; 
@@ -201,71 +209,69 @@ window.addEventListener('click', e => {
 
 // Limpiar modal
 function limpiarModal() {
-  inputNombre.value = '';
-  inputFormaFarmaceutica.value = '';
-  inputFormaFarmaceuticaOtro.value = '';
-  inputFormaFarmaceuticaOtro.style.display = 'none';
-  inputContenido.value = '';
-  inputContenidoOtro.value = '';
-  inputContenidoOtro.style.display = 'none';
-  inputUnidadDosis.value = '';
-  inputValorDosis.value = '';
-  inputVia.value = '';
-  inputViaOtra.value = '';
-  inputViaOtra.style.display = 'none';
-  inputComposicion.value = '';
-  inputCaducidad.value = '';
-  inputFrecuencia.value = '';
-  inputDuracion.value = '';
-  inputIndicaciones.value = '';
+  if(inputNombre) inputNombre.value = '';
+  // Verificaciones de seguridad para evitar el error de "set properties of null"
+  if(inputFormaFarmaceutica) inputFormaFarmaceutica.value = '';
+  if(inputFormaFarmaceuticaOtro) {
+      inputFormaFarmaceuticaOtro.value = '';
+      inputFormaFarmaceuticaOtro.style.display = 'none';
+  }
+  if(inputContenido) inputContenido.value = '';
+  if(inputContenidoOtro) {
+      inputContenidoOtro.value = '';
+      inputContenidoOtro.style.display = 'none';
+  }
+  if(inputUnidadDosis) inputUnidadDosis.value = '';
+  if(inputValorDosis) inputValorDosis.value = '';
+  if(inputVia) inputVia.value = '';
+  if(inputViaOtra) {
+      inputViaOtra.value = '';
+      inputViaOtra.style.display = 'none';
+  }
+  if(inputComposicion) inputComposicion.value = '';
+  if(inputCaducidad) inputCaducidad.value = '';
+  if(inputFrecuencia) inputFrecuencia.value = '';
+  if(inputDuracion) inputDuracion.value = '';
+  if(inputIndicaciones) inputIndicaciones.value = '';
+  
   editIndex = null;
 }
 
-// Guardar medicamento (agregar o editar)
+// Guardar medicamento
 btnGuardar.addEventListener('click', async () => {
   const nombre = inputNombre.value.trim();
   
-  // Presentación: forma + contenido
-  const formaFarmaceutica = inputFormaFarmaceutica.value === 'otro' 
-    ? inputFormaFarmaceuticaOtro.value.trim() 
-    : inputFormaFarmaceutica.value;
-  const contenido = inputContenido.value === 'otro' 
-    ? inputContenidoOtro.value.trim() 
-    : inputContenido.value;
+  // Safe access to inputs
+  const formaFarmaceutica = (inputFormaFarmaceutica && inputFormaFarmaceutica.value === 'otro')
+    ? (inputFormaFarmaceuticaOtro ? inputFormaFarmaceuticaOtro.value.trim() : '')
+    : (inputFormaFarmaceutica ? inputFormaFarmaceutica.value : '');
+
+  const contenido = (inputContenido && inputContenido.value === 'otro')
+    ? (inputContenidoOtro ? inputContenidoOtro.value.trim() : '')
+    : (inputContenido ? inputContenido.value : '');
+
   const presentacion = `${formaFarmaceutica} - ${contenido}`;
 
-  // Dosis: unidad + valor
-  const unidadDosis = inputUnidadDosis.value;
-  const valorDosis = inputValorDosis.value.trim();
+  const unidadDosis = inputUnidadDosis ? inputUnidadDosis.value : '';
+  const valorDosis = inputValorDosis ? inputValorDosis.value.trim() : '';
   const dosis = `${valorDosis} ${unidadDosis}`;
 
-  // Vía
-  const via = inputVia.value === 'otra' 
-    ? inputViaOtra.value.trim() 
-    : inputVia.value;
+  const via = (inputVia && inputVia.value === 'otra')
+    ? (inputViaOtra ? inputViaOtra.value.trim() : '')
+    : (inputVia ? inputVia.value : '');
 
-  // Composición
-  const composicion = inputComposicion.value;
-
-  // Caducidad
-  const caducidad = inputCaducidad.value;
-
-  // Frecuencia + Duración
-  const frecuencia = inputFrecuencia.value;
-  const duracion = inputDuracion.value;
+  const composicion = inputComposicion ? inputComposicion.value : '';
+  const caducidad = inputCaducidad ? inputCaducidad.value : '';
+  const frecuencia = inputFrecuencia ? inputFrecuencia.value : '';
+  const duracion = inputDuracion ? inputDuracion.value : '';
   const frecuenciaCompleta = `${frecuencia} - ${duracion}`;
+  const indicaciones = inputIndicaciones ? inputIndicaciones.value.trim() : '';
 
-  // Indicaciones
-  const indicaciones = inputIndicaciones.value.trim();
-
-  console.debug('medicamento form values:', { nombre, presentacion, dosis, via, composicion, caducidad, frecuenciaCompleta, indicaciones });
-
-  if(!nombre || !formaFarmaceutica || !contenido || !unidadDosis || !valorDosis || !via || !composicion || !caducidad || !frecuencia || !duracion) {
-    mostrarAlerta('Por favor complete todos los campos obligatorios.', 'error');
+  if(!nombre) {
+    mostrarAlerta('El nombre es obligatorio.', 'error');
     return;
   }
 
-  // Crear objeto con todos los datos
   const medData = { 
     nombre,
     presentacion,
@@ -281,21 +287,18 @@ btnGuardar.addEventListener('click', async () => {
 
   try {
     if(editIndex !== null){
-      // Update existing
       const id = medicamentos[editIndex].idMedicamento || medicamentos[editIndex].id;
       await updateMedicamentoBackend(medData, id);
     } else {
-      // Create new
       await sendMedicamentoToBackend(medData);
     }
   } catch (err) {
     console.error(err);
-    const mensaje = err && err.message ? err.message : 'Ocurrió un error en la operación con el servidor.';
-    mostrarAlerta(mensaje, 'error');
+    mostrarAlerta(err.message || 'Error en la operación.', 'error');
   }
 });
 
-// Renderizar tabla de medicamentos
+// Renderizar tabla
 function renderizarMedicamentos(lista = medicamentos){
   tablaMedicamentos.innerHTML = '';
 
@@ -319,77 +322,69 @@ function renderizarMedicamentos(lista = medicamentos){
 
   lista.forEach((med) => {
     const fila = document.createElement('tr');
+    
+    // Botones disponibles solo para Admin
+    const isUserAdmin = isAdmin();
+    const botonesHTML = isUserAdmin ? `
+        <button class="btn-ver" title="Ver detalles"><i class="fas fa-eye" aria-hidden="true"></i></button>
+        <button class="btn-editar" title="Editar"><i class="fas fa-pen" aria-hidden="true"></i></button>
+        <button class="btn-eliminar" title="Eliminar"><i class="fas fa-trash" aria-hidden="true"></i></button>
+    ` : `
+        <button class="btn-ver" title="Ver detalles"><i class="fas fa-eye" aria-hidden="true"></i></button>
+    `;
+
     fila.innerHTML = `
       <td>${med.nombre || med.nombreMedicamento || ''}</td>
       <td>${med.presentacion || med.solucion || ''}</td>
       <td>
-        <button class="btn-ver" title="Ver detalles"><i class="fas fa-eye" aria-hidden="true"></i></button>
-        <button class="btn-editar" title="Editar"><i class="fas fa-pen" aria-hidden="true"></i></button>
-        <button class="btn-eliminar" title="Eliminar"><i class="fas fa-trash" aria-hidden="true"></i></button>
+        ${botonesHTML}
       </td>
     `;
 
     // Visualizar
     fila.querySelector('.btn-ver').addEventListener('click', () => {
       contenidoMedicamento.innerHTML = `
-        <div class="detalle-item">
-          <strong>Nombre</strong>
-          <p>${med.nombre || med.nombreMedicamento || ''}</p>
-        </div>
-        <div class="detalle-item">
-          <strong>Presentación</strong>
-          <p>${med.presentacion || med.solucion || ''}</p>
-        </div>
-        <div class="detalle-item">
-          <strong>Dosis</strong>
-          <p>${med.dosis ?? 'No especificada'}</p>
-        </div>
-        <div class="detalle-item">
-          <strong>Vía de Administración</strong>
-          <p>${med.via || med.viaAdministracion || 'No especificada'}</p>
-        </div>
-        <div class="detalle-item">
-          <strong>Composición</strong>
-          <p>${med.composicion || ''}</p>
-        </div>
-        <div class="detalle-item">
-          <strong>Caducidad</strong>
-          <p>${med.caducidad || (med.caducidadMs ? new Date(med.caducidadMs).toLocaleDateString() : 'No especificada')}</p>
-        </div>
-        <div class="detalle-item">
-          <strong>Frecuencia de Aplicación</strong>
-          <p>${med.frecuenciaCompleta || med.frecuencia || ''}</p>
-        </div>
-        <div class="detalle-item">
-          <strong>Indicaciones</strong>
-          <p>${med.indicaciones || ''}</p>
-        </div>
+        <div class="detalle-item"><strong>Nombre</strong><p>${med.nombre || med.nombreMedicamento || ''}</p></div>
+        <div class="detalle-item"><strong>Presentación</strong><p>${med.presentacion || med.solucion || ''}</p></div>
+        <div class="detalle-item"><strong>Dosis</strong><p>${med.dosis ?? 'No especificada'}</p></div>
+        <div class="detalle-item"><strong>Vía de Administración</strong><p>${med.via || med.viaAdministracion || 'No especificada'}</p></div>
+        <div class="detalle-item"><strong>Composición</strong><p>${med.composicion || ''}</p></div>
+        <div class="detalle-item"><strong>Caducidad</strong><p>${med.caducidad || (med.caducidadMs ? new Date(med.caducidadMs).toLocaleDateString() : 'No especificada')}</p></div>
+        <div class="detalle-item"><strong>Frecuencia de Aplicación</strong><p>${med.frecuenciaCompleta || med.frecuencia || ''}</p></div>
+        <div class="detalle-item"><strong>Indicaciones</strong><p>${med.indicaciones || ''}</p></div>
       `;
       modalVisualizar.style.display = 'flex';
     });
 
-    // Editar / Eliminar según rol
-    if (!isAdmin()) {
-      const be = fila.querySelector('.btn-editar'); if (be) be.style.display = 'none';
-      const bd = fila.querySelector('.btn-eliminar'); if (bd) bd.style.display = 'none';
-    } else {
-      const beEl = fila.querySelector('.btn-editar');
-      if (beEl) beEl.addEventListener('click', () => {
+    // Editar (solo si existe botón)
+    const btnEdit = fila.querySelector('.btn-editar');
+    if (btnEdit) {
+      btnEdit.addEventListener('click', () => {
         inputNombre.value = med.nombre || med.nombreMedicamento || '';
-        inputFormaFarmaceutica.value = '';
-        inputContenido.value = '';
-        inputUnidadDosis.value = '';
-        inputValorDosis.value = med.dosis ? med.dosis.split(' ')[0] : '';
-        inputVia.value = med.via || med.viaAdministracion || '';
-        inputComposicion.value = med.composicion || '';
-        inputCaducidad.value = med.caducidad || (med.caducidadMs ? new Date(med.caducidadMs).toISOString().slice(0,10) : '');
-        inputFrecuencia.value = '';
-        inputDuracion.value = '';
-        inputIndicaciones.value = med.indicaciones || '';
+        if(inputFormaFarmaceutica) inputFormaFarmaceutica.value = '';
+        if(inputContenido) inputContenido.value = '';
+        if(inputUnidadDosis) inputUnidadDosis.value = '';
+        if(inputValorDosis) inputValorDosis.value = med.dosis ? String(med.dosis).split(' ')[0] : '';
+        if(inputVia) inputVia.value = med.via || med.viaAdministracion || '';
+        if(inputComposicion) inputComposicion.value = med.composicion || '';
+        if(inputCaducidad) inputCaducidad.value = med.caducidad || (med.caducidadMs ? new Date(med.caducidadMs).toISOString().slice(0,10) : '');
+        if(inputFrecuencia) inputFrecuencia.value = '';
+        if(inputDuracion) inputDuracion.value = '';
+        if(inputIndicaciones) inputIndicaciones.value = med.indicaciones || '';
         editIndex = medicamentos.indexOf(med);
+        
+        // Cambiar título
+        const tModal = modal.querySelector('h2');
+        if(tModal) tModal.textContent = 'Editar Medicamento';
+        
         modal.style.display = 'flex';
       });
-      const bdEl = fila.querySelector('.btn-eliminar'); if (bdEl) bdEl.addEventListener('click', () => { abrirModalEliminar(med); });
+    }
+    
+    // Eliminar (solo si existe botón)
+    const btnEliminar = fila.querySelector('.btn-eliminar');
+    if (btnEliminar) {
+        btnEliminar.addEventListener('click', () => { abrirModalEliminar(med); });
     }
 
     tbody.appendChild(fila);
@@ -398,36 +393,27 @@ function renderizarMedicamentos(lista = medicamentos){
   tablaMedicamentos.appendChild(tabla);
 }
 
-// Buscar medicamentos
+// Buscar
 buscador.addEventListener('input', () => {
-  const texto = buscador.value.toLowerCase();
-  const resultados = medicamentos.filter(m =>
-    m.nombre.toLowerCase().includes(texto) ||
-    m.presentacion.toLowerCase().includes(texto)
-  );
-  renderizarMedicamentos(resultados);
+  const texto = buscador.value.toLowerCase();
+  const resultados = medicamentos.filter(m =>
+    (m.nombre || '').toLowerCase().includes(texto) ||
+    (m.presentacion || '').toLowerCase().includes(texto)
+  );
+  renderizarMedicamentos(resultados);
 });
 
-// Cerrar modales con ESC
+// Cerrar modales con ESC y Click
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    if (modalAlerta.classList.contains('active')) {
-      cerrarAlerta();
-    }
-    if (modalEliminar.classList.contains('active')) {
-      cerrarModalEliminar();
-    }
-  }
+  if (e.key === 'Escape') {
+    if (modalAlerta.classList.contains('active')) cerrarAlerta();
+    if (modalEliminar.classList.contains('active')) cerrarModalEliminar();
+  }
 });
 
-// Cerrar modal de eliminar con click fuera
 window.addEventListener('click', (e) => {
-  if (e.target === modalEliminar) {
-    cerrarModalEliminar();
-  }
-  if (e.target === modalAlerta) {
-    cerrarAlerta();
-  }
+  if (e.target === modalEliminar) cerrarModalEliminar();
+  if (e.target === modalAlerta) cerrarAlerta();
 });
 
 // ---------------------------
@@ -435,240 +421,180 @@ window.addEventListener('click', (e) => {
 // ---------------------------
 
 function getAuthHeaders() {
-  const token = localStorage.getItem('token') || '';
-  const datosUsuario = localStorage.getItem('datosUsuarioAgroSystem') || '';
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-    ...(datosUsuario ? { 'Id-Usuario': datosUsuario } : {})
-  };
+  const token = localStorage.getItem('token') || '';
+  const datosUsuario = localStorage.getItem('datosUsuarioAgroSystem') || '';
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...(datosUsuario ? { 'Id-Usuario': datosUsuario } : {})
+  };
 }
 
 function formatDateToISO(dateStr) {
-  if(!dateStr) return null;
-  const parts = dateStr.split('-');
-  let iso = '';
-  if(parts.length === 3){
-    const y = Number(parts[0]);
-    const m = Number(parts[1]) - 1;
-    const d = Number(parts[2]);
-    iso = new Date(Date.UTC(y, m, d)).toISOString();
-  } else {
-    iso = new Date(dateStr).toISOString();
-  }
-  // Remove milliseconds to match server example: 2026-01-01T00:00:00Z
-  return iso.replace('.000','');
+  if(!dateStr) return null;
+  const parts = dateStr.split('-');
+  let iso = '';
+  if(parts.length === 3){
+    const y = Number(parts[0]);
+    const m = Number(parts[1]) - 1;
+    const d = Number(parts[2]);
+    iso = new Date(Date.UTC(y, m, d)).toISOString();
+  } else {
+    iso = new Date(dateStr).toISOString();
+  }
+  return iso.replace('.000','');
 }
 
 function msToDateInput(ms) {
-  if(!ms) return '';
-  try{
-    return new Date(Number(ms)).toISOString().slice(0,10);
-  }catch(e){
-    return '';
-  }
+  if(!ms) return '';
+  try{ return new Date(Number(ms)).toISOString().slice(0,10); }catch(e){ return ''; }
 }
 
 async function fetchMedicamentosFromBackend(){
-  try{
-    console.debug('GET /medicamento — iniciando petición');
-    const res = await fetch('http://192.168.1.17:7002/medicamento', {
-      method: 'GET',
-      headers: getAuthHeaders()
-    });
-    if(!res.ok) throw new Error(`GET medicamentos: ${res.status}`);
-    const data = await res.json();
-    console.debug('GET /medicamento response', data);
-    medicamentos = (data || []).map(item => ({
-      idMedicamento: item.idMedicamento,
-      nombre: item.nombreMedicamento,
-      nombreMedicamento: item.nombreMedicamento,
-      presentacion: item.solucion,
-      solucion: item.solucion,
-      dosis: item.dosis,
-      caducidadMs: item.caducidad,
-      caducidad: item.caducidad ? msToDateInput(item.caducidad) : '',
-      via: item.viaAdministracion,
-      viaAdministracion: item.viaAdministracion,
-      composicion: item.composicion,
-      indicaciones: item.indicaciones,
-      frecuencia: item.frecuenciaAplicacion,
-      frecuenciaAplicacion: item.frecuenciaAplicacion
-    }));
-    renderizarMedicamentos();
-  }catch(err){
-    console.error(err);
-    mostrarAlerta('No se pudieron cargar los medicamentos desde el servidor.', 'error');
-  }
+  try{
+    const res = await fetch('http://192.168.1.17:7002/medicamento', {
+      method: 'GET',
+      headers: getAuthHeaders()
+    });
+    if(!res.ok) throw new Error(`GET medicamentos: ${res.status}`);
+    const data = await res.json();
+    medicamentos = (data || []).map(item => ({
+      idMedicamento: item.idMedicamento,
+      nombre: item.nombreMedicamento,
+      nombreMedicamento: item.nombreMedicamento,
+      presentacion: item.solucion,
+      solucion: item.solucion,
+      dosis: item.dosis,
+      caducidadMs: item.caducidad,
+      caducidad: item.caducidad ? msToDateInput(item.caducidad) : '',
+      via: item.viaAdministracion,
+      viaAdministracion: item.viaAdministracion,
+      composicion: item.composicion,
+      indicaciones: item.indicaciones,
+      frecuencia: item.frecuenciaAplicacion,
+      frecuenciaAplicacion: item.frecuenciaAplicacion
+    }));
+    renderizarMedicamentos();
+  }catch(err){
+    console.error(err);
+    mostrarAlerta('No se pudieron cargar los medicamentos.', 'error');
+  }
 }
 
 async function sendMedicamentoToBackend(med){
-  // Validate required fields according to API
-  const nombreMedicamento = med.nombre;
-  const solucion = med.presentacion || med.solucion;
-  const dosis = med.dosis !== undefined && med.dosis !== '' ? Number(med.dosis) : null;
-  const caducidad = med.caducidad ? formatDateToISO(med.caducidad) : null;
-  const viaAdministracion = med.via;
-  const composicion = med.composicion;
-  const indicaciones = med.indicaciones;
-  const frecuenciaAplicacion = med.frecuencia || med.frecuenciaAplicacion;
+  const nombreMedicamento = med.nombre;
+  const solucion = med.presentacion;
+  const dosis = med.dosis !== undefined && med.dosis !== '' ? Number(med.dosis.split(' ')[0]) : null;
+  const caducidad = med.caducidad ? formatDateToISO(med.caducidad) : null;
+  const viaAdministracion = med.via;
+  const composicion = med.composicion;
+  const indicaciones = med.indicaciones;
+  const frecuenciaAplicacion = med.frecuenciaCompleta;
 
-  const missing = [];
-  if(!nombreMedicamento) missing.push('nombreMedicamento');
-  if(!solucion) missing.push('solucion');
-  if(dosis === null || Number.isNaN(dosis)) missing.push('dosis');
-  if(!caducidad) missing.push('caducidad');
-  if(!viaAdministracion) missing.push('viaAdministracion');
-  if(!composicion) missing.push('composicion');
-  if(!indicaciones) missing.push('indicaciones');
-  if(!frecuenciaAplicacion) missing.push('frecuenciaAplicacion');
-  if(missing.length){
-    const msg = `Faltan campos requeridos: ${missing.join(', ')}`;
-    console.debug('sendMedicamentoToBackend - med object:', med);
-    console.warn(msg);
-    mostrarAlerta(msg, 'error');
-    throw new Error(msg);
-  }
+  const payload = {
+    nombreMedicamento,
+    solucion,
+    dosis,
+    caducidad,
+    viaAdministracion,
+    composicion,
+    indicaciones,
+    frecuenciaAplicacion
+  };
 
-  const payload = {
-    nombreMedicamento,
-    solucion,
-    dosis,
-    caducidad,
-    viaAdministracion,
-    composicion,
-    indicaciones,
-    frecuenciaAplicacion
-  };
-
-  console.debug('POST /medicamento payload', payload);
-  const res = await fetch('http://192.168.1.17:7002/medicamento', {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload)
-  });
-  let created;
-  try{
-    const text = await res.text();
-    try{ created = JSON.parse(text); } catch(e){ created = text; }
-  }catch(e){ created = null; }
-  if(!res.ok){
-    console.error('POST /medicamento error response', created);
-    throw new Error(`POST medicamento: ${res.status} - ${JSON.stringify(created)}`);
-  }
-  console.debug('POST /medicamento response', created);
-  const mapped = {
-    idMedicamento: created.idMedicamento || created.id || null,
-    nombre: created.nombreMedicamento || payload.nombreMedicamento,
-    presentacion: created.solucion || payload.solucion,
-    dosis: created.dosis ?? payload.dosis,
-    caducidadMs: created.caducidad ?? null,
-    caducidad: created.caducidad ? msToDateInput(created.caducidad) : (payload.caducidad ? med.caducidad : ''),
-    via: created.viaAdministracion || payload.viaAdministracion,
-    composicion: created.composicion || payload.composicion,
-    indicaciones: created.indicaciones || payload.indicaciones,
-    frecuencia: created.frecuenciaAplicacion || payload.frecuenciaAplicacion
-  };
-  medicamentos.push(mapped);
-  renderizarMedicamentos();
-  mostrarAlerta(`El medicamento "${mapped.nombre}" ha sido registrado exitosamente.`, 'success');
+  const res = await fetch('http://192.168.1.17:7002/medicamento', {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload)
+  });
+  
+  if(!res.ok){
+    throw new Error(`POST medicamento: ${res.status}`);
+  }
+  
+  await fetchMedicamentosFromBackend();
+  mostrarAlerta(`Medicamento registrado exitosamente.`, 'success');
 }
 
 async function updateMedicamentoBackend(med, id){
-  if(!id) throw new Error('ID requerido para actualizar medicamento');
-  const payload = {
-    idMedicamento: id,
-    nombreMedicamento: med.nombre,
-    solucion: med.presentacion,
-    dosis: med.dosis ? Number(med.dosis) : null,
-    caducidad: med.caducidad ? formatDateToISO(med.caducidad) : null,
-    viaAdministracion: med.via,
-    composicion: med.composicion,
-    indicaciones: med.indicaciones,
-    frecuenciaAplicacion: med.frecuencia || med.frecuenciaAplicacion
-  };
-  console.debug(`PUT /medicamento/${id} payload`, payload);
-  const res = await fetch(`http://192.168.1.17:7002/medicamento/${id}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload)
-  });
-  if(!res.ok) throw new Error(`PUT medicamento: ${res.status}`);
-  const updated = await res.json();
-  console.debug(`PUT /medicamento/${id} response`, updated);
-  const idx = medicamentos.findIndex(m => (m.idMedicamento || m.id) === id);
-  const mapped = {
-    idMedicamento: updated.idMedicamento || id,
-    nombre: updated.nombreMedicamento || payload.nombreMedicamento,
-    presentacion: updated.solucion || payload.solucion,
-    dosis: updated.dosis ?? payload.dosis,
-    caducidadMs: updated.caducidad ?? null,
-    caducidad: updated.caducidad ? msToDateInput(updated.caducidad) : (payload.caducidad ? med.caducidad : ''),
-    via: updated.viaAdministracion || payload.viaAdministracion,
-    composicion: updated.composicion || payload.composicion,
-    indicaciones: updated.indicaciones || payload.indicaciones,
-    frecuencia: updated.frecuenciaAplicacion || payload.frecuenciaAplicacion
-  };
-  if(idx !== -1) medicamentos[idx] = mapped;
-  renderizarMedicamentos();
-  mostrarAlerta(`El medicamento "${mapped.nombre}" ha sido actualizado exitosamente.`, 'success');
+  if(!id) throw new Error('ID requerido para actualizar medicamento');
+  const dosisVal = med.dosis ? Number(String(med.dosis).split(' ')[0]) : null;
+  
+  const payload = {
+    idMedicamento: id,
+    nombreMedicamento: med.nombre,
+    solucion: med.presentacion,
+    dosis: isNaN(dosisVal) ? null : dosisVal,
+    caducidad: med.caducidad ? formatDateToISO(med.caducidad) : null,
+    viaAdministracion: med.via,
+    composicion: med.composicion,
+    indicaciones: med.indicaciones,
+    frecuenciaAplicacion: med.frecuenciaCompleta
+  };
+  
+  const res = await fetch(`http://192.168.1.17:7002/medicamento/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload)
+  });
+  
+  if(!res.ok) throw new Error(`PUT medicamento: ${res.status}`);
+  
+  await fetchMedicamentosFromBackend();
+  mostrarAlerta(`Medicamento actualizado exitosamente.`, 'success');
 }
 
 async function deleteMedicamentoBackend(id){
-  if(!id) return;
-  try{
-    console.debug(`DELETE /medicamento/${id}`);
-    const res = await fetch(`http://192.168.1.17:7002/medicamento/${id}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders()
-    });
-    if(!res.ok) throw new Error(`DELETE medicamento: ${res.status}`);
-    const idx = medicamentos.findIndex(m => (m.idMedicamento || m.id) === id);
-    const nombre = idx !== -1 ? (medicamentos[idx].nombre || medicamentos[idx].nombreMedicamento) : '';
-    if(idx !== -1) medicamentos.splice(idx,1);
-    renderizarMedicamentos();
-    mostrarAlerta(`El medicamento "${nombre}" ha sido eliminado exitosamente.`, 'success');
-  }catch(err){
-    console.error(err);
-    mostrarAlerta('No se pudo eliminar el medicamento en el servidor.', 'error');
-  }
+  if(!id) return;
+  try{
+    const res = await fetch(`http://192.168.1.17:7002/medicamento/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if(!res.ok) throw new Error(`DELETE medicamento: ${res.status}`);
+    
+    await fetchMedicamentosFromBackend();
+    mostrarAlerta(`Medicamento eliminado exitosamente.`, 'success');
+  }catch(err){
+    console.error(err);
+    mostrarAlerta('No se pudo eliminar el medicamento.', 'error');
+  }
 }
 
-// Cargar inicialmente desde backend
 fetchMedicamentosFromBackend();
-
-console.log('✅ Sistema de medicamentos cargado correctamente');
 
 // ===================================
 // EVENTOS PARA MOSTRAR CAMPOS "OTRO"
 // ===================================
+if(inputFormaFarmaceutica){
+    inputFormaFarmaceutica.addEventListener('change', () => {
+      if (inputFormaFarmaceutica.value === 'otro') {
+        inputFormaFarmaceuticaOtro.style.display = 'block';
+      } else {
+        inputFormaFarmaceuticaOtro.style.display = 'none';
+        inputFormaFarmaceuticaOtro.value = '';
+      }
+    });
+}
 
-// Forma Farmacéutica - mostrar input de "otro"
-inputFormaFarmaceutica.addEventListener('change', () => {
-  if (inputFormaFarmaceutica.value === 'otro') {
-    inputFormaFarmaceuticaOtro.style.display = 'block';
-  } else {
-    inputFormaFarmaceuticaOtro.style.display = 'none';
-    inputFormaFarmaceuticaOtro.value = '';
-  }
-});
+if(inputContenido){
+    inputContenido.addEventListener('change', () => {
+      if (inputContenido.value === 'otro') {
+        inputContenidoOtro.style.display = 'block';
+      } else {
+        inputContenidoOtro.style.display = 'none';
+        inputContenidoOtro.value = '';
+      }
+    });
+}
 
-// Contenido - mostrar input de "otro"
-inputContenido.addEventListener('change', () => {
-  if (inputContenido.value === 'otro') {
-    inputContenidoOtro.style.display = 'block';
-  } else {
-    inputContenidoOtro.style.display = 'none';
-    inputContenidoOtro.value = '';
-  }
-});
-
-// Vía - mostrar input de "otra"
-inputVia.addEventListener('change', () => {
-  if (inputVia.value === 'otra') {
-    inputViaOtra.style.display = 'block';
-  } else {
-    inputViaOtra.style.display = 'none';
-    inputViaOtra.value = '';
-  }
-});
+if(inputVia){
+    inputVia.addEventListener('change', () => {
+      if (inputVia.value === 'otra') {
+        inputViaOtra.style.display = 'block';
+      } else {
+        inputViaOtra.style.display = 'none';
+        inputViaOtra.value = '';
+      }
+    });
+}
