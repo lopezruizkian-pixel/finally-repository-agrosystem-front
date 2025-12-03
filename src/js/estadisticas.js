@@ -21,7 +21,7 @@ async function getAuthHeadersLocal(){
 async function cargarEstadisticas(){
   // Intentar obtener desde backend
   try{
-    const res = await fetch('http://100.30.25.253:7000/estadisticas/animales', { headers: await getAuthHeadersLocal() });
+    const res = await fetch('http://localhost:7002/estadisticas/animales', { headers: await getAuthHeadersLocal() });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     const totalVacas = data.total || 0;
@@ -102,7 +102,7 @@ function mostrarEstadisticas(totalVacas, machos, hembras){
 async function cargarEstadisticasEnfermedades(){
   try{
     console.debug('GET /reportes para estadísticas de enfermedades');
-    const res = await fetch('http://100.30.25.253:7000/reportes', { headers: await getAuthHeadersLocal() });
+    const res = await fetch('http://localhost:7002/reportes', { headers: await getAuthHeadersLocal() });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     
     const reportes = await res.json();

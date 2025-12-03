@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="icon" type="image/png" href="/ags-front/src/img/logo.png">
-
-      <link rel="stylesheet" href="../css/animales.css">
-  <title>Animales - Agrosystem</title>
-  <link rel="stylesheet" href="/ags-front/src/css/animales.css">
+  <link rel="icon" type="image/png" href="../img/logo.png">
+  
+  <!-- Usar rutas relativas consistentes -->
+  <link rel="stylesheet" href="../css/animales.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/modales.css">
+  <title>Animales - Agrosystem</title>
 </head>
 <body>
   <header class="header">
     <div class="logo">
-      <img src="/ags-front/src/img/logo.png" alt="Logo Agrosystem">
+      <img src="../img/logo.png" alt="Logo Agrosystem">
       <span class="nombre">AGROSYSTEM</span>
     </div>
     <div class="header-buttons">
@@ -50,15 +50,12 @@
   <div id="modalVisualizarAnimal" class="modal">
     <div class="modal-contenido visualizar">
       <h2>Detalles del Animal</h2>
-  
       <div id="contenidoAnimal" class="detalle-contenido"></div>
-  
       <div class="botones">
         <button id="btnCerrarVisualizar">Cerrar</button>
       </div>
     </div>
   </div>
-  
 
   <div id="modalAgregarAnimal" class="modal">
     <div class="modal-contenido">
@@ -114,45 +111,42 @@
       </div>
     </div>
   </div>
-  
-  <!-- Modal para actualizar peso -->
-<div id="modalActualizarPeso" class="modal">
-<div class="modal-contenido">
-<h2>Actualizar Peso del Animal</h2>
-<p id="nombreAnimalPeso" style="margin-bottom: 15px; font-weight: bold; color: #2c5f2d;"></p>
 
-<label>Nuevo Peso (kg):</label>
-<input type="number" id="nuevoPeso" step="0.1" placeholder="Ej: 450.5">
+  <div id="modalActualizarPeso" class="modal">
+    <div class="modal-contenido">
+      <h2>Actualizar Peso del Animal</h2>
+      <p id="nombreAnimalPeso" style="margin-bottom: 15px; font-weight: bold; color: #2c5f2d;"></p>
 
-<label>Fecha:</label>
-<input type="date" id="fechaPeso">
+      <label>Nuevo Peso (kg):</label>
+      <input type="number" id="nuevoPeso" step="0.1" placeholder="Ej: 450.5">
 
-<label>Condición Corporal:</label>
-<select id="condicionCorporal">
-<option value="1">1 - Muy delgado</option>
-<option value="2">2 - Delgado</option>
-<option value="3">3 - Ideal</option>
-<option value="4">4 - Sobrepeso</option>
-<option value="5">5 - Obeso</option>
-</select>
+      <label>Fecha:</label>
+      <input type="date" id="fechaPeso">
 
-<label>Usuario que Registra:</label>
-<input type="text" id="usuarioRegistro" placeholder="Nombre del usuario">
+      <label>Condición Corporal:</label>
+      <select id="condicionCorporal">
+        <option value="1">1 - Muy delgado</option>
+        <option value="2">2 - Delgado</option>
+        <option value="3">3 - Ideal</option>
+        <option value="4">4 - Sobrepeso</option>
+        <option value="5">5 - Obeso</option>
+      </select>
 
-<label>Observaciones:</label>
-<textarea id="observacionesPeso" rows="3" placeholder="Observaciones sobre el peso del animal..."></textarea>
+      <label>Usuario que Registra:</label>
+      <input type="text" id="usuarioRegistro" placeholder="Nombre del usuario">
 
-<div class="botones">
-<button id="btnGuardarPeso">Guardar</button>
-<button id="btnCerrarModalPeso">Cancelar</button>
-</div>
-</div>
-</div>
+      <label>Observaciones:</label>
+      <textarea id="observacionesPeso" rows="3" placeholder="Observaciones sobre el peso del animal..."></textarea>
 
+      <div class="botones">
+        <button id="btnGuardarPeso">Guardar</button>
+        <button id="btnCerrarModalPeso">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
-<script src="/ags-front/src/js/navegacion.js"></script>
-<script src="/ags-front/src/js/animales.js"></script>
-  <script src="../js/animales.js" defer></script>
-  <script src="../js/navegacion.js" defer></script>
+  <!-- Scripts con rutas relativas -->
+  <script src="../js/navegacion.js"></script>
+  <script src="../js/animales.js"></script>
 </body>
 </html>

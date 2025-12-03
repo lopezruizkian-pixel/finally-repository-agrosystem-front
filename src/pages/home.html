@@ -37,21 +37,29 @@
         <h2>TOTAL DE ANIMALES</h2>
 
         <div class="form-agregar">
-          <!-- Filtros: Sexo y Rebaño -->
+          <!-- Filtros: Sexo, Rebaño y estado -->
           <label for="filtroSexo">Filtrar por sexo:</label>
           <select id="filtroSexo">
             <option value="Todos">Todos</option>
-            <option value="Macho">Macho</option>
-            <option value="Hembra">Hembra</option>
+            <option value="M">Macho</option>
+            <option value="H">Hembra</option>
           </select>
 
           <label for="filtroRebano">Filtrar por rebaño:</label>
           <select id="filtroRebano">
-            <option value="Todos">Todos</option>
-            <option value="Vaca">Vaca</option>
-            <option value="Toro">Toro</option>
-            <option value="Bcerra">Becerra</option>
-            <option value="Becerro">Becerro</option>
+            <option value="todos">Todos</option>
+            <option value="vaca">Vaca</option>
+            <option value="toro">Toro</option>
+            <option value="bcerra">Becerra</option>
+            <option value="becerro">Becerro</option>
+          </select>
+
+          <label for="filtroEstado">Filtrar por estado</label>
+          <select id="filtroEstado">
+            <option value="todos">Todos</option>
+            <option value="vivo">Vivo</option>
+            <option value="muerto">Muerto</option>
+            <option value="vendido">Vendido</option>
           </select>
 
           <button id="btnIrEstadisticas"><i class="fas fa-arrow-right"></i> Ver Estadísticas</button>

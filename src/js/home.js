@@ -10,9 +10,9 @@ const btnIrEstadisticas = document.getElementById('btnIrEstadisticas');
 // filtros
 const filtroSexo = document.getElementById('filtroSexo');
 const filtroRebano = document.getElementById('filtroRebano');
+const filtroEstado = document.getElementById('filtroEstado'); // ⭐ AGREGADO
 
 // Arreglo de vacas (nombre + sexo)
-// Each animal may have: { nombre, sexo, rebano }
 let vacas = [];
 
 // Helper to include auth headers if token exists
@@ -29,7 +29,7 @@ function getAuthHeadersLocal(){
 // Fetch animals from backend and map to local shape
 async function fetchAnimalesBackend(){
   try{
-    const res = await fetch('http://100.30.25.253:7000/animales', { headers: getAuthHeadersLocal() });
+    const res = await fetch('http://localhost:7002/animales', { headers: getAuthHeadersLocal() });
     const text = await res.text();
     if(!res.ok){ console.error('Error cargando animales', res.status, text); return []; }
     let data = [];
@@ -47,7 +47,8 @@ async function fetchAnimalesBackend(){
       caracteristica: a.caracteristica || a.característica || '',
       edad: a.edad || '',
       procedencia: a.procedencia || a.procedencia || '',
-      sexo: (typeof a.sexo === 'boolean') ? (a.sexo ? 'Macho' : 'Hembra') : (a.sexo || '')
+      sexo: (typeof a.sexo === 'boolean') ? (a.sexo ? 'Macho' : 'Hembra') : (a.sexo || ''),
+      estado: a.estado || 'Vivo' // ⭐ AGREGADO: incluir estado
     }));
     vacas = mapped;
     aplicarFiltros();
@@ -157,6 +158,14 @@ function renderizarLista(lista = vacas) {
   lista.forEach((vaca) => {
     const card = document.createElement('div');
     card.className = 'animal-card';
+    
+    // ⭐ AGREGADO: Badge de estado con colores
+    const estadoBadge = vaca.estado ? `
+      <span class="estado-badge estado-${vaca.estado.toLowerCase()}">
+        ${vaca.estado}
+      </span>
+    ` : '';
+    
     card.innerHTML = `
       <div class="card-header">
         <h3 class="card-title">${vaca.nombre || '—'}</h3>
@@ -167,6 +176,7 @@ function renderizarLista(lista = vacas) {
         <p><strong>Rebaño:</strong> ${vaca.rebano || '—'}</p>
         <p><strong>Edad:</strong> ${vaca.edad || '—'}</p>
         <p><strong>Peso inicial:</strong> ${vaca.pesoInicial || '—'}</p>
+        <p><strong>Estado:</strong> ${estadoBadge || vaca.estado || 'Vivo'}</p>
         <p class="card-desc">${vaca.caracteristica || ''}</p>
       </div>
     `;
@@ -174,8 +184,6 @@ function renderizarLista(lista = vacas) {
   });
   listaVacas.appendChild(fragment);
 }
-
-// Quitar funcionalidad de agregar en Home: el botón fue eliminado en el HTML
 
 // Botón para ir a estadísticas
 btnIrEstadisticas.addEventListener('click', () => {
@@ -220,24 +228,39 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-// Aplicar filtros y renderizar inicialmente
+// ⭐ MODIFICADO: Aplicar filtros incluyendo estado
 function aplicarFiltros(){
   const sexoSel = filtroSexo ? filtroSexo.value : 'Todos';
-  const rebanoSel = filtroRebano ? filtroRebano.value : 'Todos';
+  const rebanoSel = filtroRebano ? filtroRebano.value : 'todos';
+  const estadoSel = filtroEstado ? filtroEstado.value : 'todos'; // ⭐ AGREGADO
 
   let filtrados = vacas.slice();
+  
+  // Filtro por sexo
   if(sexoSel && sexoSel !== 'Todos'){
     filtrados = filtrados.filter(v => String(v.sexo).toLowerCase() === String(sexoSel).toLowerCase());
   }
-  if(rebanoSel && rebanoSel !== 'Todos'){
+  
+  // Filtro por rebaño
+  if(rebanoSel && rebanoSel !== 'todos'){
     filtrados = filtrados.filter(v => String(v.rebano).toLowerCase() === String(rebanoSel).toLowerCase());
   }
+  
+  // ⭐ AGREGADO: Filtro por estado
+  if(estadoSel && estadoSel !== 'todos'){
+    filtrados = filtrados.filter(v => {
+      const estado = String(v.estado || 'vivo').toLowerCase();
+      return estado === estadoSel.toLowerCase();
+    });
+  }
+  
   renderizarLista(filtrados);
 }
 
 // Listeners para filtros
 if(filtroSexo) filtroSexo.addEventListener('change', aplicarFiltros);
 if(filtroRebano) filtroRebano.addEventListener('change', aplicarFiltros);
+if(filtroEstado) filtroEstado.addEventListener('change', aplicarFiltros); // ⭐ AGREGADO
 
 // Inicial: cargar animales desde backend
 fetchAnimalesBackend();
