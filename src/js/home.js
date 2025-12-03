@@ -10,7 +10,7 @@ const btnIrEstadisticas = document.getElementById('btnIrEstadisticas');
 // filtros
 const filtroSexo = document.getElementById('filtroSexo');
 const filtroRebano = document.getElementById('filtroRebano');
-const filtroEstado = document.getElementById('filtroEstado'); // ⭐ AGREGADO
+const filtroEstado = document.getElementById('filtroEstado'); 
 
 // Arreglo de vacas (nombre + sexo)
 let vacas = [];
@@ -31,20 +31,11 @@ async function fetchAnimalesBackend(){
   try{
     const res = await fetch('http://192.168.1.17:7002/animales', { headers: getAuthHeadersLocal() });
     const text = await res.text();
-    if(!res.ok){
-      console.error('Error cargando animales', res.status, text);
-      return [];
-    }
+    if(!res.ok){ console.error('Error cargando animales', res.status, text); return []; }
     let data = [];
     if(text){
-      try{
-        data = JSON.parse(text);
-      }catch(e){
-        console.warn('fetchAnimalesBackend: not JSON', text);
-        return [];
-      }
+      try{ data = JSON.parse(text); }catch(e){ console.warn('fetchAnimalesBackend: response not JSON', text); return []; }
     }
-    
     // Map backend shape to local shape
     const mapped = (data || []).map(a => ({
       idAnimal: a.idAnimal || a.id,
@@ -56,26 +47,77 @@ async function fetchAnimalesBackend(){
       caracteristica: a.caracteristica || a.característica || '',
       edad: a.edad || '',
       procedencia: a.procedencia || a.procedencia || '',
-      // CORREGIDO: normalizar sexo a 'H' o 'M' basado en el valor del backend
-      sexo: (typeof a.sexo === 'boolean') 
-        ? (a.sexo ? 'M' : 'H') 
-        : (String(a.sexo || '').toUpperCase() === 'M' ? 'M' : 'H'),
-      estado: a.estado || 'Vivo'
+      sexo: (typeof a.sexo === 'boolean') ? (a.sexo ? 'Macho' : 'Hembra') : (a.sexo || ''),
+      estado: a.estado || 'Vivo' 
     }));
-    
-    console.debug('Animales mapeados:', mapped.map(m => ({ nombre: m.nombre, sexo: m.sexo })));
     vacas = mapped;
     aplicarFiltros();
     return mapped;
-  }catch(err){ 
-    console.error('Error en fetchAnimalesBackend:', err); 
-    return []; 
-  }
+  }catch(err){ console.error(err); return []; }
 }
 
 // ===================================
 // SISTEMA DE ALERTAS PERSONALIZADAS
 // ===================================
+
+// ⭐ INYECCIÓN DE ESTILOS PARA ASEGURAR QUE SE OCULTE
+if (!document.getElementById('estilos-alertas-home')) {
+  const estilosAlerta = document.createElement('style');
+  estilosAlerta.id = 'estilos-alertas-home';
+  estilosAlerta.textContent = `
+    .alerta-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: none; /* Oculto por defecto */
+      justify-content: center;
+      align-items: center;
+      z-index: 10001;
+    }
+    .alerta-overlay.active {
+      display: flex !important;
+    }
+    .alerta-container {
+      background: white;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: alertaSlideIn 0.3s ease;
+      text-align: center;
+      overflow: hidden;
+    }
+    @keyframes alertaSlideIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .alerta-header {
+      padding: 20px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .alerta-header.error { background-color: #dc3545; }
+    .alerta-header.success { background-color: #28a745; }
+    .alerta-header.warning { background-color: #ffc107; color: #333; }
+    .alerta-header.info { background-color: #17a2b8; }
+    
+    .alerta-body { padding: 20px; }
+    .alerta-message { font-size: 1rem; color: #333; }
+    
+    .alerta-footer { padding: 15px; border-top: 1px solid #eee; }
+    .btn-alerta-ok {
+      padding: 8px 20px; border: none; border-radius: 6px;
+      background-color: #729e65; color: white; cursor: pointer; font-weight: bold;
+    }
+  `;
+  document.head.appendChild(estilosAlerta);
+}
 
 // Crear modal de alerta al cargar
 const modalAlerta = document.createElement('div');
@@ -107,22 +149,10 @@ function mostrarAlerta(mensaje, tipo = 'info') {
   alertaHeader.className = 'alerta-header ' + tipo;
   
   const config = {
-    error: {
-      icon: 'fa-exclamation-circle',
-      title: 'Error'
-    },
-    success: {
-      icon: 'fa-check-circle',
-      title: 'Éxito'
-    },
-    warning: {
-      icon: 'fa-exclamation-triangle',
-      title: 'Advertencia'
-    },
-    info: {
-      icon: 'fa-info-circle',
-      title: 'Información'
-    }
+    error: { icon: 'fa-exclamation-circle', title: 'Error' },
+    success: { icon: 'fa-check-circle', title: 'Éxito' },
+    warning: { icon: 'fa-exclamation-triangle', title: 'Advertencia' },
+    info: { icon: 'fa-info-circle', title: 'Información' }
   };
 
   const tipoConfig = config[tipo] || config.info;
@@ -176,7 +206,6 @@ function renderizarLista(lista = vacas) {
     const card = document.createElement('div');
     card.className = 'animal-card';
     
-    // ⭐ AGREGADO: Badge de estado con colores
     const estadoBadge = vaca.estado ? `
       <span class="estado-badge estado-${vaca.estado.toLowerCase()}">
         ${vaca.estado}
@@ -216,14 +245,18 @@ function irPerfil() {
 // Funciones del modal de cerrar sesión
 function abrirModalCerrarSesion() {
   const modal = document.getElementById('modalCerrarSesion');
-  modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
+  if(modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
 }
 
 function cerrarModalCerrarSesion() {
   const modal = document.getElementById('modalCerrarSesion');
-  modal.classList.remove('active');
-  document.body.style.overflow = 'auto';
+  if(modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
 }
 
 function confirmarCerrarSesion() {
@@ -232,7 +265,6 @@ function confirmarCerrarSesion() {
   window.location.href = '../../index.html';
 }
 
-// Cerrar modal al hacer clic fuera o con ESC
 window.addEventListener('click', (event) => {
   const modal = document.getElementById('modalCerrarSesion');
   if (event.target === modal) cerrarModalCerrarSesion();
@@ -241,51 +273,37 @@ window.addEventListener('click', (event) => {
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     const modal = document.getElementById('modalCerrarSesion');
-    if (modal.classList.contains('active')) cerrarModalCerrarSesion();
+    if (modal && modal.classList.contains('active')) cerrarModalCerrarSesion();
   }
 });
 
-// ⭐ MODIFICADO: Aplicar filtros incluyendo estado
 function aplicarFiltros(){
   const sexoSel = filtroSexo ? filtroSexo.value : 'Todos';
   const rebanoSel = filtroRebano ? filtroRebano.value : 'todos';
-  const estadoSel = filtroEstado ? filtroEstado.value : 'todos';
+  const estadoSel = filtroEstado ? filtroEstado.value : 'todos'; 
 
   let filtrados = vacas.slice();
   
-  // Filtro por sexo - CORREGIDO
   if(sexoSel && sexoSel !== 'Todos'){
-    const sexoNormalizado = sexoSel === 'M' ? 'M' : (sexoSel === 'H' ? 'H' : sexoSel.toUpperCase().charAt(0));
-    filtrados = filtrados.filter(v => {
-      const sexoAnimal = String(v.sexo || '').toUpperCase().charAt(0);
-      return sexoAnimal === sexoNormalizado;
-    });
-    console.debug(`Filtro sexo aplicado: "${sexoSel}" -> ${filtrados.length} resultados`);
+    filtrados = filtrados.filter(v => String(v.sexo).toLowerCase() === String(sexoSel).toLowerCase());
   }
   
-  // Filtro por rebaño
   if(rebanoSel && rebanoSel !== 'todos'){
-    filtrados = filtrados.filter(v => {
-      const rebanoAnimal = String(v.rebano || '').toLowerCase();
-      return rebanoAnimal === String(rebanoSel).toLowerCase();
-    });
+    filtrados = filtrados.filter(v => String(v.rebano).toLowerCase() === String(rebanoSel).toLowerCase());
   }
   
-  // Filtro por estado
   if(estadoSel && estadoSel !== 'todos'){
     filtrados = filtrados.filter(v => {
-      const estadoAnimal = String(v.estado || '').toLowerCase();
-      return estadoAnimal === String(estadoSel).toLowerCase();
+      const estado = String(v.estado || 'vivo').toLowerCase();
+      return estado === estadoSel.toLowerCase();
     });
   }
   
   renderizarLista(filtrados);
 }
 
-// Listeners para filtros
 if(filtroSexo) filtroSexo.addEventListener('change', aplicarFiltros);
 if(filtroRebano) filtroRebano.addEventListener('change', aplicarFiltros);
-if(filtroEstado) filtroEstado.addEventListener('change', aplicarFiltros); // ⭐ AGREGADO
+if(filtroEstado) filtroEstado.addEventListener('change', aplicarFiltros);
 
-// Inicial: cargar animales desde backend
 fetchAnimalesBackend();

@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/png" href="/ags-front/src/img/logo.png"/>
+  <link rel="icon" type="image/png" href="../img/logo.png"/>
   <title>AGROSYSTEM - Home</title>
+  
   <link rel="stylesheet" href="../css/estilos.css">
-  <link rel="stylesheet" href="/ags-front/src/css/estilos.css">
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
   <header class="header">
     <div class="logo">
-      <img src="/ags-front/src/img/logo.png" alt="Logo Agrosystem">
+      <img src="../img/logo.png" alt="Logo Agrosystem">
       <span class="nombre">AGROSYSTEM</span>
     </div>
     <span class="usuario-bienvenida" id="bienvenidaUsuario">Bienvenido, Juan!</span>
@@ -41,7 +42,6 @@
         <h2>TOTAL DE ANIMALES</h2>
 
         <div class="form-agregar">
-          <!-- Filtros: Sexo, Rebaño y estado -->
           <label for="filtroSexo">Filtrar por sexo:</label>
           <select id="filtroSexo">
             <option value="Todos">Todos</option>
@@ -70,7 +70,6 @@
         </div>
 
         <div class="estadisticas-home">
-          <!-- Contenedor para tarjetas mejoradas -->
           <div id="listaVacas" class="cards-container"></div>
         </div>
       </main>
@@ -78,8 +77,6 @@
   </div>
 
   <script src="../js/sidebar.js" defer></script>
-  <script src="/ags-front/src/js/home.js" defer></script>
-  <script src="/ags-front/src/js/navegacion.js" defer></script>
   <script src="../js/navegacion.js" defer></script>
   <script src="../js/home.js" defer></script>
 </body>
