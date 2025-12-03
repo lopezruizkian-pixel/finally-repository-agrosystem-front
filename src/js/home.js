@@ -31,11 +31,20 @@ async function fetchAnimalesBackend(){
   try{
     const res = await fetch('http://192.168.1.17:7002/animales', { headers: getAuthHeadersLocal() });
     const text = await res.text();
-    if(!res.ok){ console.error('Error cargando animales', res.status, text); return []; }
+    if(!res.ok){
+      console.error('Error cargando animales', res.status, text);
+      return [];
+    }
     let data = [];
     if(text){
-      try{ data = JSON.parse(text); }catch(e){ console.warn('fetchAnimalesBackend: response not JSON', text); return []; }
+      try{
+        data = JSON.parse(text);
+      }catch(e){
+        console.warn('fetchAnimalesBackend: not JSON', text);
+        return [];
+      }
     }
+    
     // Map backend shape to local shape
     const mapped = (data || []).map(a => ({
       idAnimal: a.idAnimal || a.id,
@@ -47,13 +56,21 @@ async function fetchAnimalesBackend(){
       caracteristica: a.caracteristica || a.característica || '',
       edad: a.edad || '',
       procedencia: a.procedencia || a.procedencia || '',
-      sexo: (typeof a.sexo === 'boolean') ? (a.sexo ? 'Macho' : 'Hembra') : (a.sexo || ''),
-      estado: a.estado || 'Vivo' // ⭐ AGREGADO: incluir estado
+      // CORREGIDO: normalizar sexo a 'H' o 'M' basado en el valor del backend
+      sexo: (typeof a.sexo === 'boolean') 
+        ? (a.sexo ? 'M' : 'H') 
+        : (String(a.sexo || '').toUpperCase() === 'M' ? 'M' : 'H'),
+      estado: a.estado || 'Vivo'
     }));
+    
+    console.debug('Animales mapeados:', mapped.map(m => ({ nombre: m.nombre, sexo: m.sexo })));
     vacas = mapped;
     aplicarFiltros();
     return mapped;
-  }catch(err){ console.error(err); return []; }
+  }catch(err){ 
+    console.error('Error en fetchAnimalesBackend:', err); 
+    return []; 
+  }
 }
 
 // ===================================
@@ -232,25 +249,33 @@ document.addEventListener('keydown', (event) => {
 function aplicarFiltros(){
   const sexoSel = filtroSexo ? filtroSexo.value : 'Todos';
   const rebanoSel = filtroRebano ? filtroRebano.value : 'todos';
-  const estadoSel = filtroEstado ? filtroEstado.value : 'todos'; // ⭐ AGREGADO
+  const estadoSel = filtroEstado ? filtroEstado.value : 'todos';
 
   let filtrados = vacas.slice();
   
-  // Filtro por sexo
+  // Filtro por sexo - CORREGIDO
   if(sexoSel && sexoSel !== 'Todos'){
-    filtrados = filtrados.filter(v => String(v.sexo).toLowerCase() === String(sexoSel).toLowerCase());
+    const sexoNormalizado = sexoSel === 'M' ? 'M' : (sexoSel === 'H' ? 'H' : sexoSel.toUpperCase().charAt(0));
+    filtrados = filtrados.filter(v => {
+      const sexoAnimal = String(v.sexo || '').toUpperCase().charAt(0);
+      return sexoAnimal === sexoNormalizado;
+    });
+    console.debug(`Filtro sexo aplicado: "${sexoSel}" -> ${filtrados.length} resultados`);
   }
   
   // Filtro por rebaño
   if(rebanoSel && rebanoSel !== 'todos'){
-    filtrados = filtrados.filter(v => String(v.rebano).toLowerCase() === String(rebanoSel).toLowerCase());
+    filtrados = filtrados.filter(v => {
+      const rebanoAnimal = String(v.rebano || '').toLowerCase();
+      return rebanoAnimal === String(rebanoSel).toLowerCase();
+    });
   }
   
-  // ⭐ AGREGADO: Filtro por estado
+  // Filtro por estado
   if(estadoSel && estadoSel !== 'todos'){
     filtrados = filtrados.filter(v => {
-      const estado = String(v.estado || 'vivo').toLowerCase();
-      return estado === estadoSel.toLowerCase();
+      const estadoAnimal = String(v.estado || '').toLowerCase();
+      return estadoAnimal === String(estadoSel).toLowerCase();
     });
   }
   

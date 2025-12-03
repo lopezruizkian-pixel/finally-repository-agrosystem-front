@@ -428,7 +428,6 @@ btnGuardar.addEventListener("click", async () => {
         temperatura: temperatura, // Mantener como string (categoría)
         condicionCorporal: condicionCorporal, // Mantener como string
         frecuenciaRespiratoria: frecuenciaRespiratoria, // Mantener como string (categoría)
-        sintomasObservados: sintomas, // Nuevo campo para síntomas concatenados
         fecha: fecha,
         diagnosticoPresuntivo: diagnosticoPresuntivo || '',
         diagnosticoDefinitivo: diagnosticoDefinitivo || ''
