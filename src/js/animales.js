@@ -229,7 +229,7 @@ async function resolveUsuarioId(candidate) {
   // intentar obtener lista de usuarios y buscar coincidencia
   try {
     const token = localStorage.getItem('token') || '';
-    const res = await fetch('http://localhost:7002/usuarios', {
+    const res = await fetch('http://192.168.1.17:7002/usuarios', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ async function sendAnimalToBackend(animal) {
     // debug: mostrar payload en consola para diagnóstico
     console.debug('POST /animales payload', payload);
 
-    const res = await fetch('http://localhost:7002/animales', {
+    const res = await fetch('http://192.168.1.17:7002/animales', {
       method: 'POST',
       headers,
       body: JSON.stringify(payload)
@@ -343,7 +343,7 @@ async function sendAnimalToBackend(animal) {
 async function fetchAnimalsFromBackend() {
   try {
     const headers = await getAuthHeaders();
-    const res = await fetch('http://localhost:7002/animales', {
+    const res = await fetch('http://192.168.1.17:7002/animales', {
       method: 'GET',
       headers
     });
@@ -401,7 +401,7 @@ async function updateAnimalBackend(animalTemp, routeId) {
     // debug: mostrar payload en consola para diagnóstico
     console.debug('PUT /animales/' + id + ' payload', payload);
 
-    const res = await fetch(`http://localhost:7002/animales/${id}`, {
+    const res = await fetch(`http://192.168.1.17:7002/animales/${id}`, {
       method: 'PUT',
       headers,
       body: JSON.stringify(payload)
@@ -424,7 +424,7 @@ async function updateAnimalBackend(animalTemp, routeId) {
 async function deleteAnimalBackend(id) {
   try {
     const headers = await getAuthHeaders();
-    const res = await fetch(`http://localhost:7002/animales/${id}`, {
+    const res = await fetch(`http://192.168.1.17:7002/animales/${id}`, {
       method: 'DELETE',
       headers
     });
@@ -904,7 +904,7 @@ function renderizarAnimales(lista = animales){
 
         try {
           const headers = await getAuthHeaders();
-          const res = await fetch(`http://localhost:7002/animales/${routeId}`, {
+          const res = await fetch(`http://192.168.1.17:7002/animales/${routeId}`, {
             method: 'PUT',
             headers,
             body: JSON.stringify(payload)

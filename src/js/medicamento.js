@@ -472,7 +472,7 @@ function msToDateInput(ms) {
 async function fetchMedicamentosFromBackend(){
   try{
     console.debug('GET /medicamento — iniciando petición');
-    const res = await fetch('http://localhost:7002/medicamento', {
+    const res = await fetch('http://192.168.1.17:7002/medicamento', {
       method: 'GET',
       headers: getAuthHeaders()
     });
@@ -542,7 +542,7 @@ async function sendMedicamentoToBackend(med){
   };
 
   console.debug('POST /medicamento payload', payload);
-  const res = await fetch('http://localhost:7002/medicamento', {
+  const res = await fetch('http://192.168.1.17:7002/medicamento', {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(payload)
@@ -588,7 +588,7 @@ async function updateMedicamentoBackend(med, id){
     frecuenciaAplicacion: med.frecuencia || med.frecuenciaAplicacion
   };
   console.debug(`PUT /medicamento/${id} payload`, payload);
-  const res = await fetch(`http://localhost:7002/medicamento/${id}`, {
+  const res = await fetch(`http://192.168.1.17:7002/medicamento/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     body: JSON.stringify(payload)
@@ -618,7 +618,7 @@ async function deleteMedicamentoBackend(id){
   if(!id) return;
   try{
     console.debug(`DELETE /medicamento/${id}`);
-    const res = await fetch(`http://localhost:7002/medicamento/${id}`, {
+    const res = await fetch(`http://192.168.1.17:7002/medicamento/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders()
     });

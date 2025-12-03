@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loginButton.disabled = true;
         (async () => {
             try {
-                const res = await fetch('http://localhost:7002/login', {
+                const res = await fetch('http://192.168.1.17:7002/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nombre: usuario, contrasena: contraseña })

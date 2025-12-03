@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:7001/api/estadisticas/tratamiento-vs-sanos';
+const API_URL = 'http://192.168.1.17:7001/api/estadisticas/tratamiento-vs-sanos';
 
 async function cargarEstadisticas() {
     try {

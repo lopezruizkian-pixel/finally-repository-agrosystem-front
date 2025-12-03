@@ -608,7 +608,7 @@ async function getAuthHeaders() {
 async function fetchEnfermedades(){
   try{
     console.debug('GET /enfermedades');
-    const res = await fetch('http://localhost:7002/enfermedades', { headers: await getAuthHeaders() });
+    const res = await fetch('http://192.168.1.17:7002/enfermedades', { headers: await getAuthHeaders() });
     const text = await res.text();
     if(!res.ok){ console.error('Error cargando enfermedades', res.status, text); return; }
     let data = [];
@@ -632,7 +632,7 @@ async function fetchEnfermedades(){
 async function fetchAnimalesList(){
   try{
     console.debug('GET /animales');
-    const res = await fetch('http://localhost:7002/animales', { headers: await getAuthHeaders() });
+    const res = await fetch('http://192.168.1.17:7002/animales', { headers: await getAuthHeaders() });
     const text = await res.text();
     if(!res.ok){ console.error('Error cargando animales', res.status, text); return; }
     let data = [];
@@ -657,7 +657,7 @@ async function fetchAnimalesList(){
 async function fetchTratamientos(){
   try{
     console.debug('GET /tratamientos');
-    const res = await fetch('http://localhost:7002/tratamientos', { headers: await getAuthHeaders() });
+    const res = await fetch('http://192.168.1.17:7002/tratamientos', { headers: await getAuthHeaders() });
     const text = await res.text();
     if(!res.ok){ console.error('Error cargando tratamientos', res.status, text); return; }
     let data = [];
@@ -682,7 +682,7 @@ async function fetchTratamientos(){
 async function fetchTarjetasFromBackend(){
   try{
     console.debug('GET /tarjetas');
-    const res = await fetch('http://localhost:7002/tarjetas', { headers: await getAuthHeaders() });
+    const res = await fetch('http://192.168.1.17:7002/tarjetas', { headers: await getAuthHeaders() });
     const text = await res.text();
     if(!res.ok){ console.error('Error cargando tarjetas', res.status, text); return; }
     let data = [];
@@ -703,7 +703,7 @@ async function fetchTarjetasFromBackend(){
 async function sendTarjetaToBackend(payload){
   try{
     console.debug('POST /tarjetas payload', payload);
-    const res = await fetch('http://localhost:7002/tarjetas', {
+    const res = await fetch('http://192.168.1.17:7002/tarjetas', {
       method: 'POST',
       headers: await getAuthHeaders(),
       body: JSON.stringify(payload)
@@ -732,7 +732,7 @@ async function updateTarjetaBackend(id, payload){
     console.debug(`PUT /tarjetas/${id} payload`, payload);
     // Asegurar que el payload incluya el campo idTarjeta (numérico) que coincida con la ruta
     const bodyPayload = Object.assign({}, payload, { idTarjeta: Number(id) });
-    const res = await fetch(`http://localhost:7002/tarjetas/${id}`, {
+    const res = await fetch(`http://192.168.1.17:7002/tarjetas/${id}`, {
       method: 'PUT',
       headers: await getAuthHeaders(),
       body: JSON.stringify(bodyPayload)
@@ -753,7 +753,7 @@ async function updateTarjetaBackend(id, payload){
 async function deleteTarjetaBackend(id){
   try{
     console.debug(`DELETE /tarjetas/${id}`);
-    const res = await fetch(`http://localhost:7002/tarjetas/${id}`, { method: 'DELETE', headers: await getAuthHeaders() });
+    const res = await fetch(`http://192.168.1.17:7002/tarjetas/${id}`, { method: 'DELETE', headers: await getAuthHeaders() });
     if(!res.ok) throw new Error('DELETE failed');
     const idx = tarjetas.findIndex(t => t.idTarjeta === id);
     if(idx !== -1) tarjetas.splice(idx,1);

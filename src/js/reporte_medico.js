@@ -142,7 +142,7 @@ function isVeterinario(){ const r = getCurrentUserRole(); return r.includes('vet
 async function fetchAnimalesForSelect(){
     try{
         console.debug('GET /animales for select');
-        const res = await fetch('http://localhost:7002/animales', { headers: await getAuthHeaders() });
+        const res = await fetch('http://192.168.1.17:7002/animales', { headers: await getAuthHeaders() });
         const text = await res.text();
         if(!res.ok){ console.error('Error cargando animales', res.status, text); return; }
         let data = [];
@@ -167,7 +167,7 @@ async function fetchAnimalesForSelect(){
 async function fetchTratamientosForSelect(){
     try{
         console.debug('GET /tratamientos for select');
-        const res = await fetch('http://localhost:7002/tratamientos', { headers: await getAuthHeaders() });
+        const res = await fetch('http://192.168.1.17:7002/tratamientos', { headers: await getAuthHeaders() });
         const text = await res.text();
         if(!res.ok){ console.error('Error cargando tratamientos', res.status, text); return; }
         let data = [];
@@ -192,7 +192,7 @@ async function fetchTratamientosForSelect(){
 async function fetchMedicamentosForSelect(){
     try{
         console.debug('GET /medicamento for select');
-        const res = await fetch('http://localhost:7002/medicamento', { headers: await getAuthHeaders() });
+        const res = await fetch('http://192.168.1.17:7002/medicamento', { headers: await getAuthHeaders() });
         const text = await res.text();
         if(!res.ok){ console.error('Error cargando medicamentos', res.status, text); return; }
         let data = [];
@@ -215,7 +215,7 @@ async function fetchMedicamentosForSelect(){
 async function fetchReportes(){
     try{
         console.debug('GET /reportes');
-        const res = await fetch('http://localhost:7002/reportes', { headers: await getAuthHeaders() });
+        const res = await fetch('http://192.168.1.17:7002/reportes', { headers: await getAuthHeaders() });
         const text = await res.text();
         if(!res.ok){ console.error('Error cargando reportes', res.status, text); return; }
         let data = [];
@@ -251,7 +251,7 @@ async function sendReporteToBackend(payload, idUsuarioHeaderOverride){
         if(idUsuarioHeaderOverride){
             baseHeaders['Id-Usuario'] = String(idUsuarioHeaderOverride);
         }
-        const res = await fetch('http://localhost:7002/reportes', {
+        const res = await fetch('http://192.168.1.17:7002/reportes', {
             method: 'POST',
             headers: baseHeaders,
             body: JSON.stringify(payload)
@@ -277,7 +277,7 @@ async function updateReporteBackend(payload, id, idUsuarioHeaderOverride){
         console.debug(`PUT /reportes/${id} payload`, payload);
         const baseHeaders = await getAuthHeaders();
         if(idUsuarioHeaderOverride){ baseHeaders['Id-Usuario'] = String(idUsuarioHeaderOverride); }
-        const res = await fetch(`http://localhost:7002/reportes/${id}`, {
+        const res = await fetch(`http://192.168.1.17:7002/reportes/${id}`, {
             method: 'PUT',
             headers: baseHeaders,
             body: JSON.stringify(payload)
@@ -303,7 +303,7 @@ async function resolveUsuarioId(usuarioString){
     if(!usuarioString) return null;
     try{
         console.debug('Resolving usuario id for', usuarioString);
-        const res = await fetch('http://localhost:7002/usuarios', { headers: await getAuthHeaders() });
+        const res = await fetch('http://192.168.1.17:7002/usuarios', { headers: await getAuthHeaders() });
         const text = await res.text();
         if(!res.ok){ console.warn('Could not fetch usuarios to resolve id', res.status, text); return null; }
         let list = [];
@@ -699,7 +699,7 @@ async function confirmarEliminarReporte() {
         // override Id-Usuario header con id numérico resuelto
         headers['Id-Usuario'] = String(resolvedIdForHeader);
         console.debug(`DELETE /reportes/${r.idReporte}`, { headers });
-        const res = await fetch(`http://localhost:7002/reportes/${r.idReporte}`, { method: 'DELETE', headers });
+        const res = await fetch(`http://192.168.1.17:7002/reportes/${r.idReporte}`, { method: 'DELETE', headers });
         const text = await res.text();
         let body = null;
         if(text){ try{ body = JSON.parse(text); }catch(e){ body = text; } }

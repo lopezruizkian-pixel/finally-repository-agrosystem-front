@@ -29,7 +29,7 @@ function getAuthHeadersLocal(){
 // Fetch animals from backend and map to local shape
 async function fetchAnimalesBackend(){
   try{
-    const res = await fetch('http://localhost:7002/animales', { headers: getAuthHeadersLocal() });
+    const res = await fetch('http://192.168.1.17:7002/animales', { headers: getAuthHeadersLocal() });
     const text = await res.text();
     if(!res.ok){ console.error('Error cargando animales', res.status, text); return []; }
     let data = [];

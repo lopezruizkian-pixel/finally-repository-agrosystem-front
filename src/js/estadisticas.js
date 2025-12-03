@@ -21,7 +21,7 @@ async function getAuthHeadersLocal(){
 async function cargarEstadisticas(){
   // Intentar obtener desde backend
   try{
-    const res = await fetch('http://localhost:7002/estadisticas/animales', { headers: await getAuthHeadersLocal() });
+    const res = await fetch('http://192.168.1.17:7002/estadisticas/animales', { headers: await getAuthHeadersLocal() });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     const totalVacas = data.total || 0;
@@ -50,7 +50,7 @@ function mostrarEstadisticas(totalVacas, machos, hembras){
   }
 
   contenido.innerHTML = `
-    <p><i class="fas fa-horse"></i> <strong>Total de Animales:</strong> ${totalVacas}</p>
+    <p><i class="fas fa-cow"></i> <strong>Total de Animales:</strong> ${totalVacas}</p>
     <p><i class="fas fa-mars"></i> <strong>Machos:</strong> ${machos}</p>
     <p><i class="fas fa-venus"></i> <strong>Hembras:</strong> ${hembras}</p>
   `;
@@ -102,7 +102,7 @@ function mostrarEstadisticas(totalVacas, machos, hembras){
 async function cargarEstadisticasEnfermedades(){
   try{
     console.debug('GET /reportes para estadísticas de enfermedades');
-    const res = await fetch('http://localhost:7002/reportes', { headers: await getAuthHeadersLocal() });
+    const res = await fetch('http://192.168.1.17:7002/reportes', { headers: await getAuthHeadersLocal() });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     
     const reportes = await res.json();
