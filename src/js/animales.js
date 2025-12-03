@@ -21,9 +21,7 @@ if (rebanoGroup) {
   rebanoGroup.style.display = 'none';
 }
 
-/**
- * Poblar opciones de rebaño según sexo
- */
+// Función para poblar opciones de rebaño según sexo
 function populateRebanoOptions(sexo) {
   if (!selectRebano) return;
   const s = String(sexo || '').toUpperCase();
@@ -50,7 +48,6 @@ function populateRebanoOptions(sexo) {
   if (rebanoGroup) rebanoGroup.style.display = '';
 }
 
-// Cambio de sexo -> actualizar rebaño
 if (selectSexo) {
   selectSexo.addEventListener('change', (e) => {
     populateRebanoOptions(e.target.value);
@@ -80,24 +77,19 @@ const btnCerrarVisualizar = document.getElementById('btnCerrarVisualizar');
 let editIndex = null;
 
 // ===================================
-// ROLES Y PERMISOS (MEJORADO)
+// ROLES Y PERMISOS
 // ===================================
 function getCurrentUserRole() {
   const datosStr = sessionStorage.getItem('datosUsuarioAgroSystem') || localStorage.getItem('datosUsuarioAgroSystem') || null;
   if (!datosStr) return '';
   try {
     const datos = JSON.parse(datosStr);
-    // Intenta obtener el nombre del rol o el ID si es un objeto, o el valor directo
     let role = datos.rolNombre || (datos.rol && datos.rol.nombre) || datos.rol || '';
-    
-    // Si el rol es un objeto con idRol
     if (datos.rol && datos.rol.idRol) {
         if(datos.rol.idRol === 1) return 'administrador';
         return String(datos.rol.nombre || '').toLowerCase();
     }
-    // Si el rol es numérico (1 = admin)
     if (role === 1 || role === '1') return 'administrador';
-    
     return String(role).toLowerCase();
   } catch (e) {
     return String(datosStr).toLowerCase();
@@ -111,36 +103,55 @@ function isVeterinario() {
 
 function isAdmin() { 
     const r = getCurrentUserRole(); 
-    // Se asegura de cubrir todas las variantes de administrador
     return r.includes('admin') || r.includes('administrador') || r === '1'; 
 }
 
 // ===================================
 // ALERTAS
 // ===================================
-// (Código de alertas abreviado para no ocupar espacio innecesario, asumiendo que el CSS ya existe o se inyecta)
-if (!document.getElementById('estilos-alertas')) {
-    const s = document.createElement('style');
-    s.id = 'estilos-alertas';
-    // Se asume que los estilos de alerta ya están en tu CSS o se cargan aquí
-    document.head.appendChild(s);
+if (!document.querySelector('.alerta-overlay')) {
+    const modalAlerta = document.createElement('div');
+    modalAlerta.classList.add('alerta-overlay');
+    modalAlerta.innerHTML = `
+      <div class="alerta-container">
+        <div class="alerta-header" id="alertaHeader">
+          <i class="fas fa-info-circle alerta-icon" id="alertaIcon"></i>
+          <h3 class="alerta-title" id="alertaTitle">Alerta</h3>
+        </div>
+        <div class="alerta-body"><p class="alerta-message" id="alertaMessage"></p></div>
+        <div class="alerta-footer"><button class="btn-alerta-ok" id="btnAlertaOk">Aceptar</button></div>
+      </div>
+    `;
+    document.body.appendChild(modalAlerta);
+    
+    const btnOk = modalAlerta.querySelector('#btnAlertaOk');
+    if(btnOk) btnOk.addEventListener('click', () => {
+        modalAlerta.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    });
 }
 
 function mostrarAlerta(mensaje, tipo = 'info') {
-  // Implementación simple reutilizando tu estructura o creando una nueva si no existe
-  let overlay = document.querySelector('.alerta-overlay');
-  if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.className = 'alerta-overlay';
-      overlay.innerHTML = `<div class="alerta-container"><div class="alerta-body"><p id="msgAlerta"></p></div><div class="alerta-footer"><button class="btn-alerta-ok">OK</button></div></div>`;
-      document.body.appendChild(overlay);
-      overlay.querySelector('button').onclick = () => { overlay.classList.remove('active'); };
-  }
-  const p = overlay.querySelector('#msgAlerta') || overlay.querySelector('p');
-  if(p) p.textContent = mensaje;
-  overlay.classList.add('active');
+    const overlay = document.querySelector('.alerta-overlay');
+    const header = document.getElementById('alertaHeader');
+    const msg = document.getElementById('alertaMessage');
+    
+    if (header) {
+        header.className = 'alerta-header ' + tipo;
+        // Iconos simples basados en clase
+        const icon = document.getElementById('alertaIcon');
+        if(icon) {
+            icon.className = 'fas alerta-icon ' + (tipo === 'success' ? 'fa-check-circle' : (tipo === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'));
+        }
+    }
+    if (msg) msg.textContent = mensaje;
+    if (overlay) {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        alert(mensaje);
+    }
 }
-
 
 // ===================================
 // API
@@ -163,11 +174,16 @@ async function getAuthHeaders() {
 async function fetchAnimalsFromBackend() {
   try {
     const headers = await getAuthHeaders();
-    const res = await fetch('http://192.168.1.17:7002/animales', { method: 'GET', headers });
+    // IMPORTANTE: cache: 'no-store' para evitar datos viejos
+    const res = await fetch('http://192.168.1.17:7002/animales', { 
+        method: 'GET', 
+        headers,
+        cache: 'no-store' 
+    });
+    
     if (!res.ok) throw new Error('Error al cargar animales');
     const list = await res.json();
     
-    // MAPEO DE DATOS
     animales = list.map(a => ({
       idAnimal: a.idAnimal || a.id,
       nombreAnimal: a.nombreAnimal || a.nombre || '',
@@ -195,7 +211,10 @@ async function updateAnimalBackend(animal, id) {
     try {
         const headers = await getAuthHeaders();
         const sexoBool = (animal.sexo === 'M');
+        
+        // Construimos el payload asegurando tipos
         const payload = {
+            id: Number(id), // Algunos backends esperan 'id'
             idAnimal: Number(id),
             nombreAnimal: animal.nombre,
             numArete: Number(animal.numArete),
@@ -210,10 +229,17 @@ async function updateAnimalBackend(animal, id) {
             idMadre: animal.madreArete ? Number(animal.madreArete) : null,
             estado: animal.estado
         };
+        
+        console.log("Enviando UPDATE:", payload); // Depuración
+
         const res = await fetch(`http://192.168.1.17:7002/animales/${id}`, {
             method: 'PUT', headers, body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('Error actualizando');
+        
+        if (!res.ok) {
+            const txt = await res.text();
+            throw new Error(`Servidor respondió: ${txt}`);
+        }
         return { success: true };
     } catch (e) { return { success: false, error: e.message }; }
 }
@@ -236,6 +262,7 @@ async function sendAnimalToBackend(animal) {
             idMadre: animal.madreArete ? Number(animal.madreArete) : null,
             estado: animal.estado
         };
+        
         const res = await fetch('http://192.168.1.17:7002/animales', {
             method: 'POST', headers, body: JSON.stringify(payload)
         });
@@ -247,7 +274,6 @@ async function sendAnimalToBackend(animal) {
 // ===================================
 // RENDERIZADO
 // ===================================
-
 function renderizarAnimales(lista = animales) {
   tablaAnimales.innerHTML = '';
   if (lista.length === 0) {
@@ -270,19 +296,15 @@ function renderizarAnimales(lista = animales) {
   `;
   const tbody = tabla.querySelector('tbody');
   
-  // Verificar permisos
   const esAdmin = isAdmin();
 
   lista.forEach(animal => {
     const fila = document.createElement('tr');
     
-    // LÓGICA DE BOTONES SOLICITADA:
-    // Admin: Ver + Editar (Sin Eliminar)
-    // Veterinario: Solo Ver
+    // LÓGICA: Admin (Ver + Editar), Otros (Ver)
     let botonesHTML = `
         <button class="btn-ver" title="Ver detalles"><i class="fas fa-eye"></i></button>
     `;
-    
     if (esAdmin) {
         botonesHTML += `
             <button class="btn-editar" title="Editar"><i class="fas fa-pen"></i></button>
@@ -297,7 +319,7 @@ function renderizarAnimales(lista = animales) {
       <td>${botonesHTML}</td>
     `;
 
-    // --- EVENTO VER ---
+    // EVENTO VER
     fila.querySelector('.btn-ver').addEventListener('click', () => {
         let fecha = '';
         if(Array.isArray(animal.fechaNacimiento)) {
@@ -319,31 +341,35 @@ function renderizarAnimales(lista = animales) {
         modalVisualizar.style.display = 'flex';
     });
 
-    // --- EVENTO EDITAR (Solo si el botón existe) ---
+    // EVENTO EDITAR
     const btnEdit = fila.querySelector('.btn-editar');
     if (btnEdit) {
         btnEdit.addEventListener('click', () => {
-            // 1. Llenar campos básicos (seguros)
-            if(inputNombre) inputNombre.value = animal.nombreAnimal || '';
-            if(inputNumArete) inputNumArete.value = animal.numArete || '';
+            // Llenar campos
+            if (inputNombre) inputNombre.value = animal.nombreAnimal || '';
+            if (inputNumArete) inputNumArete.value = animal.numArete || '';
             
-            // Sexo y Rebaño
-            const sVal = (animal.sexo === 'M' || animal.sexo === true) ? 'M' : 'H';
-            if(selectSexo) {
-                selectSexo.value = sVal;
-                populateRebanoOptions(sVal);
+            const sexoVal = (animal.sexo === 'M' || animal.sexo === true) ? 'M' : 'H';
+            if (selectSexo) {
+                selectSexo.value = sexoVal;
+                populateRebanoOptions(sexoVal);
             }
-            if(selectRebano) selectRebano.value = animal['rebaño'] || 'Vaca';
-            if(selectProcedencia) selectProcedencia.value = animal.procedencia || 'Interno';
-            if(selectEstado) selectEstado.value = animal.estado || 'Vivo';
             
-            // 2. Llenar campos con VALIDACIÓN DE EXISTENCIA (Corrección del TypeError)
-            const setIfExist = (id, val) => {
+            // setTimeout pequeño para asegurar que las opciones de rebaño se pintaron
+            setTimeout(() => {
+                if (selectRebano) selectRebano.value = animal['rebaño'] || 'Vaca';
+            }, 0);
+
+            if (selectProcedencia) selectProcedencia.value = animal.procedencia || 'Interno';
+            if (selectEstado) selectEstado.value = animal.estado || 'Vivo';
+            
+            // Validar existencia de elementos del modal antes de asignar
+            const setIf = (id, val) => {
                 const el = document.getElementById(id);
                 if(el) el.value = (val !== null && val !== undefined) ? val : '';
             };
             
-            // Fecha (convertir array a string YYYY-MM-DD)
+            // Fecha
             let fechaStr = '';
             if(Array.isArray(animal.fechaNacimiento) && animal.fechaNacimiento.length >= 3) {
                  const y = String(animal.fechaNacimiento[0]).padStart(4,'0');
@@ -353,16 +379,14 @@ function renderizarAnimales(lista = animales) {
             } else {
                 fechaStr = animal.fechaNacimiento || '';
             }
-            setIfExist('fechaNacimiento', fechaStr);
-            
-            setIfExist('edad', animal.edad);
-            setIfExist('peso', animal.pesoInicial);
-            setIfExist('caracteristicas', animal.caracteristica);
-            setIfExist('padreArete', animal.idPadre);
-            setIfExist('madreArete', animal.idMadre);
+            setIf('fechaNacimiento', fechaStr);
+            setIf('edad', animal.edad);
+            setIf('peso', animal.pesoInicial);
+            setIf('caracteristicas', animal.caracteristica);
+            setIf('padreArete', animal.idPadre);
+            setIf('madreArete', animal.idMadre);
 
             editIndex = animales.indexOf(animal);
-            // Cambiar título del modal
             const tModal = document.getElementById('tituloModal');
             if(tModal) tModal.textContent = 'Editar Animal';
             
@@ -375,11 +399,11 @@ function renderizarAnimales(lista = animales) {
   tablaAnimales.appendChild(tabla);
 }
 
-// ===================================
-// EVENTOS GLOBALES
-// ===================================
+// ===========================
+// MANEJO DEL MODAL
+// ===========================
 
-// Botón Agregar (Solo visible para Admin)
+// Botón Agregar (Admin)
 if (btnAgregar) {
     if (isAdmin()) {
         btnAgregar.style.display = 'flex'; 
@@ -394,9 +418,9 @@ if (btnAgregar) {
     }
 }
 
-// Cerrar modales
 if (btnCerrarModal) btnCerrarModal.addEventListener('click', () => modal.style.display = 'none');
 if (btnCerrarVisualizar) btnCerrarVisualizar.addEventListener('click', () => modalVisualizar.style.display = 'none');
+
 window.addEventListener('click', (e) => {
     if(e.target === modal) modal.style.display = 'none';
     if(e.target === modalVisualizar) modalVisualizar.style.display = 'none';
@@ -407,13 +431,14 @@ function limpiarModal() {
     if(inputNombre) inputNombre.value = '';
     if(inputNumArete) inputNumArete.value = '';
     if(selectSexo) selectSexo.value = '';
-    if(selectRebano) selectRebano.innerHTML = '';
-    
-    const clearIds = ['fechaNacimiento', 'edad', 'peso', 'caracteristicas', 'padreArete', 'madreArete'];
-    clearIds.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.value = '';
-    });
+    // Limpiar inputs seguros
+    const clear = id => { const el = document.getElementById(id); if(el) el.value = ''; };
+    clear('fechaNacimiento');
+    clear('edad');
+    clear('peso');
+    clear('caracteristicas');
+    clear('padreArete');
+    clear('madreArete');
 }
 
 // Guardar
@@ -442,26 +467,25 @@ if (btnGuardar) {
         }
 
         if (editIndex !== null) {
-            // EDITAR
             const id = animales[editIndex].idAnimal;
             updateAnimalBackend(data, id).then(res => {
                 if(res.success) {
-                    fetchAnimalsFromBackend();
                     modal.style.display = 'none';
                     mostrarAlerta('Animal editado correctamente', 'success');
+                    // Esperar un poco antes de recargar para asegurar que el backend procesó
+                    setTimeout(() => fetchAnimalsFromBackend(), 300);
                 } else {
-                    mostrarAlerta('Error al editar', 'error');
+                    mostrarAlerta('Error: ' + res.error, 'error');
                 }
             });
         } else {
-            // AGREGAR
             sendAnimalToBackend(data).then(res => {
                 if(res.success) {
-                    fetchAnimalsFromBackend();
                     modal.style.display = 'none';
                     mostrarAlerta('Animal agregado correctamente', 'success');
+                    setTimeout(() => fetchAnimalsFromBackend(), 300);
                 } else {
-                    mostrarAlerta('Error al agregar', 'error');
+                    mostrarAlerta('Error: ' + res.error, 'error');
                 }
             });
         }
