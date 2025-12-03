@@ -91,51 +91,162 @@ body {
   padding: 20px 40px;
   overflow-y: auto;
   height: calc(100vh - 60px);
-}
-
-.buscador-agregar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.buscador {
-  display: flex;
-  align-items: center;
-  background-color: #f3f3f3;
-  border-radius: 20px;
-  padding: 5px 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.buscador input {
-  border: none;
-  background: none;
-  outline: none;
-  padding: 5px 10px;
-}
-
-.buscador button {
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-.btn-agregar {
-  background-color: white;
-  border: none;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  padding: 8px 15px;
-  cursor: pointer;
-}
-
-.tabla-animales {
   display: flex;
   flex-direction: column;
+  align-items: center;
+}
+
+/* Secciones de estadísticas */
+.seccion-estadistica {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid rgba(114, 158, 100, 1);
+  width: 100%;
+  max-width: 1000px;
+}
+
+.seccion-estadistica h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: rgba(114, 158, 100, 1);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
   gap: 10px;
-  margin-top: 20px;
+}
+
+.seccion-estadistica h3 i {
+  font-size: 1.3rem;
+}
+
+/* Contenedor del gráfico y info - horizontal centrado */
+.estadistica-contenedor {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: center;
+  justify-items: center;
+}
+
+.grafico-contenedor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 280px;
+  width: 100%;
+  max-width: 350px;
+}
+
+.grafico-contenedor canvas {
+  max-width: 100%;
+  max-height: 280px;
+}
+
+.estadistica-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 350px;
+}
+
+.estadistica-info p {
+  margin: 0;
+  padding: 10px 12px;
+  background-color: #f0f7f1;
+  border-radius: 6px;
+  border-left: 3px solid rgba(114, 158, 100, 1);
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.estadistica-info strong {
+  color: rgba(114, 158, 100, 1);
+  font-weight: 600;
+}
+
+.estadistica-info i {
+  margin-right: 6px;
+  color: rgba(114, 158, 100, 1);
+  font-size: 1rem;
+}
+
+/* Responsive: en pantallas medianas */
+@media (max-width: 1200px) {
+  .estadistica-contenedor {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .grafico-contenedor {
+    min-height: 250px;
+  }
+
+  .grafico-contenedor canvas {
+    max-height: 250px;
+  }
+
+  .contenido {
+    padding: 15px 20px;
+  }
+
+  .seccion-estadistica {
+    padding: 20px;
+    margin-bottom: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contenido {
+    padding: 12px 15px;
+    align-items: stretch;
+  }
+
+  .seccion-estadistica {
+    padding: 15px;
+    margin-bottom: 20px;
+    max-width: 100%;
+  }
+
+  .estadistica-info p {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+
+  .grafico-contenedor {
+    min-height: 220px;
+    padding: 15px;
+    max-width: 100%;
+  }
+
+  .grafico-contenedor canvas {
+    max-height: 220px;
+  }
+
+  .estadistica-contenedor {
+    gap: 15px;
+  }
+
+  .seccion-estadistica h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    gap: 8px;
+  }
+
+  .seccion-estadistica h3 i {
+    font-size: 1.2rem;
+  }
+
+  .estadistica-info {
+    max-width: 100%;
+  }
 }
 
 /* Tabla */
@@ -450,68 +561,8 @@ body {
   line-height: 1.5;
 }
 
-/* Estilos para secciones de estadísticas */
-.seccion-estadistica {
-  background-color: #fff;
-  border-radius: 15px;
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-left: 5px solid rgba(114, 158, 100, 1);
-  width: 100%;
-  max-width: 900px;
-}
-
-.seccion-estadistica h3 {
-  margin-top: 0;
-  color: rgba(114, 158, 100, 1);
-  font-size: 1.3rem;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.seccion-estadistica h3::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  background-color: rgba(114, 158, 100, 1);
-  border-radius: 50%;
-}
-
-#graficoVacas,
-#graficoEnfermedades {
-  max-width: 100%;
-  height: auto;
-  margin: 20px 0;
-  display: block;
-}
-
-.contenidoEstadisticas {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.contenidoEstadisticas p {
-  margin: 0;
-  font-size: 1rem;
-  color: #333;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border-left: 3px solid rgba(114, 158, 100, 1);
-}
-
-.contenidoEstadisticas i {
-  margin-right: 8px;
-  color: rgba(114, 158, 100, 1);
-}
-
 /* ===================================
-   ESTILOS PARA VISTA DE ESTADÍSTICAS
+   ESTILOS PARA VISTA DE ESTADÍSTICAS - CENTRADAS
    =================================== */
 
 .contenido {
@@ -519,38 +570,44 @@ body {
   padding: 20px 40px;
   overflow-y: auto;
   height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Secciones de estadísticas */
 .seccion-estadistica {
   background-color: #fff;
   border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 20px;
+  padding: 25px;
+  margin-bottom: 30px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-left: 5px solid rgba(114, 158, 100, 1);
+  width: 100%;
+  max-width: 1000px;
 }
 
 .seccion-estadistica h3 {
   margin-top: 0;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
   color: rgba(114, 158, 100, 1);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .seccion-estadistica h3 i {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
 }
 
-/* Contenedor del gráfico y info */
+/* Contenedor del gráfico y info - horizontal centrado */
 .estadistica-contenedor {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  align-items: start;
+  gap: 30px;
+  align-items: center;
+  justify-items: center;
 }
 
 .grafico-contenedor {
@@ -559,29 +616,33 @@ body {
   align-items: center;
   background-color: #f8f9fa;
   border-radius: 8px;
-  padding: 12px;
-  min-height: 250px;
+  padding: 20px;
+  min-height: 280px;
+  width: 100%;
+  max-width: 350px;
 }
 
 .grafico-contenedor canvas {
   max-width: 100%;
-  max-height: 250px;
+  max-height: 280px;
 }
 
 .estadistica-info {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  width: 100%;
+  max-width: 350px;
 }
 
 .estadistica-info p {
   margin: 0;
-  padding: 8px 12px;
+  padding: 10px 12px;
   background-color: #f0f7f1;
   border-radius: 6px;
   border-left: 3px solid rgba(114, 158, 100, 1);
   color: #333;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   line-height: 1.4;
 }
 
@@ -593,65 +654,77 @@ body {
 .estadistica-info i {
   margin-right: 6px;
   color: rgba(114, 158, 100, 1);
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
-/* Responsive: en pantallas pequeñas */
+/* Responsive: en pantallas medianas */
 @media (max-width: 1200px) {
   .estadistica-contenedor {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 20px;
   }
 
   .grafico-contenedor {
-    min-height: 220px;
+    min-height: 250px;
   }
 
   .grafico-contenedor canvas {
-    max-height: 220px;
+    max-height: 250px;
   }
 
   .contenido {
-    padding: 15px 25px;
+    padding: 15px 20px;
+  }
+
+  .seccion-estadistica {
+    padding: 20px;
+    margin-bottom: 25px;
   }
 }
 
 @media (max-width: 768px) {
   .contenido {
     padding: 12px 15px;
+    align-items: stretch;
   }
 
   .seccion-estadistica {
-    padding: 12px;
-    margin-bottom: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    max-width: 100%;
   }
 
   .estadistica-info p {
-    font-size: 0.85rem;
-    padding: 6px 10px;
+    font-size: 0.9rem;
+    padding: 8px 10px;
   }
 
   .grafico-contenedor {
-    min-height: 200px;
-    padding: 10px;
+    min-height: 220px;
+    padding: 15px;
+    max-width: 100%;
   }
 
   .grafico-contenedor canvas {
-    max-height: 200px;
+    max-height: 220px;
   }
 
   .estadistica-contenedor {
-    gap: 10px;
+    gap: 15px;
   }
 
   .seccion-estadistica h3 {
-    font-size: 1rem;
-    margin-bottom: 10px;
-    gap: 6px;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    gap: 8px;
   }
 
   .seccion-estadistica h3 i {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+  }
+
+  .estadistica-info {
+    max-width: 100%;
   }
 }
 

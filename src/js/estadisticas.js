@@ -2,8 +2,8 @@
 const titulo = document.getElementById('tituloEstadistica');
 const contenido = document.getElementById('contenidoEstadisticas');
 const canvas = document.getElementById('graficoVacas');
-const canvasEnfermedades = document.getElementById('graficoEnfermedades');
-const contenidoEnfermedades = document.getElementById('contenidoEnfermedades');
+const canvasTratamientos = document.getElementById('graficoTratamientos');
+const contenidoTratamientos = document.getElementById('contenidoTratamientos');
 
 async function getAuthHeadersLocal(){
   const token = localStorage.getItem('token') || '';
@@ -97,72 +97,72 @@ function mostrarEstadisticas(totalVacas, machos, hembras){
 }
 
 // ===================================
-// ESTADÍSTICAS DE ENFERMEDADES
+// ESTADÍSTICAS DE TRATAMIENTOS MÁS APLICADOS
 // ===================================
-async function cargarEstadisticasEnfermedades(){
+async function cargarEstadisticasTratamientos(){
   try{
-    console.debug('GET /reportes para estadísticas de enfermedades');
-    const res = await fetch('http://192.168.1.17:7002/reportes', { headers: await getAuthHeadersLocal() });
+    console.debug('GET /tratamientos para estadísticas');
+    const res = await fetch('http://192.168.1.17:7002/tratamientos', { headers: await getAuthHeadersLocal() });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     
-    const reportes = await res.json();
-    console.debug('Reportes cargados:', reportes);
+    const tratamientos = await res.json();
+    console.debug('Tratamientos cargados:', tratamientos);
     
-    // Contar ocurrencias de cada enfermedad
-    const enfermedadesCount = {};
-    (reportes || []).forEach(r => {
-      const diagnostico = r.diagnosticoPresuntivo || r.diagnosticoDefinitivo || 'Sin diagnóstico';
-      if(diagnostico && diagnostico !== ''){
-        enfermedadesCount[diagnostico] = (enfermedadesCount[diagnostico] || 0) + 1;
+    // Contar ocurrencias de cada tratamiento por nombre
+    const tratamientosCount = {};
+    (tratamientos || []).forEach(t => {
+      const nombreTratamiento = t.nombreTratamiento || t.nombre || 'Sin nombre';
+      if(nombreTratamiento && nombreTratamiento !== ''){
+        tratamientosCount[nombreTratamiento] = (tratamientosCount[nombreTratamiento] || 0) + 1;
       }
     });
     
-    console.debug('Enfermedades contabilizadas:', enfermedadesCount);
+    console.debug('Tratamientos contabilizados:', tratamientosCount);
     
     // Ordenar por cantidad (descendente) y tomar top 10
-    const enfermedadesOrdenadas = Object.entries(enfermedadesCount)
+    const tratamientosOrdenados = Object.entries(tratamientosCount)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10);
     
-    mostrarEstadisticasEnfermedades(enfermedadesOrdenadas);
+    mostrarEstadisticasTratamientos(tratamientosOrdenados);
     
   }catch(err){
-    console.error('Error cargando estadísticas de enfermedades:', err);
-    if(contenidoEnfermedades){
-      contenidoEnfermedades.innerHTML = '<p><i class="fas fa-info-circle"></i> <strong>No hay datos</strong> de enfermedades disponibles</p>';
+    console.error('Error cargando estadísticas de tratamientos:', err);
+    if(contenidoTratamientos){
+      contenidoTratamientos.innerHTML = '<p><i class="fas fa-info-circle"></i> <strong>No hay datos</strong> de tratamientos disponibles</p>';
     }
   }
 }
 
-function mostrarEstadisticasEnfermedades(enfermedades){
-  if(!canvasEnfermedades || !contenidoEnfermedades) return;
+function mostrarEstadisticasTratamientos(tratamientos){
+  if(!canvasTratamientos || !contenidoTratamientos) return;
   
-  if(enfermedades.length === 0){
-    contenidoEnfermedades.innerHTML = '<p><i class="fas fa-info-circle"></i> <strong>No hay datos</strong> de enfermedades registradas en los reportes</p>';
+  if(tratamientos.length === 0){
+    contenidoTratamientos.innerHTML = '<p><i class="fas fa-info-circle"></i> <strong>No hay datos</strong> de tratamientos registrados</p>';
     return;
   }
   
   // Preparar datos para el gráfico
-  const nombres = enfermedades.map(e => e[0]);
-  const cantidades = enfermedades.map(e => e[1]);
+  const nombres = tratamientos.map(t => t[0]);
+  const cantidades = tratamientos.map(t => t[1]);
   
   // Mostrar información
-  let contenidoHTML = '<p><i class="fas fa-virus"></i> <strong>Total de Enfermedades Registradas:</strong> ' + nombres.length + '</p>';
-  contenidoHTML += '<p><i class="fas fa-exclamation-triangle"></i> <strong>Enfermedad Más Frecuente:</strong> ' + nombres[0] + ' (' + cantidades[0] + ' casos)</p>';
-  contenidoHTML += '<p><i class="fas fa-chart-bar"></i> <strong>Total de Casos:</strong> ' + cantidades.reduce((a, b) => a + b, 0) + '</p>';
-  contenidoEnfermedades.innerHTML = contenidoHTML;
+  let contenidoHTML = '<p><i class="fas fa-syringe"></i> <strong>Total de Tratamientos Registrados:</strong> ' + nombres.length + '</p>';
+  contenidoHTML += '<p><i class="fas fa-star"></i> <strong>Tratamiento Más Aplicado:</strong> ' + nombres[0] + ' (' + cantidades[0] + ' aplicaciones)</p>';
+  contenidoHTML += '<p><i class="fas fa-chart-bar"></i> <strong>Total de Aplicaciones:</strong> ' + cantidades.reduce((a, b) => a + b, 0) + '</p>';
+  contenidoTratamientos.innerHTML = contenidoHTML;
   
   // Crear gráfico de barras
-  if(canvasEnfermedades.getContext && window.Chart){
+  if(canvasTratamientos.getContext && window.Chart){
     try{
-      const ctx = canvasEnfermedades.getContext('2d');
-      if(window._enfermedadChart){ try{ window._enfermedadChart.destroy(); }catch(e){} }
-      window._enfermedadChart = new Chart(ctx, {
+      const ctx = canvasTratamientos.getContext('2d');
+      if(window._tratamientoChart){ try{ window._tratamientoChart.destroy(); }catch(e){} }
+      window._tratamientoChart = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: nombres,
           datasets: [{
-            label: 'Cantidad de Casos',
+            label: 'Cantidad de Aplicaciones',
             data: cantidades,
             backgroundColor: 'rgba(114, 158, 100, 0.7)',
             borderColor: 'rgba(114, 158, 100, 1)',
@@ -202,7 +202,7 @@ function mostrarEstadisticasEnfermedades(enfermedades){
           }
         }
       });
-    }catch(e){ console.error('Error renderizando gráfico de enfermedades', e); }
+    }catch(e){ console.error('Error renderizando gráfico de tratamientos', e); }
   }
 }
 
@@ -210,6 +210,6 @@ function mostrarEstadisticasEnfermedades(enfermedades){
 // EJECUTAR CARGAS
 // ===================================
 cargarEstadisticas();
-cargarEstadisticasEnfermedades();
+cargarEstadisticasTratamientos();
 
 console.log('✅ Estadísticas cargadas correctamente');
