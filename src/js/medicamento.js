@@ -452,7 +452,7 @@ function msToDateInput(ms) {
 
 async function fetchMedicamentosFromBackend(){
   try{
-    const res = await fetch('http://192.168.1.17:7002/medicamento', {
+    const res = await fetch('http://54.243.211.195:7002/medicamento', {
       method: 'GET',
       headers: getAuthHeaders()
     });
@@ -502,7 +502,7 @@ async function sendMedicamentoToBackend(med){
     frecuenciaAplicacion
   };
 
-  const res = await fetch('http://192.168.1.17:7002/medicamento', {
+  const res = await fetch('http://54.243.211.195:7002/medicamento', {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(payload)
@@ -532,7 +532,7 @@ async function updateMedicamentoBackend(med, id){
     frecuenciaAplicacion: med.frecuenciaCompleta
   };
   
-  const res = await fetch(`http://192.168.1.17:7002/medicamento/${id}`, {
+  const res = await fetch(`http://54.243.211.195:7002/medicamento/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     body: JSON.stringify(payload)
@@ -547,7 +547,7 @@ async function updateMedicamentoBackend(med, id){
 async function deleteMedicamentoBackend(id){
   if(!id) return;
   try{
-    const res = await fetch(`http://192.168.1.17:7002/medicamento/${id}`, {
+    const res = await fetch(`http://54.243.211.195:7002/medicamento/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders()
     });

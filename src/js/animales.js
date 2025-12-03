@@ -175,7 +175,7 @@ async function fetchAnimalsFromBackend() {
   try {
     const headers = await getAuthHeaders();
     // IMPORTANTE: cache: 'no-store' para evitar datos viejos
-    const res = await fetch('http://192.168.1.17:7002/animales', { 
+    const res = await fetch('http://54.243.211.195:7002/animales', { 
         method: 'GET', 
         headers,
         cache: 'no-store' 
@@ -231,7 +231,7 @@ async function updateAnimalBackend(animal, id) {
         
         console.log("Enviando UPDATE:", payload); // Depuración
 
-        const res = await fetch(`http://192.168.1.17:7002/animales/${id}`, {
+        const res = await fetch(`http://54.243.211.195:7002/animales/${id}`, {
             method: 'PUT', headers, body: JSON.stringify(payload)
         });
         
@@ -262,7 +262,7 @@ async function sendAnimalToBackend(animal) {
             estado: animal.estado
         };
         
-        const res = await fetch('http://192.168.1.17:7002/animales', {
+        const res = await fetch('http://54.243.211.195:7002/animales', {
             method: 'POST', headers, body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error('Error creando');

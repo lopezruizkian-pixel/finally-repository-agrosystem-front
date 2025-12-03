@@ -134,7 +134,7 @@ async function getAuthHeaders() {
 async function resolveUsuarioId(usuarioString){
   if(!usuarioString) return null;
   try{
-    const res = await fetch('http://192.168.1.17:7002/usuarios', { headers: await getAuthHeaders() });
+    const res = await fetch('http://54.243.211.195:7002/usuarios', { headers: await getAuthHeaders() });
     // Manejo seguro de respuesta vacía
     const text = await res.text();
     if(!res.ok) return null;
@@ -176,7 +176,7 @@ function isAdmin(){ const r = getCurrentUserRole(); const id = getCurrentUserRol
 // Fetch data functions (Animals, Reportes, Medicamentos, Enfermedades)
 async function fetchEnfermedades(){
   try{
-    const res = await fetch('http://192.168.1.17:7002/enfermedades', { headers: await getAuthHeaders() });
+    const res = await fetch('http://54.243.211.195:7002/enfermedades', { headers: await getAuthHeaders() });
     if(res.ok) {
         const text = await res.text();
         enfermedadesList = text ? JSON.parse(text) : [];
@@ -195,7 +195,7 @@ async function fetchEnfermedades(){
 
 async function fetchAnimales(){
   try{
-    const res = await fetch('http://192.168.1.17:7002/animales', { headers: await getAuthHeaders() });
+    const res = await fetch('http://54.243.211.195:7002/animales', { headers: await getAuthHeaders() });
     if(res.ok){
         const text = await res.text();
         animalesList = text ? JSON.parse(text) : [];
@@ -212,7 +212,7 @@ async function fetchAnimales(){
 
 async function fetchReportes(){
   try{
-    const res = await fetch('http://192.168.1.17:7002/reportes', { headers: await getAuthHeaders() });
+    const res = await fetch('http://54.243.211.195:7002/reportes', { headers: await getAuthHeaders() });
     if(res.ok){
         const text = await res.text();
         reportesList = text ? JSON.parse(text) : [];
@@ -230,7 +230,7 @@ async function fetchReportes(){
 
 async function fetchMedicamentos(){
   try{
-    const res = await fetch('http://192.168.1.17:7002/medicamento', { headers: await getAuthHeaders() });
+    const res = await fetch('http://54.243.211.195:7002/medicamento', { headers: await getAuthHeaders() });
     if(res.ok){
         const text = await res.text();
         medicamentosList = text ? JSON.parse(text) : [];
@@ -249,7 +249,7 @@ async function fetchMedicamentos(){
 // ⭐ CORRECCIÓN PRINCIPAL AQUÍ: Lectura segura del JSON
 async function fetchTratamientosFromBackend(){
   try{
-    const res = await fetch('http://192.168.1.17:7002/tratamientos', { headers: await getAuthHeaders() });
+    const res = await fetch('http://54.243.211.195:7002/tratamientos', { headers: await getAuthHeaders() });
     if(res.ok){
         // Leemos como texto primero para evitar el error "Unexpected end of JSON input"
         const text = await res.text();
@@ -320,7 +320,7 @@ btnGuardar.addEventListener('click', () => {
   console.log("Payload a enviar:", payload);
 
   try {
-      let url = 'http://192.168.1.17:7002/tratamientos';
+      let url = 'http://54.243.211.195:7002/tratamientos';
       let method = 'POST';
       
       if (editIndex !== null) {
@@ -389,7 +389,7 @@ async function confirmarEliminarTratamiento() {
    if(!isVeterinario()){ mostrarAlerta('No tiene permisos para eliminar tratamientos', 'warning'); cerrarModalEliminar(); return; }
    if(tratamientoAEliminar && tratamientoAEliminar.idTratamiento) {
      try {
-       const res = await fetch(`http://192.168.1.17:7002/tratamientos/${tratamientoAEliminar.idTratamiento}`, {
+       const res = await fetch(`http://54.243.211.195:7002/tratamientos/${tratamientoAEliminar.idTratamiento}`, {
          method: 'DELETE', headers: await getAuthHeaders()
        });
        if(res.ok) {
