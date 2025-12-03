@@ -2,11 +2,11 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background-color: #fff;
-  /* CONFIGURACIÓN CLAVE PARA DASHBOARD */
+  /* DASHBOARD LAYOUT - NO MODIFICAR */
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Evita que la página entera haga scroll */
+  overflow: hidden;
 }
 
 .header {
@@ -16,15 +16,56 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 60px; /* Altura fija */
+  height: 60px;
   box-sizing: border-box;
-  flex-shrink: 0; /* No encoger */
+  flex-shrink: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.nombre {
+  font-style: italic;
+  font-size: 1.2rem;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-volver {
+  background-color: #6bb16e;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-volver:hover {
+  background-color: #388e3c;
 }
 
 .contenedor-principal {
   display: flex;
-  flex: 1; /* Ocupa el espacio restante */
-  height: calc(100vh - 60px); /* Altura exacta restante */
+  flex: 1;
+  height: calc(100vh - 60px);
   overflow: hidden;
 }
 
@@ -38,8 +79,8 @@ body {
   padding-top: 20px;
   gap: 20px;
   transition: width 0.3s ease;
-  height: 100%; /* Ocupa todo el alto del contenedor padre */
-  overflow-y: auto; /* Scroll interno si es necesario */
+  height: 100%;
+  overflow-y: auto;
   position: relative;
   z-index: 10;
 }
@@ -48,50 +89,128 @@ body {
   width: 180px;
 }
 
+.btn-toggle-sidebar {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(114, 158, 100, 1);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-toggle-sidebar:hover {
+  background-color: rgba(94, 138, 80, 1);
+  transform: scale(1.1);
+}
+
+.btn-dashboard {
+  width: 50px;
+  height: 50px;
+  border: none;
+  background-color: rgba(114, 158, 100, 1);
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.btn-dashboard:hover {
+  background-color: rgba(94, 138, 80, 1);
+  transform: translateY(-2px);
+}
+
+.btn-dashboard span {
+  display: none;
+}
+
+.sidebar.active .btn-dashboard {
+  width: 140px;
+  justify-content: flex-start;
+  padding: 10px;
+  gap: 10px;
+}
+
+.sidebar.active .btn-dashboard span {
+  display: inline;
+}
+
+.menu-btn {
+  width: 50px;
+  height: 50px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #333;
+  border-radius: 10px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-btn:hover, .menu-btn.activo {
+  background-color: rgba(114, 158, 100, 0.2);
+}
+
+.menu-btn span {
+  display: none;
+}
+
+.sidebar.active .menu-btn {
+  width: 140px;
+  justify-content: flex-start;
+  padding: 10px;
+  gap: 10px;
+}
+
+.sidebar.active .menu-btn span {
+  display: inline;
+}
+
+.menu-btn i {
+  flex-shrink: 0;
+  min-width: 20px;
+  text-align: center;
+}
+
 /* CONTENIDO PRINCIPAL */
 .contenido {
   flex: 1;
   padding: 20px 40px;
-  height: 100%; /* Ocupa todo el alto */
-  overflow-y: auto; /* Scroll interno para el contenido */
-  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* --- Resto de estilos (Botones, Tablas, Modales) se mantienen igual --- */
+/* ESTILOS DE TABLA Y OTROS COMPONENTES (No modificados) */
+.tabla-animales {
+  width: 100%;
+  max-width: 1000px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
 
-.logo { display: flex; align-items: center; gap: 10px; }
-.logo img { width: 50px; height: 50px; border-radius: 50%; }
-.nombre { font-style: italic; font-size: 1.2rem; }
-
-.header-buttons { display: flex; gap: 10px; align-items: center; }
-.btn-volver { background-color: #6bb16e; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 14px; transition: background-color 0.3s ease; }
-.btn-volver:hover { background-color: #388e3c; }
-
-.btn-toggle-sidebar { width: 50px; height: 50px; background-color: rgba(114, 158, 100, 1); border: none; color: white; font-size: 1.5rem; cursor: pointer; border-radius: 8px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
-.btn-toggle-sidebar:hover { background-color: rgba(94, 138, 80, 1); transform: scale(1.1); }
-
-.btn-dashboard { width: 50px; height: 50px; border: none; background-color: rgba(114, 158, 100, 1); color: white; cursor: pointer; font-size: 1.2rem; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
-.btn-dashboard:hover { background-color: rgba(94, 138, 80, 1); transform: translateY(-2px); }
-.btn-dashboard span { display: none; }
-.sidebar.active .btn-dashboard { width: 140px; justify-content: flex-start; padding: 10px; gap: 10px; }
-.sidebar.active .btn-dashboard span { display: inline; }
-
-.menu-btn { width: 50px; height: 50px; border: none; background: none; cursor: pointer; font-size: 1.2rem; color: #333; border-radius: 10px; transition: all 0.3s; display: flex; align-items: center; justify-content: center; position: relative; }
-.menu-btn:hover { background-color: rgba(114, 158, 100, 0.2); }
-.menu-btn.activo { background-color: rgba(114, 158, 100, 0.3); }
-.sidebar.active .menu-btn { width: 140px; justify-content: flex-start; padding: 10px; gap: 10px; }
-.menu-btn i { flex-shrink: 0; min-width: 20px; text-align: center; }
-.menu-btn span { display: none; font-weight: 500; }
-.sidebar.active .menu-btn span { display: inline; }
-
-/* Tabla */
-.tabla-animales { width: 100%; max-width: 1000px; background: white; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); overflow: hidden; }
 .tabla-animales table { width: 100%; border-collapse: collapse; }
 .tabla-animales th, .tabla-animales td { border: 1px solid #ddd; padding: 8px; text-align: left; }
 .tabla-animales th { background-color: #f2f2f2; }
 .tabla-animales button { margin-right: 5px; cursor: pointer; border: none; background: none; font-size: 1rem; }
 
-/* Buscador y Botón Agregar */
 .buscador-agregar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; max-width: 1000px; }
 .buscador { display: flex; align-items: center; background-color: #f3f3f3; border-radius: 20px; padding: 5px 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 .buscador input { border: none; background: none; outline: none; padding: 5px 10px; }
@@ -107,11 +226,97 @@ body {
 .modal-contenido input, .modal-contenido select { width: 100%; padding: 6px 8px; margin-top: 4px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
 .modal-contenido .botones { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
 .modal-contenido .botones button { padding: 8px 15px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
-#btnGuardarAnimal, #btnGuardar, #btnGuardarSecundario { background-color: rgba(114, 158, 100, 1); color: white; }
-#btnCerrarModal, #btnCerrarVisualizar, #btnCerrarSecundario { background-color: #ccc; color: #333; }
+#btnGuardarAnimal { background-color: rgba(114, 158, 100, 1); color: white; }
+#btnCerrarModal { background-color: #ccc; color: #333; }
+
+
+/* ==========================================================
+   ESTILOS REDUCIDOS PARA ESTADÍSTICAS (Gráficas más pequeñas)
+   ========================================================== */
+
+.seccion-estadistica {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 15px 20px; /* Menos padding */
+  margin-bottom: 20px; /* Menos margen inferior */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid rgba(114, 158, 100, 1);
+  width: 100%;
+  max-width: 900px; /* Ancho máximo controlado */
+}
+
+.seccion-estadistica h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: rgba(114, 158, 100, 1);
+  font-size: 1.1rem; /* Fuente más pequeña */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.estadistica-contenedor {
+  display: flex;
+  flex-direction: row; /* Alinear lado a lado */
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap; /* Permitir que baje si es muy pequeña la pantalla */
+}
+
+.grafico-contenedor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px; /* Padding interno reducido */
+  /* TAMAÑOS REDUCIDOS PARA LA GRÁFICA */
+  min-height: 180px; 
+  width: 100%;
+  max-width: 280px; 
+  max-height: 280px;
+}
+
+.grafico-contenedor canvas {
+  max-width: 100%;
+  max-height: 180px !important; /* Forzar altura máxima del canvas */
+  width: auto !important;
+}
+
+.estadistica-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.estadistica-info p {
+  margin: 0;
+  padding: 8px 10px; /* Padding reducido */
+  background-color: #f0f7f1;
+  border-radius: 6px;
+  border-left: 3px solid rgba(114, 158, 100, 1);
+  color: #333;
+  font-size: 0.9rem; /* Fuente más pequeña */
+  line-height: 1.3;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
   .sidebar { width: 80px; padding-top: 10px; gap: 10px; }
   .sidebar:hover { width: 180px; position: fixed; left: 0; top: 60px; height: calc(100vh - 60px); z-index: 999; box-shadow: 2px 0 8px rgba(0,0,0,0.2); padding-top: 20px; gap: 20px; }
+  
+  /* Ajuste responsive para estadísticas */
+  .estadistica-contenedor {
+    flex-direction: column;
+  }
+  .grafico-contenedor {
+    max-width: 100%;
+    min-height: 200px;
+  }
+  .estadistica-info {
+    max-width: 100%;
+  }
 }

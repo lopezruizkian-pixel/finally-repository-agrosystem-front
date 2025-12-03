@@ -1,98 +1,199 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+/* =========================================
+   LAYOUT GENERAL (IGUAL AL DASHBOARD)
+   ========================================= */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    padding: 20px;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #fff; /* Fondo blanco limpio */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
+.header {
+  background-color: rgba(114, 158, 100, 1);
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
-h1 {
-    color: white;
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo img { width: 50px; height: 50px; border-radius: 50%; }
+.nombre { font-style: italic; font-size: 1.2rem; }
+
+.contenedor-principal {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+}
+
+/* SIDEBAR */
+.sidebar {
+  background-color: rgba(173, 199, 166, 1);
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  gap: 20px;
+  transition: width 0.3s ease;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar.active { width: 180px; }
+
+.btn-toggle-sidebar, .btn-dashboard, .menu-btn {
+  /* Estilos compartidos de botones del sidebar */
+  width: 50px; height: 50px;
+  border: none; background: none;
+  cursor: pointer; color: #333;
+  border-radius: 8px; transition: all 0.3s;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.btn-dashboard { background-color: rgba(114, 158, 100, 1); color: white; margin-bottom: 10px; }
+.btn-dashboard:hover { background-color: rgba(94, 138, 80, 1); transform: translateY(-2px); }
+.menu-btn:hover, .menu-btn.activo { background-color: rgba(114, 158, 100, 0.2); }
+
+.sidebar.active .btn-dashboard, 
+.sidebar.active .menu-btn { width: 140px; justify-content: flex-start; padding: 10px; gap: 10px; }
+
+.btn-dashboard span, .menu-btn span { display: none; font-weight: 500; }
+.sidebar.active .btn-dashboard span, 
+.sidebar.active .menu-btn span { display: inline; }
+
+.menu-btn i, .btn-dashboard i { flex-shrink: 0; min-width: 20px; text-align: center; }
+
+/* CONTENIDO PRINCIPAL */
+.contenido {
+  flex: 1;
+  padding: 20px 40px;
+  height: 100%;
+  overflow-y: auto; /* Scroll interno */
+  box-sizing: border-box;
+  background-color: #f8f9fa;
+}
+
+/* =========================================
+   ESTILOS ESPECÍFICOS DE ESTADÍSTICAS
+   (Más compactos y limpios)
+   ========================================= */
+
+#tituloEstadistica {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  border-bottom: 2px solid rgba(114, 158, 100, 1);
+  padding-bottom: 10px;
+}
+
+/* Grid para poner las tarjetas una al lado de la otra si hay espacio */
+.grid-estadisticas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.seccion-estadistica {
+  background-color: #fff;
+  border-radius: 10px;
+  /* Padding reducido para hacerlo más compacto */
+  padding: 15px 20px; 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid rgba(114, 158, 100, 1);
+  margin-bottom: 0; /* El margen lo maneja el grid */
+}
+
+.seccion-estadistica h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: rgba(114, 158, 100, 1);
+  font-size: 1.1rem; /* Fuente más pequeña */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.estadistica-contenedor {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  gap: 15px;
+}
+
+.grafico-contenedor {
+  /* Contenedor de gráfico más pequeño */
+  position: relative;
+  height: 200px; 
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.grafico-contenedor canvas {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.estadistica-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  max-width: 250px;
+}
+
+.estadistica-info p {
+  margin: 0;
+  padding: 8px 10px;
+  background-color: #f1f5f1;
+  border-radius: 6px;
+  color: #444;
+  font-size: 0.9rem; /* Texto más compacto */
+  border-left: 2px solid rgba(114, 158, 100, 0.5);
+}
+
+.estadistica-info strong {
+  color: rgba(114, 158, 100, 1);
+}
+
+.estadistica-info i {
+  margin-right: 6px;
+  color: rgba(114, 158, 100, 0.8);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .sidebar { width: 80px; padding-top: 10px; gap: 10px; }
+  .sidebar:hover { width: 180px; position: fixed; left: 0; top: 60px; height: calc(100vh - 60px); z-index: 999; box-shadow: 2px 0 8px rgba(0,0,0,0.2); padding-top: 20px; gap: 20px; }
+  
+  .estadistica-contenedor {
+    flex-direction: column;
     text-align: center;
-    margin-bottom: 30px;
-    font-size: 2.5rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-}
-
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 30px;
-    margin-bottom: 30px;
-}
-
-.chart-card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    transition: transform 0.3s ease;
-}
-
-.chart-card:hover {
-    transform: translateY(-5px);
-}
-
-.chart-title {
-    font-size: 1.3rem;
-    color: #333;
-    margin-bottom: 20px;
-    text-align: center;
-    font-weight: 600;
-}
-
-.stats-summary {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.stat-box {
-    text-align: center;
-    padding: 20px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.stat-number {
-    font-size: 3rem;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.stat-label {
-    font-size: 1rem;
-    opacity: 0.9;
-}
-
-.loading {
-    text-align: center;
-    color: white;
-    font-size: 1.5rem;
-    padding: 50px;
-}
-
-.error {
-    background: #ff4757;
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    margin: 20px 0;
+  }
+  
+  .grafico-contenedor {
+    width: 100%;
+    max-width: 250px;
+    margin-bottom: 15px;
+  }
+  
+  .estadistica-info {
+    width: 100%;
+    max-width: none;
+  }
 }
