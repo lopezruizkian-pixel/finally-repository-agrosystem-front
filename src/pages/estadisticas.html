@@ -15,21 +15,21 @@
       <img src="/ags-front/src/img/logo.png" alt="Logo Agrosystem">
       <span class="nombre">AGROSYSTEM</span>
     </div>
-    <div class="header-buttons">
-      <button onclick="irHome()" class="btn-volver">
-        <i class="fas fa-arrow-left"></i> Volver al Inicio
-      </button>
-    </div>
+   
   </header>
 
   <div class="contenedor-principal">
-    <aside class="sidebar">
-      <button class="menu-btn"><i class="fas fa-cow"></i> Animal</button>
-      <button class="menu-btn"><i class="fas fa-pills"></i> Medicamento</button>
-      <button class="menu-btn"><i class="fas fa-file-alt"></i> Tarjeta de salud</button>
-      <button class="menu-btn"><i class="fas fa-notes-medical"></i> Reporte médico</button>
-      <button class="menu-btn"><i class="fas fa-syringe"></i> Tratamiento</button>
-      <button class="menu-btn activo"><i class="fas fa-shield-virus"></i> Enfermedad</button>
+    <aside class="sidebar" id="sidebar">
+      <button class="btn-dashboard" onclick="irHome()">
+        <i class="fas fa-home"></i>
+        <span>Inicio</span>
+      </button>
+      <button class="menu-btn"><i class="fas fa-cow"></i> <span>Animal</span></button>
+      <button class="menu-btn"><i class="fas fa-pills"></i> <span>Medicamento</span></button>
+      <button class="menu-btn"><i class="fas fa-file-alt"></i> <span>Tarjeta de salud</span></button>
+      <button class="menu-btn"><i class="fas fa-notes-medical"></i> <span>Reporte médico</span></button>
+      <button class="menu-btn"><i class="fas fa-syringe"></i> <span>Tratamiento</span></button>
+      <button class="menu-btn activo"><i class="fas fa-shield-virus"></i> <span>Enfermedad</span></button>
     </aside>
 
     <main class="contenido">
@@ -59,6 +59,8 @@
     </main>
   </div>
 
+  <script src="/ags-front/src/js/estadisticas.js" defer></script>
+  <script src="../js/sidebar.js" defer></script>
   <script src="/ags-front/src/js/estadisticas.js" defer></script>
   <script src="/ags-front/src/js/navegacion.js" defer></script>
   <script src="../js/estadisticas.js" defer></script>

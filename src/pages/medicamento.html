@@ -16,21 +16,21 @@
       <img src="/ags-front/src/img/logo.png" alt="Logo Agrosystem">
       <span class="nombre">AGROSYSTEM</span>
     </div>
-    <div class="header-buttons">
-      <button onclick="irHome()" class="btn-volver">
-        <i class="fas fa-arrow-left"></i> Volver al Inicio
-      </button>
-    </div>
+   
   </header>
 
   <div class="contenedor-principal">
-    <aside class="sidebar">
-      <button class="menu-btn"><i class="fas fa-cow"></i> Animal</button>
-      <button class="menu-btn activo"><i class="fas fa-pills"></i> Medicamento</button>
-      <button class="menu-btn"><i class="fas fa-file-alt"></i> Tarjeta de salud</button>
-      <button class="menu-btn"><i class="fas fa-notes-medical"></i> Reporte médico</button>
-      <button class="menu-btn"><i class="fas fa-syringe"></i> Tratamiento</button>
-      <button class="menu-btn"><i class="fas fa-shield-virus"></i> Enfermedad</button>
+    <aside class="sidebar" id="sidebar">
+      <button class="btn-dashboard" onclick="irHome()">
+        <i class="fas fa-home"></i>
+        <span>Inicio</span>
+      </button>
+      <button class="menu-btn"><i class="fas fa-cow"></i> <span>Animal</span></button>
+      <button class="menu-btn activo"><i class="fas fa-pills"></i> <span>Medicamento</span></button>
+      <button class="menu-btn"><i class="fas fa-file-alt"></i> <span>Tarjeta de salud</span></button>
+      <button class="menu-btn"><i class="fas fa-notes-medical"></i> <span>Reporte médico</span></button>
+      <button class="menu-btn"><i class="fas fa-syringe"></i> <span>Tratamiento</span></button>
+      <button class="menu-btn"><i class="fas fa-shield-virus"></i> <span>Enfermedad</span></button>
     </aside>
 
     <main class="contenido">
@@ -53,33 +53,6 @@
       <label>Nombre:</label>
       <input type="text" id="nombre">
 
-      <label>Presentacion:</label>
-      <select id="formaFarmaceutica">
-        <option value="">Seleccionar</option>
-        <option value="Solución Inyectable">Solución Inyectable</option>
-        <option value="Suspensión Inyectable">Suspensión Inyectable</option>
-        <option value="Polvo Soluble">Polvo Soluble</option>
-        <option value="Comprimido/Bolo Oral">Comprimido/Bolo Oral</option>
-        <option value="Tópico (Pour-on)">Tópico (Pour-on)</option>
-        <option value="Premix (para alimento)">Premix (para alimento)</option>
-        <option value="Ungüento">Ungüento</option>
-        <option value="otro">Otro</option>
-      </select>
-      <input type="text" id="formaFarmaceuticaOtro" placeholder="Especificar otra forma" style="display:none;">
-
-      <label>Contenido:</label>
-      <select id="contenido">
-        <option value="">Seleccionar...</option>
-        <option value="10 ml">10 ml</option>
-        <option value="50 ml">50 ml</option>
-        <option value="100 ml">100 ml</option>
-        <option value="500 ml">500 ml</option>
-        <option value="1 kg">1 kg</option>
-        <option value="20 kg">20 kg</option>
-        <option value="otro">Otro</option>
-      </select>
-      <input type="text" id="contenidoOtro" placeholder="Especificar otro contenido" style="display:none;">
-
       <h3>Dosis</h3>
       <label>Unidad de Dosis:</label>
       <select id="unidadDosis">
@@ -91,8 +64,6 @@
         <option value="g/tonelada de alimento">g/tonelada de alimento</option>
       </select>
 
-      <label>Valor de Dosis:</label>
-      <input type="number" id="valorDosis" step="0.1" placeholder="Ej: 0.5, 1.0, 10.0">
 
       <label>Vía de Administración:</label>
       
@@ -150,16 +121,7 @@
         <option value="Continuo">Continuo</option>
       </select>
 
-      <label>Duración:</label>
-      <select id="duracion">
-        <option value="">Seleccionar...</option>
-        <option value="1 día">1 día</option>
-        <option value="3 días">3 días</option>
-        <option value="5 días">5 días</option>
-        <option value="7 días">7 días</option>
-        <option value="Hasta remisión clínica">Hasta remisión clínica</option>
-      </select>
-
+    
       <label>Indicaciones:</label>
       <input type="text" id="indicaciones">
 
@@ -186,13 +148,9 @@
 
 
   <script src="/ags-front/src/js/medicamento.js"></script>
+  <script src="../js/sidebar.js" defer></script>
   <script src="/ags-front/src/js/navegacion.js"></script>
   <script src="../js/navegacion.js" defer></script>
   <script src="../js/medicamento.js" defer></script>
-  
-<script>
- 
-</script>
-
 </body>
 </html>
