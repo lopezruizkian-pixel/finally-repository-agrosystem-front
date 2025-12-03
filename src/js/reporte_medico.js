@@ -2,83 +2,77 @@
 // SISTEMA DE ALERTAS PERSONALIZADAS
 // =====================
 function mostrarAlerta(tipo, titulo, mensaje) {
-    const overlay = document.createElement("div");
-    overlay.classList.add("alerta-overlay", "active");
+        const overlay = document.createElement('div');
+        overlay.classList.add('alerta-overlay', 'active');
+        overlay.innerHTML = `
+                <div class="alerta-container">
+                        <div class="alerta-header ${tipo}">
+                                <i class="fas fa-info-circle alerta-icon"></i>
+                                <h3 class="alerta-title">${titulo}</h3>
+                        </div>
+                        <div class="alerta-body">
+                                <p class="alerta-message">${mensaje}</p>
+                        </div>
+                        <div class="alerta-footer">
+                                <button class="btn-alerta-ok">Aceptar</button>
+                        </div>
+                </div>
+        `;
+        document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden';
 
-    overlay.innerHTML = `
-        <div class="alerta-container">
-            <div class="alerta-header ${tipo}">
-                <span class="alerta-icon">⚠️</span>
-                <h3 class="alerta-title">${titulo}</h3>
-            </div>
-            <div class="alerta-body">
-                <p class="alerta-message">${mensaje}</p>
-            </div>
-            <div class="alerta-footer">
-                <button class="btn-alerta-ok">Aceptar</button>
-            </div>
-        </div>
-    `;
+        const btn = overlay.querySelector('.btn-alerta-ok');
+        if (btn) btn.addEventListener('click', () => {
+                overlay.remove();
+                document.body.style.overflow = 'auto';
+        });
 
-    document.body.appendChild(overlay);
-
-    overlay.querySelector(".btn-alerta-ok").addEventListener("click", () => {
-        overlay.remove();
-    });
+        // close on ESC
+        const esc = (e) => { if (e.key === 'Escape' && document.body.contains(overlay)) { overlay.remove(); document.body.style.overflow = 'auto'; document.removeEventListener('keydown', esc); } };
+        document.addEventListener('keydown', esc);
 }
 
 // Mostrar confirmación con botones Sí / No. Devuelve Promise<boolean>.
 function mostrarConfirmacion(titulo, mensaje) {
-    return new Promise(resolve => {
-        // build a modal matching the animals' delete modal style
-        const overlay = document.createElement('div');
-        overlay.classList.add('modal-overlay', 'active');
-        overlay.id = 'modalConfirmacionTemp';
-        overlay.innerHTML = `
-            <div class="modal-container">
-              <div class="modal-header-custom">
-                <h2 class="modal-title-custom"><i class="fas fa-exclamation-triangle"></i> ${titulo}</h2>
-                <button class="btn-close-custom" id="_closeConfirmTemp"><i class="fas fa-times"></i></button>
-              </div>
-              <div class="modal-body-custom">
-                <div class="modal-icon-warning" style="background-color: #fff3cd;">
-                  <i class="fas fa-exclamation-circle" style="color: #856404;"></i>
-                </div>
-                <p class="modal-message">${mensaje}</p>
-              </div>
-              <div class="modal-footer-custom">
-                <button class="btn-modal-cancelar" id="_confirmNo">No</button>
-                <button class="btn-modal-confirmar" id="_confirmYes">Sí</button>
-              </div>
-            </div>
-        `;
+        return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.classList.add('modal-overlay', 'active');
+                overlay.id = 'modalConfirmacionTemp';
+                overlay.innerHTML = `
+                        <div class="modal-container">
+                            <div class="modal-header-custom">
+                                <h2 class="modal-title-custom"><i class="fas fa-exclamation-triangle"></i> ${titulo}</h2>
+                                <button class="btn-close-custom" id="_closeConfirmTemp"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="modal-body-custom">
+                                <div class="modal-icon-warning" style="background-color: #fff3cd;">
+                                    <i class="fas fa-exclamation-circle" style="color: #856404;"></i>
+                                </div>
+                                <p class="modal-message">${mensaje}</p>
+                            </div>
+                            <div class="modal-footer-custom">
+                                <button class="btn-modal-cancelar" id="_confirmNo">No</button>
+                                <button class="btn-modal-confirmar" id="_confirmYes">Sí</button>
+                            </div>
+                        </div>
+                `;
 
-        document.body.appendChild(overlay);
-        document.body.style.overflow = 'hidden';
+                document.body.appendChild(overlay);
+                document.body.style.overflow = 'hidden';
 
-        const cleanup = () => {
-            const el = document.getElementById('modalConfirmacionTemp');
-            if (el && el.parentNode) el.parentNode.removeChild(el);
-            document.body.style.overflow = 'auto';
-        };
+                const cleanup = () => { if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay); document.body.style.overflow = 'auto'; };
+                const yes = document.getElementById('_confirmYes');
+                const no = document.getElementById('_confirmNo');
+                const close = document.getElementById('_closeConfirmTemp');
 
-        const yes = document.getElementById('_confirmYes');
-        const no = document.getElementById('_confirmNo');
-        const close = document.getElementById('_closeConfirmTemp');
+                if (yes) yes.addEventListener('click', () => { cleanup(); resolve(true); });
+                if (no) no.addEventListener('click', () => { cleanup(); resolve(false); });
+                if (close) close.addEventListener('click', () => { cleanup(); resolve(false); });
 
-        const onYes = () => { cleanup(); resolve(true); };
-        const onNo = () => { cleanup(); resolve(false); };
-
-        if (yes) yes.addEventListener('click', onYes);
-        if (no) no.addEventListener('click', onNo);
-        if (close) close.addEventListener('click', onNo);
-
-        // close on ESC
-        const escHandler = (e) => { if (e.key === 'Escape') { onNo(); document.removeEventListener('keydown', escHandler); } };
-        document.addEventListener('keydown', escHandler);
-        // clicking outside
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) onNo(); });
-    });
+                const escHandler = (e) => { if (e.key === 'Escape') { cleanup(); resolve(false); document.removeEventListener('keydown', escHandler); } };
+                document.addEventListener('keydown', escHandler);
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) { cleanup(); resolve(false); } });
+        });
 }
 
 
@@ -89,7 +83,6 @@ function mostrarConfirmacion(titulo, mensaje) {
 const btnAgregar = document.querySelector(".btn-agregar");
 const modalAgregar = document.getElementById("modalAgregarReporte");
 const modalVisualizar = document.getElementById("modalVisualizarReporte");
-
 const btnCerrarAgregar = document.getElementById("btnCerrarModal");
 const btnCerrarVisualizar = document.getElementById("btnCerrarVisualizar");
 const btnGuardar = document.getElementById("btnGuardarReporte");
@@ -391,24 +384,31 @@ btnGuardar.addEventListener("click", async () => {
     // Construir payload para backend
     const selectedAnimal = selectAnimalReporte ? selectAnimalReporte.value : '';
     const fecha = document.getElementById("fecha").value;
-    const temperatura = document.getElementById("temperatura").value; // Ahora es select
+    const temperatura = document.getElementById("temperatura").value; // Ahora es select (etiqueta)
     const condicionCorporal = document.getElementById("condicionCorporal").value; // Ahora es select
     const frecuenciaRespiratoria = document.getElementById("frecuenciaRespiratoria").value; // Ahora es select
     
-    // Obtener síntomas como array de checkboxes
-    const sintomasArray = getCheckboxValues('sintomas');
-    const sintomas = sintomasArray.join(', ');
+    // sintomas eliminado del payload (no se recoge ni se envía)
     
     const diagnosticoPresuntivo = document.getElementById("diagnosticoPresuntivo").value;
     const diagnosticoDefinitivo = document.getElementById("diagnosticoDefinitivo").value;
 
-    if(!selectedAnimal || !fecha || !temperatura || !condicionCorporal || !frecuenciaRespiratoria || sintomasArray.length === 0){
-        mostrarAlerta('warning','Campos incompletos','Seleccione un animal, fecha, temperatura, condición corporal, frecuencia respiratoria y al menos un síntoma.');
+    // Validación robusta: comprobar campos obligatorios y evitar falsos positivos
+    const missing = [];
+    if(selectedAnimal === '' || selectedAnimal === null || typeof selectedAnimal === 'undefined') missing.push('Animal');
+    if(!fecha || String(fecha).trim() === '') missing.push('Fecha');
+    if(!temperatura || String(temperatura).trim() === '') missing.push('Temperatura');
+    if(!condicionCorporal || String(condicionCorporal).trim() === '') missing.push('Condición corporal');
+    if(!frecuenciaRespiratoria || String(frecuenciaRespiratoria).trim() === '') missing.push('Frecuencia respiratoria');
+    // sintomas ya no es obligatorio ni se envía al backend
+
+    if(missing.length > 0){
+        mostrarAlerta('warning','Campos incompletos', `Faltan los siguientes campos obligatorios: ${missing.join(', ')}.`);
         return;
     }
 
-    // obtener idUsuario desde sessionStorage (preferido) o localStorage
-    const datosUsuarioRaw = sessionStorage.getItem('datosUsuarioAgroSystem') || localStorage.getItem('datosUsuarioAgroSystem') || '';
+    // obtener idUsuario desde localStorage (requerido por contrato)
+    const datosUsuarioRaw = localStorage.getItem('datosUsuarioAgroSystem') || '';
     let idUsuario = null;
     if(datosUsuarioRaw){
         try{
@@ -419,18 +419,81 @@ btnGuardar.addEventListener("click", async () => {
             idUsuario = datosUsuarioRaw;
         }
     }
-    const idUsuarioForPayload = (!isNaN(Number(idUsuario)) && idUsuario !== null) ? Number(idUsuario) : idUsuario || 0;
+    const idUsuarioForPayload = (!isNaN(Number(idUsuario)) && idUsuario !== null) ? Number(idUsuario) : (idUsuario || '');
     console.debug('Using idUsuario for payload/header:', idUsuarioForPayload);
 
+    // Formatear fecha a yyyy-mm-dd (asegurar consistencia)
+    let fechaIso = fecha;
+    try{
+        if(fecha){
+            const d = new Date(fecha);
+            if(!isNaN(d.getTime())){
+                const yy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2,'0');
+                const dd = String(d.getDate()).padStart(2,'0');
+                fechaIso = `${yy}-${mm}-${dd}`;
+            }
+        }
+    }catch(e){ /* keep original */ }
+
+    // Convertir valores a tipos esperados por la API
+    const idAnimalesInt = Number(selectedAnimal);
+    // La API espera un entero para frecuenciaRespiratoria. El select usa etiquetas
+    // como "Normal (10-30 resp/min)" — mapearlas a un entero representativo.
+    function parseFrecuencia(raw){
+        if(raw === null || raw === undefined) return NaN;
+        const s = String(raw).trim();
+        // si ya es numérico
+        if(/^\d+$/.test(s)) return parseInt(s,10);
+        // buscar rango como 10-30
+        const range = s.match(/(\d+)\s*-\s*(\d+)/);
+        if(range){ const a = Number(range[1]), b = Number(range[2]); if(!isNaN(a)&&!isNaN(b)) return Math.round((a+b)/2); }
+        // buscar >40 o >=40
+        const gt = s.match(/>\s*(\d+)/);
+        if(gt){ const v = Number(gt[1]); if(!isNaN(v)) return v + 1; }
+        // buscar single number in parentheses
+        const single = s.match(/(\d+)/);
+        if(single){ const v = Number(single[1]); if(!isNaN(v)) return v; }
+        return NaN;
+    }
+    const frecuenciaResp = parseFrecuencia(frecuenciaRespiratoria);
+
+    // La API espera un double para 'temperatura' — mapear la etiqueta a un número.
+    function parseTemperatura(raw){
+        if(raw === null || raw === undefined) return NaN;
+        const s = String(raw).trim();
+        // si ya es decimal/numérico
+        if(/^\d+(?:\.\d+)?$/.test(s)) return parseFloat(s);
+        // buscar rango como 38-39 o 38-39°C
+        const range = s.match(/(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)/);
+        if(range){ const a = Number(range[1]), b = Number(range[2]); if(!isNaN(a)&&!isNaN(b)) return (a + b) / 2; }
+        // buscar >40 o > 40°C
+        const gt = s.match(/>\s*(\d+(?:\.\d+)?)/);
+        if(gt){ const v = Number(gt[1]); if(!isNaN(v)) return v + 1; }
+        // buscar número simple dentro del texto
+        const single = s.match(/(\d+(?:\.\d+)?)/);
+        if(single){ const v = Number(single[1]); if(!isNaN(v)) return v; }
+        return NaN;
+    }
+    const temperaturaNum = parseTemperatura(temperatura);
+
+    // Validaciones de tipos
+    if(isNaN(idAnimalesInt) || idAnimalesInt <= 0){ mostrarAlerta('warning','Error','Seleccione un animal válido.'); return; }
+    if(isNaN(frecuenciaResp) ){ mostrarAlerta('warning','Error','La frecuencia respiratoria debe ser un entero válido. Revise la selección.'); return; }
+    if(isNaN(temperaturaNum)){ mostrarAlerta('warning','Error','La temperatura debe mapearse a un número válido (ej. 38.5). Revise la selección.'); return; }
+
     const payload = {
-        idAnimales: { idAnimal: Number(selectedAnimal) },
-        idUsuario: { idUsuario: idUsuarioForPayload },
-        temperatura: temperatura, // Mantener como string (categoría)
-        condicionCorporal: condicionCorporal, // Mantener como string
-        frecuenciaRespiratoria: frecuenciaRespiratoria, // Mantener como string (categoría)
-        fecha: fecha,
-        diagnosticoPresuntivo: diagnosticoPresuntivo || '',
-        diagnosticoDefinitivo: diagnosticoDefinitivo || ''
+        // idAnimales como entero (no objeto)
+        idAnimales: idAnimalesInt,
+        // idUsuario como entero (si disponible)
+        idUsuario: (typeof idUsuarioForPayload === 'number' && !isNaN(idUsuarioForPayload)) ? Number(idUsuarioForPayload) : undefined,
+        temperatura: Number(temperaturaNum),
+        condicionCorporal: String(condicionCorporal || ''),
+        frecuenciaRespiratoria: frecuenciaResp,
+        fecha: String(fechaIso || ''),
+        diagnosticoPresuntivo: String(diagnosticoPresuntivo || ''),
+        diagnosticoDefinitivo: String(diagnosticoDefinitivo || ''),
+        // sintomas removed by request
     };
 
     let resolvedIdForHeader = null;
@@ -449,6 +512,8 @@ btnGuardar.addEventListener("click", async () => {
         return;
     }
 
+    console.log(payload);
+    
     if(currentEditingId){
         await updateReporteBackend(payload, currentEditingId, resolvedIdForHeader);
     } else {
